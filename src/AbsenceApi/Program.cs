@@ -1,9 +1,12 @@
+using AbsenceApi.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<AbsenceMockService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",

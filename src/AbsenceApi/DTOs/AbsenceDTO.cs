@@ -9,7 +9,7 @@ public class AbsenceDTO
     [Required]
     public string Name { get; set; } = null!;
     [Required]
-    public int AbsenceTypeId { get; set; }
+    public AbsenceTypeDTO Type { get; set; } = null!;
     [Required]
     public DateTime StartDate { get; set; }
     [Required]

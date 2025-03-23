@@ -5,7 +5,7 @@ namespace AbsenceApi.Controllers;
 
 [ApiController]
 [Route("absence_types")]
-public class AbsenceTypeController(ILogger<AbsenceTypeController> logger) : ControllerBase
+public class AbsenceTypesController(ILogger<AbsenceTypesController> logger) : ControllerBase
 {
     [HttpGet]
     public ActionResult<IEnumerable<AbsenceTypeDTO>> Get()
