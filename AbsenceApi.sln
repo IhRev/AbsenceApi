@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35806.99
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{52959981-CD71-4A6E-A3C8-AA16ED9CC685}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{321B278B-8756-4EB8-8050-6A76F92F1AD6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbsenceApi", "src\AbsenceApi\AbsenceApi.csproj", "{87179F4B-168E-44ED-BE87-814AA6A11C98}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{87179F4B-168E-44ED-BE87-814AA6A11C98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87179F4B-168E-44ED-BE87-814AA6A11C98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87179F4B-168E-44ED-BE87-814AA6A11C98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87179F4B-168E-44ED-BE87-814AA6A11C98}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{87179F4B-168E-44ED-BE87-814AA6A11C98} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {72776A4E-01AC-425B-AA30-E901843C6C73}
+	EndGlobalSection
+EndGlobal

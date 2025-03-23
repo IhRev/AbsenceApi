@@ -1,0 +1,6 @@
+@AbsenceApi_HostAddress = http://localhost:5249
+
+GET {{AbsenceApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
