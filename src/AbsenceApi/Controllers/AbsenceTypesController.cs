@@ -10,25 +10,33 @@ public class AbsenceTypesController(ILogger<AbsenceTypesController> logger) : Co
     [HttpGet]
     public ActionResult<IEnumerable<AbsenceTypeDTO>> Get()
     {
-        return Ok(
-            new[] 
-            { 
-                new AbsenceTypeDTO() 
-                { 
-                    Id = 1, 
-                    Name = "Remote Work" 
-                }, 
-                new AbsenceTypeDTO()
+        try
+        {
+            return Ok(
+                new[]
                 {
-                    Id = 2,
-                    Name = "Vacation Leave"
-                },
-                new AbsenceTypeDTO()
-                {
-                    Id = 3,
-                    Name = "Sick"
+                    new AbsenceTypeDTO()
+                    {
+                        Id = 1,
+                        Name = "Remote Work"
+                    },
+                    new AbsenceTypeDTO()
+                    {
+                        Id = 2,
+                        Name = "Vacation Leave"
+                    },
+                    new AbsenceTypeDTO()
+                    {
+                        Id = 3,
+                        Name = "Sick"
+                    }
                 }
-            } 
-        );
+            );
+        }
+        catch (Exception e)
+        {
+            logger.LogCritical(e, "");
+            return StatusCode(500);
+        }
     }
 }

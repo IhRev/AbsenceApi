@@ -1,4 +1,6 @@
+using AbsenceApi.Database.Contexts;
 using AbsenceApi.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel();
@@ -7,6 +9,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<AbsenceMockService>();
+builder.Services.AddDbContext<AbsenceContext>(opt => opt.UseSqlServer(""));
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",

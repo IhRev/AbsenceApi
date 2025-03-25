@@ -8,7 +8,7 @@ namespace AbsenceApi.Controllers;
 [Route("absences")]
 public class AbsencesController(ILogger<AbsencesController> logger, AbsenceMockService absenceService) : ControllerBase
 {
-    private static int lastId = 0;
+    private readonly ILogger<AbsencesController> _logger = logger;
     private readonly AbsenceMockService _absenceService = absenceService;
 
     [HttpGet]
@@ -20,7 +20,7 @@ public class AbsencesController(ILogger<AbsencesController> logger, AbsenceMockS
         }
         catch (Exception e)
         {
-            logger.LogCritical(e, "");
+            _logger.LogCritical(e, "");
             return StatusCode(500);
         }
     }
@@ -34,7 +34,7 @@ public class AbsencesController(ILogger<AbsencesController> logger, AbsenceMockS
         }
         catch (Exception e)
         {
-            logger.LogCritical(e, "");
+            _logger.LogCritical(e, "");
             return StatusCode(500);
         }
     }
