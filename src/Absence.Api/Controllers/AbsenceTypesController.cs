@@ -7,6 +7,8 @@ namespace AbsenceApi.Controllers;
 [Route("absence_types")]
 public class AbsenceTypesController(ILogger<AbsenceTypesController> logger) : ControllerBase
 {
+    private readonly ILogger<AbsenceTypesController> _logger = logger;
+
     [HttpGet]
     public ActionResult<IEnumerable<AbsenceTypeDTO>> Get()
     {
@@ -35,7 +37,7 @@ public class AbsenceTypesController(ILogger<AbsenceTypesController> logger) : Co
         }
         catch (Exception e)
         {
-            logger.LogCritical(e, "");
+            _logger.LogCritical(e, "");
             return StatusCode(500);
         }
     }

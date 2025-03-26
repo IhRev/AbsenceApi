@@ -8,5 +8,9 @@ public class OrganizationEntityConfiguration : EntityConfiguration<OrganizationE
     public override void Configure(EntityTypeBuilder<OrganizationEntity> builder)
     {
         base.Configure(builder);
+
+        builder
+            .Property(_ => _.Name)
+            .IsRequired();
     }
 }
