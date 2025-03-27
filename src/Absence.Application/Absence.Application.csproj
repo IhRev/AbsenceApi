@@ -6,4 +6,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Absence.Domain\Absence.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\Abstractions\" />
+    <Folder Include="UseCases\Absences\" />
+    <Folder Include="UseCases\AbsenceTypes\" />
+    <Folder Include="UseCases\Organizations\" />
+    <Folder Include="UseCases\Users\" />
+  </ItemGroup>
+
 </Project>

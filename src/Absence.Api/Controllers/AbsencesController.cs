@@ -1,22 +1,20 @@
-using AbsenceApi.DTOs;
-using AbsenceApi.Services;
+using Absence.Application.Common.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AbsenceApi.Controllers;
+namespace Absence.Api.Controllers;
 
 [ApiController]
 [Route("absences")]
-public class AbsencesController(ILogger<AbsencesController> logger, AbsenceMockService absenceService) : ControllerBase
+public class AbsencesController(ILogger<AbsencesController> logger) : ControllerBase
 {
     private readonly ILogger<AbsencesController> _logger = logger;
-    private readonly AbsenceMockService _absenceService = absenceService;
 
     [HttpGet]
     public ActionResult<IEnumerable<AbsenceDTO>> Get()
     {
         try
         {
-            return Ok(_absenceService.GetAll());
+            return Ok();
         }
         catch (Exception e)
         {
@@ -30,7 +28,7 @@ public class AbsencesController(ILogger<AbsencesController> logger, AbsenceMockS
     {
         try
         {
-            return Ok(_absenceService.Add(absence));
+            return Ok();
         }
         catch (Exception e)
         {

@@ -1,6 +1,6 @@
-﻿using AbsenceApi.Common;
+﻿using Absence.Domain.Common;
 
-namespace AbsenceApi.Entities;
+namespace Absence.Domain.Entities;
 
 public class AbsenceEntity : IIdKeyed<int>
 {

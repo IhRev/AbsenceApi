@@ -1,7 +1,7 @@
-﻿using AbsenceApi.DTOs;
+﻿using Absence.Application.Common.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AbsenceApi.Controllers;
+namespace Absence.Api.Controllers;
 
 [ApiController]
 [Route("absence_types")]

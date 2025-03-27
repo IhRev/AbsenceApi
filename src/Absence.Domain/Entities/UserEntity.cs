@@ -1,7 +1,7 @@
-﻿using AbsenceApi.Common;
+﻿using Absence.Domain.Common;
 using Microsoft.AspNetCore.Identity;
 
-namespace AbsenceApi.Entities;
+namespace Absence.Domain.Entities;
 
 public class UserEntity : IdentityUser, IIdKeyed<string>
 {

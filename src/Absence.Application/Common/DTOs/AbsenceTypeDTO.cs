@@ -1,4 +1,4 @@
-﻿namespace AbsenceApi.DTOs;
+﻿namespace Absence.Application.Common.DTOs;
 
 public class AbsenceTypeDTO
 {

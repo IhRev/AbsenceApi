@@ -1,8 +1,10 @@
-﻿using AbsenceApi.DTOs;
+﻿using Absence.Application.Common.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AbsenceApi.Controllers;
+namespace Absence.Api.Controllers;
 
+[ApiController]
+[Route("users")]
 public class UsersController(ILogger<AbsencesController> logger) : ControllerBase
 {
     private readonly ILogger<AbsencesController> _logger = logger;

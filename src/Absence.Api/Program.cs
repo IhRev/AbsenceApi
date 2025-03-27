@@ -1,7 +1,4 @@
-using AbsenceApi.Database.Contexts;
-using AbsenceApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -11,8 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<AbsenceMockService>();
-builder.Services.AddDbContext<AbsenceContext>(opt => opt.UseSqlServer(""));
+//builder.Services.AddDbContext<AbsenceContext>(opt => opt.UseSqlServer(""));
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
@@ -47,7 +43,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", nameof(AbsenceApi));
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Absence.Api");
         c.RoutePrefix = string.Empty;
     });
 }

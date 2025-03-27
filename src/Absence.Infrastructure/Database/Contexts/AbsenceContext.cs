@@ -1,9 +1,9 @@
-﻿using AbsenceApi.Entities;
+﻿using Absence.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace AbsenceApi.Database.Contexts;
+namespace Absence.Infrastructure.Database.Contexts;
 
 public class AbsenceContext(DbContextOptions options) : IdentityDbContext(options)
 {

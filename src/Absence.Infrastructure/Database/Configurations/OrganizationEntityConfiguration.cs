@@ -1,7 +1,7 @@
-﻿using AbsenceApi.Entities;
+﻿using Absence.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AbsenceApi.Database.EntityConfigurations;
+namespace Absence.Infrastructure.Database.Configurations;
 
 public class OrganizationEntityConfiguration : EntityConfiguration<OrganizationEntity, int>
 {
