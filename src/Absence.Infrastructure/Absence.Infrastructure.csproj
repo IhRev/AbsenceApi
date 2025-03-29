@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Database\Migrations\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Absence.Application\Absence.Application.csproj" />
     <ProjectReference Include="..\Absence.Domain\Absence.Domain.csproj" />
   </ItemGroup>
 

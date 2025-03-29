@@ -11,11 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Abstractions\" />
-    <Folder Include="UseCases\Absences\" />
-    <Folder Include="UseCases\AbsenceTypes\" />
     <Folder Include="UseCases\Organizations\" />
     <Folder Include="UseCases\Users\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
   </ItemGroup>
 
 </Project>

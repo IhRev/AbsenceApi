@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Absence.Application\Absence.Application.csproj" />
+    <ProjectReference Include="..\Absence.Infrastructure\Absence.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

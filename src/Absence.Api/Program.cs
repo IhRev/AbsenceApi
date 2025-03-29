@@ -1,9 +1,14 @@
+using Absence.Application;
+using Absence.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel();
+builder.Services
+    .AddApplication()
+    .AddInfrastructure();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
