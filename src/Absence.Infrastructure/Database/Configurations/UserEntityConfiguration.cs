@@ -13,19 +13,22 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 
         builder
             .Property(_ => _.FirstName)
+            .HasMaxLength(50)
             .IsRequired();
 
         builder
             .Property(_ => _.SecondName)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        builder
+            .Property(u => u.Email)
+            .HasMaxLength(100)
             .IsRequired();
 
         builder
             .HasOne(_ => _.Organization)
             .WithMany(_ => _.Members)
             .HasForeignKey(_ => _.OrganizationId);
-
-        builder
-            .Property(u => u.Email)
-            .IsRequired();
     }
 }

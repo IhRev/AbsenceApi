@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Absence.Application.UseCases.Absences.Queries;
 
-public class GetUserAbsencesQuery(int userId) : IRequest<IEnumerable<AbsenceDTO>>
+public class GetUserAbsencesQuery(string userId) : IRequest<IEnumerable<AbsenceDTO>>
 {
-    public int UserId { get; } = userId;
+    public string UserId { get; } = userId;
 }

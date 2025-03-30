@@ -11,6 +11,7 @@ public class AbsenceEntityConfiguration : EntityConfiguration<AbsenceEntity, int
 
         builder
             .Property(_ => _.Name)
+            .HasMaxLength(30)
             .IsRequired();
 
         builder

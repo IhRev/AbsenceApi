@@ -11,6 +11,7 @@ public class OrganizationEntityConfiguration : EntityConfiguration<OrganizationE
 
         builder
             .Property(_ => _.Name)
+            .HasMaxLength(100)
             .IsRequired();
     }
 }

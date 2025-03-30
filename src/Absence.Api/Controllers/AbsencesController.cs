@@ -21,7 +21,7 @@ public class AbsencesController(
     {
         try
         {
-            var absences = await _sender.Send(new GetUserAbsencesQuery(1));
+            var absences = await _sender.Send(new GetUserAbsencesQuery("id"));
             return Ok(absences);
         }
         catch (Exception e)
@@ -29,14 +29,14 @@ public class AbsencesController(
             _logger.LogCritical(e, "");
             return StatusCode(500);
         }
-    }
+    } 
 
     [HttpPost]
-    public async Task<ActionResult<int>> Add([FromBody] AbsenceDTO absence)
+    public async Task<ActionResult<int>> Add([FromBody] CreateAbsenceDTO absence)
     {
         try
         {
-            int id = await _sender.Send(new AddAbsenceCommand(absence));
+            int id = await _sender.Send(new AddAbsenceCommand(absence, "id"));
             return Ok(id);
         }
         catch (Exception e)

@@ -17,6 +17,7 @@ internal class AddAbsenceHandler(
     public async Task<int> Handle(AddAbsenceCommand request, CancellationToken cancellationToken)
     {
         var absence = _mapper.Map<AbsenceEntity>(request.Absence);
+        absence.UserId = request.UserId;
         await _absenceRepository.InsertAsync(absence, cancellationToken);
         return absence.Id;
     }

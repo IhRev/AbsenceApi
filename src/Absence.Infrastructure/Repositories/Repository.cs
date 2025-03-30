@@ -1,4 +1,5 @@
 ﻿using Absence.Application.Common.Abstractions;
+using Absence.Infrastructure.Database.Contexts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Absence.Infrastructure.Repositories;
@@ -7,10 +8,10 @@ internal class Repository<TEntity> : IRepository<TEntity>
     where TEntity : class
 {
     private bool _isDisposed = false;
-    protected readonly DbContext _context;
+    protected readonly AbsenceContext _context;
     protected readonly DbSet<TEntity> _entities;
 
-    public Repository(DbContext context)
+    public Repository(AbsenceContext context)
     {
         _context = context;
         _entities = context.Set<TEntity>();
@@ -88,11 +89,11 @@ internal class Repository<TEntity> : IRepository<TEntity>
 
     public async ValueTask DisposeAsync()
     {
-        await DisposeAsync();
+        await DisposeAsync(true);
         GC.SuppressFinalize(this);
     }
 
-    protected async ValueTask DisposeAsync(bool isDisposing = true)
+    protected async ValueTask DisposeAsync(bool isDisposing)
     {
         if (_isDisposed)
             return;

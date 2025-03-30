@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Absence.Infrastructure.Database.Contexts;
 
-public class AbsenceContext(DbContextOptions options) : IdentityDbContext(options)
+public class AbsenceContext(DbContextOptions options) : IdentityDbContext<UserEntity>(options)
 {
     public virtual DbSet<AbsenceEntity> Absences { get; set; }
     public virtual DbSet<AbsenceTypeEntity> AbsenceTypes { get; set; }

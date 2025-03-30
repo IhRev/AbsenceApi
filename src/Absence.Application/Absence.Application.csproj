@@ -11,8 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UseCases\Organizations\" />
-    <Folder Include="UseCases\Users\" />
+    <Folder Include="UseCases\Users\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
