@@ -1,20 +1,28 @@
 using Absence.Application.Common.DTOs;
+using Absence.Application.UseCases.Absences.Commands;
+using Absence.Application.UseCases.Absences.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Absence.Api.Controllers;
 
 [ApiController]
 [Route("absences")]
-public class AbsencesController(ILogger<AbsencesController> logger) : ControllerBase
+public class AbsencesController(
+    ILogger<AbsencesController> logger,
+    ISender sender
+) : ControllerBase
 {
     private readonly ILogger<AbsencesController> _logger = logger;
+    private readonly ISender _sender = sender;
 
     [HttpGet]
-    public ActionResult<IEnumerable<AbsenceDTO>> Get()
+    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get()
     {
         try
         {
-            return Ok();
+            var absences = await _sender.Send(new GetUserAbsencesQuery(1));
+            return Ok(absences);
         }
         catch (Exception e)
         {
@@ -24,11 +32,12 @@ public class AbsencesController(ILogger<AbsencesController> logger) : Controller
     }
 
     [HttpPost]
-    public ActionResult<int> Add([FromBody] AbsenceDTO absence)
+    public async Task<ActionResult<int>> Add([FromBody] AbsenceDTO absence)
     {
         try
         {
-            return Ok();
+            int id = await _sender.Send(new AddAbsenceCommand(absence));
+            return Ok(id);
         }
         catch (Exception e)
         {

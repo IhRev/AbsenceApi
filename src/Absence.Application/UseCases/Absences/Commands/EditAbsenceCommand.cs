@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Absence.Application.UseCases.Absences.Commands;
 
-internal class EditAbsenceCommand(AbsenceDTO absence) : IRequest
+public class EditAbsenceCommand(AbsenceDTO absence) : IRequest
 {
     public AbsenceDTO Absence { get; } = absence;
 }

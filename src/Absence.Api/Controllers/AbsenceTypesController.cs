@@ -1,39 +1,27 @@
 ﻿using Absence.Application.Common.DTOs;
+using Absence.Application.UseCases.AbsenceTypes.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Absence.Api.Controllers;
 
 [ApiController]
 [Route("absence_types")]
-public class AbsenceTypesController(ILogger<AbsenceTypesController> logger) : ControllerBase
+public class AbsenceTypesController(
+    ILogger<AbsenceTypesController> logger,
+    ISender sender
+) : ControllerBase
 {
     private readonly ILogger<AbsenceTypesController> _logger = logger;
+    private readonly ISender _sender = sender;
 
     [HttpGet]
-    public ActionResult<IEnumerable<AbsenceTypeDTO>> Get()
+    public async Task<ActionResult<IEnumerable<AbsenceTypeDTO>>> Get()
     {
         try
         {
-            return Ok(
-                new[]
-                {
-                    new AbsenceTypeDTO()
-                    {
-                        Id = 1,
-                        Name = "Remote Work"
-                    },
-                    new AbsenceTypeDTO()
-                    {
-                        Id = 2,
-                        Name = "Vacation Leave"
-                    },
-                    new AbsenceTypeDTO()
-                    {
-                        Id = 3,
-                        Name = "Sick"
-                    }
-                }
-            );
+            var types = await _sender.Send(new GetAllAbsenceTypesQuery());
+            return Ok(types);
         }
         catch (Exception e)
         {
