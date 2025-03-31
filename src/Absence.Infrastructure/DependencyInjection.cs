@@ -2,6 +2,7 @@
 using Absence.Domain.Entities;
 using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,12 @@ public static class DependencyInjection
             var connectionString = configuration.GetConnectionString(connectionStringName);
             opt.UseSqlServer(connectionString);
         });
+
+        services
+            .AddDefaultIdentity<UserEntity>()
+            .AddEntityFrameworkStores<AbsenceContext>()
+            .AddDefaultTokenProviders();
+
         services.AddScoped<IRepository<AbsenceEntity>, Repository<AbsenceEntity>>();
         services.AddScoped<IRepository<AbsenceTypeEntity>, Repository<AbsenceTypeEntity>>();
         services.AddScoped<IRepository<OrganizationEntity>, Repository<OrganizationEntity>>();

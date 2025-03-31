@@ -19,4 +19,6 @@ public interface IRepository<TEntity> : IAsyncDisposable where TEntity : class
     void Update(TEntity entity);
     
     void UpdateRange(IEnumerable<TEntity> entities);
+
+    Task SaveAsync(CancellationToken cancellationToken = default);
 }

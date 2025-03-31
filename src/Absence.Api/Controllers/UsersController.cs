@@ -34,10 +34,10 @@ public class UsersController(
     {
         try
         {
-            var id = _sender.Send(new AddUserCommand(user));
+            var id = await _sender.Send(new AddUserCommand(user));
             return Ok(id);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             _logger.LogCritical(e, "");
             return StatusCode(500);

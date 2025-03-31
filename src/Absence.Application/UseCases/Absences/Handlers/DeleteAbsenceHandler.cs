@@ -9,6 +9,9 @@ internal class DeleteAbsenceHandler(IRepository<AbsenceEntity> absenceRepository
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
 
-    public Task Handle(DeleteAbsenceCommand request, CancellationToken cancellationToken) =>
-        _absenceRepository.DeleteByIdAsync(request.Id);
+    public async Task Handle(DeleteAbsenceCommand request, CancellationToken cancellationToken)
+    {
+        await _absenceRepository.DeleteByIdAsync(request.Id, cancellationToken);
+        await _absenceRepository.SaveAsync(cancellationToken);
+    }
 }

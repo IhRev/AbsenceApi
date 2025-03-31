@@ -18,6 +18,7 @@ internal class AddOrganizationHandler(
     {
         var organization = _mapper.Map<OrganizationEntity>(request.Organization);
         await _organizationRepository.InsertAsync(organization, cancellationToken);
+        await _organizationRepository.SaveAsync(cancellationToken);
         return organization.Id;
     }
 }

@@ -113,4 +113,7 @@ internal class Repository<TEntity> : IRepository<TEntity>
             _entities.Attach(entity);
         }
     }
+
+    public Task SaveAsync(CancellationToken cancellationToken = default) =>
+        _context.SaveChangesAsync(cancellationToken);
 }

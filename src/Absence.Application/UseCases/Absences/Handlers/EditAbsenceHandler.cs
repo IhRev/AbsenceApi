@@ -1,20 +1,17 @@
 ﻿using Absence.Application.Common.Abstractions;
 using Absence.Application.UseCases.Absences.Commands;
 using Absence.Domain.Entities;
-using AutoMapper;
 using MediatR;
 
 namespace Absence.Application.UseCases.Absences.Handlers;
 
 internal class EditAbsenceHandler(
     IRepository<AbsenceEntity> absenceRepository, 
-    IRepository<AbsenceTypeEntity> absenceTypeRepository, 
-    IMapper mapper
+    IRepository<AbsenceTypeEntity> absenceTypeRepository
 ) : IRequestHandler<EditAbsenceCommand>
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
     private readonly IRepository<AbsenceTypeEntity> _absenceTypeRepository = absenceTypeRepository;
-    private readonly IMapper _mapper = mapper;
 
     public async Task Handle(EditAbsenceCommand request, CancellationToken cancellationToken)
     {
@@ -39,5 +36,6 @@ internal class EditAbsenceHandler(
         }
 
         _absenceRepository.Update(absence);
+        await _absenceRepository.SaveAsync(cancellationToken);
     }
 }

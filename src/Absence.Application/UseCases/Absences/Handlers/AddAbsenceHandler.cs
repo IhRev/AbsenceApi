@@ -19,6 +19,7 @@ internal class AddAbsenceHandler(
         var absence = _mapper.Map<AbsenceEntity>(request.Absence);
         absence.UserId = request.UserId;
         await _absenceRepository.InsertAsync(absence, cancellationToken);
+        await _absenceRepository.SaveAsync(cancellationToken);
         return absence.Id;
     }
 }

@@ -24,7 +24,7 @@ internal class UserRepository(
 
     public async Task CreateUserAsync(UserEntity user, CancellationToken cancellationToken = default)
     {
-        await _userManager.CreateAsync(user, "");
+        await _userManager.CreateAsync(user, "TestPassword123!");
     }
 
     //public async Task<bool> IsInRoleAsync(string userId, string role)
