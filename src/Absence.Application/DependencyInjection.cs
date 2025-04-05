@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Absence.Application.Common.Configurations;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace Absence.Application;

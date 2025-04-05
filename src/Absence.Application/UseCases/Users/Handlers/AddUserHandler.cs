@@ -1,23 +1,30 @@
-﻿using Absence.Application.Common.Abstractions;
-using Absence.Application.UseCases.Users.Commands;
+﻿using Absence.Application.UseCases.Users.Commands;
 using Absence.Domain.Entities;
+using Absence.Domain.Interfaces;
 using AutoMapper;
 using MediatR;
 
 namespace Absence.Application.UseCases.Users.Handlers;
 
 internal class AddUserHandler(
-    IUserRepository userRepository,
+    IUserService userRepository,
     IMapper mapper
 ) : IRequestHandler<AddUserCommand, string>
 {
-    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IUserService _userRepository = userRepository;
     private readonly IMapper _mapper = mapper;
 
     public async Task<string> Handle(AddUserCommand request, CancellationToken cancellationToken)
     {
-        var user = _mapper.Map<UserEntity>(request.User);
-        await _userRepository.CreateUserAsync(user, cancellationToken);
+        var user = new UserEntity()
+        {
+            FirstName = request.User.FirstName,
+            SecondName = request.User.SecondName,
+            Email = request.User.Credentials.Email,
+            UserName = "username",
+            OrganizationId = 1
+        };
+        var a = await _userRepository.CreateAsync(user, request.User.Credentials.Password);
         return user.Id;
     }
 }

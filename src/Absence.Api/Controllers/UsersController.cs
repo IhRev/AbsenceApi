@@ -28,9 +28,9 @@ public class UsersController(
             return StatusCode(500);
         }
     }
-
+    
     [HttpPost]
-    public async Task<ActionResult<string>> Add([FromBody] CreateUserDTO user)
+    public async Task<ActionResult<int>> Add([FromBody] CreateUserDTO user)
     {
         try
         {

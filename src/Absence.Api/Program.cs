@@ -10,7 +10,7 @@ const string connectionStringName = "AbsenceDB";
 builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration, connectionStringName)
-    .AddApi();
+    .AddApi(builder.Configuration);
 
 var app = builder.Build();
 app.AddMiddlewares();

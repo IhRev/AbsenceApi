@@ -8,9 +8,6 @@ public class CreateUserDTO
     public string FirstName { get; set; } = null!;
     [Required(AllowEmptyStrings = false)]
     public string SecondName { get; set; } = null!;
-    [Required(AllowEmptyStrings = false)]
-    [EmailAddress]
-    public string Email { get; set; } = null!;
     [Required]
-    public int Organization { get; set; }
+    public required UserCredentialsDTO Credentials { get; set; }
 }

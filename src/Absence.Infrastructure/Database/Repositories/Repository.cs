@@ -1,8 +1,8 @@
-﻿using Absence.Application.Common.Abstractions;
+﻿using Absence.Domain.Interfaces;
 using Absence.Infrastructure.Database.Contexts;
 using Microsoft.EntityFrameworkCore;
 
-namespace Absence.Infrastructure.Repositories;
+namespace Absence.Infrastructure.Database.Repositories;
 
 internal class Repository<TEntity> : IRepository<TEntity>
     where TEntity : class

@@ -1,7 +1,7 @@
-﻿using Absence.Application.Common.Abstractions;
-using Absence.Application.Common.DTOs;
+﻿using Absence.Application.Common.DTOs;
 using Absence.Application.UseCases.Absences.Queries;
 using Absence.Domain.Entities;
+using Absence.Domain.Interfaces;
 using AutoMapper;
 using MediatR;
 

@@ -1,4 +1,4 @@
-﻿namespace Absence.Application.Common.Abstractions;
+﻿namespace Absence.Domain.Interfaces;
 
 public interface IRepository<TEntity> : IAsyncDisposable where TEntity : class
 {

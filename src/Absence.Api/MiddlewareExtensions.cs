@@ -17,6 +17,7 @@ public static class MiddlewareExtensions
         app.UseCors("AllowSpecificOrigin");
         app.MapFallbackToFile("/index.html");
         //app.UseHttpsRedirection();
+        app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
 
