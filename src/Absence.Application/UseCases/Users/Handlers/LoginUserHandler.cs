@@ -13,7 +13,7 @@ internal class LoginUserHandler(IUserService userRepository, IJwtService jwtServ
     public async Task<AuthResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.FindByEmailAsync(request.Credentials.Email);
-        if (user == null || await _userRepository.CheckPasswordAsync(user, request.Credentials.Password))
+        if (user == null || !await _userRepository.CheckPasswordAsync(user, request.Credentials.Password))
         {
             return AuthResponse.Fail("Incorrect email or password");
         }

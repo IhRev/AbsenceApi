@@ -21,7 +21,7 @@ internal class AddUserHandler(
             FirstName = request.User.FirstName,
             SecondName = request.User.SecondName,
             Email = request.User.Credentials.Email,
-            UserName = "username",
+            UserName = request.User.Credentials.Email,
             OrganizationId = 1
         };
         var a = await _userRepository.CreateAsync(user, request.User.Credentials.Password);

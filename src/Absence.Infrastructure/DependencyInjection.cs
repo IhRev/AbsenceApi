@@ -30,7 +30,11 @@ public static class DependencyInjection
         });
 
         services
-            .AddAuthentication()
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
                 var jwtConfiguration = configuration.GetSection("JwtConfiguration").Get<JwtConfiguration>();
                 ArgumentNullException.ThrowIfNull(jwtConfiguration);

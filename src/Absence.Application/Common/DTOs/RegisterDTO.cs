@@ -2,7 +2,7 @@
 
 namespace Absence.Application.Common.DTOs;
 
-public class CreateUserDTO
+public class RegisterDTO
 {
     [Required(AllowEmptyStrings = false)]
     public string FirstName { get; set; } = null!;

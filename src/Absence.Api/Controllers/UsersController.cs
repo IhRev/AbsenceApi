@@ -1,46 +1,20 @@
 ﻿using Absence.Application.Common.DTOs;
-using Absence.Application.UseCases.Users.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Absence.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("users")]
-public class UsersController(
-    ILogger<AbsencesController> logger,
-    ISender sender
-) : ControllerBase
+public class UsersController(ISender sender) : ControllerBase
 {
-    private readonly ILogger<AbsencesController> _logger = logger;
     private readonly ISender _sender = sender;
 
-    [HttpGet]
+    [HttpGet("details")]
     public ActionResult<IEnumerable<AbsenceDTO>> Get()
     {
-        try
-        {
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            _logger.LogCritical(e, "");
-            return StatusCode(500);
-        }
-    }
-    
-    [HttpPost]
-    public async Task<ActionResult<int>> Add([FromBody] CreateUserDTO user)
-    {
-        try
-        {
-            var id = await _sender.Send(new AddUserCommand(user));
-            return Ok(id);
-        }
-        catch (Exception e)
-        {
-            _logger.LogCritical(e, "");
-            return StatusCode(500);
-        }
+        return Ok();
     }
 }
