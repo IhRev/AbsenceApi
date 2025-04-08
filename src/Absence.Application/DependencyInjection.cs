@@ -1,4 +1,5 @@
-﻿using Absence.Application.Common.Configurations;
+﻿using Absence.Application.Common.Adapters;
+using Absence.Domain.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -13,6 +14,9 @@ public static class DependencyInjection
 
         services
             .AddAutoMapper(Assembly.GetExecutingAssembly());
+
+        services
+            .AddScoped<IRandomGenerator, RandomGenerator>();
 
         return services;
     }

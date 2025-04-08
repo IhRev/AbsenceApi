@@ -1,5 +1,4 @@
-﻿using Absence.Application.Common.Configurations;
-using Absence.Domain.Entities;
+﻿using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -27,7 +26,7 @@ internal class JwtService(IOptions<JwtConfiguration> jwtConfiguration) : IJwtSer
             issuer: _jwtConfiguration.Issuer,
             audience: _jwtConfiguration.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtConfiguration.ExpireTimeInMinutes),
+            expires: DateTime.UtcNow.AddMinutes(_jwtConfiguration.RefreshTokenExpireTimeInDays),
             signingCredentials: credentials
         );
 

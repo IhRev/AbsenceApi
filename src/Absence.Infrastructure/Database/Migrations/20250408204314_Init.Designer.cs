@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Absence.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AbsenceContext))]
-    [Migration("20250330165046_Init")]
+    [Migration("20250408204314_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -147,6 +147,12 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("RefreshTokenExpireTimeInDays")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("SecondName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -257,10 +263,12 @@ namespace Absence.Infrastructure.Database.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -297,10 +305,12 @@ namespace Absence.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Absence.Api.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("organizations")]
 public class OrganizationsController(ISender sender) : ControllerBase

@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Database\Migrations\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.3" />
@@ -25,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Absence.Application\Absence.Application.csproj" />
     <ProjectReference Include="..\Absence.Domain\Absence.Domain.csproj" />
   </ItemGroup>
 

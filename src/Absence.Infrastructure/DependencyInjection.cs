@@ -1,5 +1,4 @@
-﻿using Absence.Application.Common.Configurations;
-using Absence.Domain.Entities;
+﻿using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Database.Repositories;
@@ -72,9 +71,11 @@ public static class DependencyInjection
                 options.Password.RequireLowercase = false;
             });
 
-        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IJwtService, JwtService>();
+        services
+            .AddScoped(typeof(IRepository<>), typeof(Repository<>))
+            .AddScoped<IUserService, UserService>()
+            .AddScoped<IJwtService, JwtService>()
+            .AddScoped<IRefreshTokenService, RefreshTokenService>();
 
         return services;
     }

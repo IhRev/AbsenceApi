@@ -5,8 +5,10 @@ namespace Absence.Domain.Entities;
 
 public class UserEntity : IdentityUser, IIdKeyed<string>
 {
-    public string FirstName { get; set; } = null!;
-    public string SecondName { get; set; } = null!;
+    public required string FirstName { get; set; }
+    public required string SecondName { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTimeOffset? RefreshTokenExpireTimeInDays { get; set; }
     public int OrganizationId { get; set; }
     public OrganizationEntity Organization { get; set; } = null!;
     public ICollection<AbsenceEntity> Absences { get; set; } = null!;

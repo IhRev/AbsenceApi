@@ -5,21 +5,27 @@ using MediatR;
 
 namespace Absence.Application.UseCases.Users.Handlers;
 
-internal class LoginUserHandler(IUserService userRepository, IJwtService jwtService) : IRequestHandler<LoginUserCommand, AuthResponse>
+internal class LoginUserHandler(
+    IUserService userService, 
+    IJwtService jwtService,
+    IRefreshTokenService refreshTokenService
+) : IRequestHandler<LoginUserCommand, AuthResponse>
 {
-    private readonly IUserService _userRepository = userRepository;
+    private readonly IUserService _userService = userService;
     private readonly IJwtService _jwtService = jwtService;
+    private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
 
     public async Task<AuthResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.FindByEmailAsync(request.Credentials.Email);
-        if (user == null || !await _userRepository.CheckPasswordAsync(user, request.Credentials.Password))
+        var user = await _userService.FindByEmailAsync(request.Credentials.Email);
+        if (user == null || !await _userService.CheckPasswordAsync(user, request.Credentials.Password))
         {
             return AuthResponse.Fail("Incorrect email or password");
         }
 
-        var token = _jwtService.GenerateToken(user);
+        var accessToken = _jwtService.GenerateToken(user);
+        var refreshToken = await _refreshTokenService.GenerateToken(user, cancellationToken);
 
-        return AuthResponse.Success(token);
+        return AuthResponse.Success(accessToken, refreshToken);
     }
 }
