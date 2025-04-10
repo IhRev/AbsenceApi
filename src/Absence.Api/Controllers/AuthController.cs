@@ -12,9 +12,16 @@ public class AuthController(ISender sender) : ControllerBase
     private readonly ISender _sender = sender;
 
     [HttpPost("login")]
-    public async Task<ActionResult<int>> Login([FromBody] UserCredentialsDTO credentials)
+    public async Task<ActionResult<int>> Login([FromBody] UserCredentials credentials)
     {
         var response = await _sender.Send(new LoginUserCommand(credentials));
+        return Ok(response);
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<ActionResult<int>> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
+    {
+        var response = await _sender.Send(new RefreshTokenCommand(refreshTokenRequest));
         return Ok(response);
     }
 

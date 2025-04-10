@@ -7,5 +7,7 @@ public class CurrentUser(IHttpContextAccessor httpContextAccessor) : IUser
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    public string? Name => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name);
+    public string Id =>
+        _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? 
+        throw new ArgumentNullException($"User Id is missing");
 }

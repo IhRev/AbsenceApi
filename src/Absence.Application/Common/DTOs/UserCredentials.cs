@@ -2,7 +2,7 @@
 
 namespace Absence.Application.Common.DTOs;
 
-public class UserCredentialsDTO
+public class UserCredentials
 {
     [Required]
     [EmailAddress]

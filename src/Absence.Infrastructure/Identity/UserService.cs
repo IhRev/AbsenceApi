@@ -16,4 +16,10 @@ internal class UserService(UserManager<UserEntity> userManager) : IUserService
 
     public Task<bool> CheckPasswordAsync(UserEntity user, string password) => 
         _userManager.CheckPasswordAsync(user, password);
+
+    public Task<UserEntity?> FindByIdAsync(string id) =>
+        _userManager.FindByIdAsync(id);
+
+    public Task UpdateAsync(UserEntity user) =>
+        _userManager.UpdateAsync(user);
 }

@@ -10,4 +10,8 @@ public interface IUserService
     Task<IdentityResult> CreateAsync(UserEntity user, string password);
 
     Task<UserEntity?> FindByEmailAsync(string email);
+
+    Task<UserEntity?> FindByIdAsync(string id);
+
+    Task UpdateAsync(UserEntity user);
 }

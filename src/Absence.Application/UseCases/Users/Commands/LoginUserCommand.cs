@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Absence.Application.UseCases.Users.Commands;
 
-public class LoginUserCommand(UserCredentialsDTO credentials) : IRequest<AuthResponse>
+public class LoginUserCommand(UserCredentials credentials) : IRequest<AuthResponse>
 {
-    public UserCredentialsDTO Credentials { get; } = credentials;
+    public UserCredentials Credentials { get; } = credentials;
 }

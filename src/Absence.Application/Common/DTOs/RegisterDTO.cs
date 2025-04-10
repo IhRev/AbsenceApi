@@ -9,5 +9,5 @@ public class RegisterDTO
     [Required(AllowEmptyStrings = false)]
     public string SecondName { get; set; } = null!;
     [Required]
-    public required UserCredentialsDTO Credentials { get; set; }
+    public required UserCredentials Credentials { get; set; }
 }
