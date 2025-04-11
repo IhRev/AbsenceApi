@@ -1,7 +1,6 @@
 ﻿using Absence.Application.Common.DTOs;
 using Absence.Application.UseCases.Organizations.Commands;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Absence.Api.Controllers;

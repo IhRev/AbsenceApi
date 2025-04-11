@@ -4,8 +4,6 @@ public interface IRepository<TEntity> : IAsyncDisposable where TEntity : class
 {
     void Delete(TEntity entity);
 
-    Task DeleteByIdAsync(object id, CancellationToken cancellationToken = default);
-
     void DeleteRange(IEnumerable<TEntity> entities);
 
     Task<List<TEntity>> GetAsync(Func<IQueryable<TEntity>, IQueryable<TEntity>>[] queries = null!, CancellationToken cancellationToken = default);

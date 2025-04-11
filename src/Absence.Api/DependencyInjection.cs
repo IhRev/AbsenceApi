@@ -1,4 +1,5 @@
 ﻿using Absence.Api.Services;
+using Absence.Application.Common.Interfaces;
 using Absence.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
@@ -62,6 +63,9 @@ public static class DependencyInjection
 
         services
             .Configure<JwtConfiguration>(configuration.GetSection("JwtConfiguration"));
+
+        services
+            .AddScoped<IUser, CurrentUser>();
 
         return services;
     }

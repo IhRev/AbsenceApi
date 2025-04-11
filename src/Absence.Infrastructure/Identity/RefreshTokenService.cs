@@ -7,13 +7,13 @@ namespace Absence.Infrastructure.Identity;
 internal class RefreshTokenService(
     IOptions<JwtConfiguration> jwtConfiguration,
     IRandomGenerator randomGenerator,
-    IRepository<UserEntity> userRepository
+    IUserService userService
 ) : IRefreshTokenService
 {
     private const int REFRESH_TOKEN_SIZE = 64;
     private readonly JwtConfiguration _jwtConfiguration = jwtConfiguration.Value;
     private readonly IRandomGenerator _randomGenerator = randomGenerator;
-    private readonly IRepository<UserEntity> _userRepository = userRepository;
+    private readonly IUserService _userService = userService;
 
     public async Task<string> GenerateToken(UserEntity user, CancellationToken cancellationToken)
     {
@@ -28,7 +28,6 @@ internal class RefreshTokenService(
     {
         user.RefreshToken = token;
         user.RefreshTokenExpireTimeInDays = DateTimeOffset.UtcNow.AddDays(_jwtConfiguration.RefreshTokenExpireTimeInDays);
-
-        await _userRepository.SaveAsync();
+        await _userService.UpdateAsync(user);
     }
 }

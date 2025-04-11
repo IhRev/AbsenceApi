@@ -1,5 +1,4 @@
-﻿using Absence.Application.Common.Interfaces;
-using Absence.Application.Common.Responses;
+﻿using Absence.Application.Common.Responses;
 using Absence.Application.UseCases.Users.Commands;
 using Absence.Domain.Interfaces;
 using MediatR;
@@ -28,7 +27,7 @@ internal class RefreshTokenHandler(
             userEntity.RefreshToken != request.RefreshTokenRequest.RefreshToken ||
             userEntity.RefreshTokenExpireTimeInDays <= DateTime.UtcNow)
         {
-            throw new Exception("Invalid refresh token");
+            return AuthResponse.Fail("Token is invalid");
         }
 
         var newAccessToken = _jwtService.GenerateToken(userEntity);

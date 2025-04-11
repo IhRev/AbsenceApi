@@ -1,24 +1,27 @@
-﻿using Absence.Application.UseCases.Absences.Commands;
+﻿using Absence.Application.Common.Results;
+using Absence.Application.UseCases.Absences.Commands;
 using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using MediatR;
+using OneOf;
+using OneOf.Types;
 
 namespace Absence.Application.UseCases.Absences.Handlers;
 
 internal class EditAbsenceHandler(
     IRepository<AbsenceEntity> absenceRepository, 
     IRepository<AbsenceTypeEntity> absenceTypeRepository
-) : IRequestHandler<EditAbsenceCommand>
+) : IRequestHandler<EditAbsenceCommand, OneOf<Success, NotFound, BadRequest>>
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
     private readonly IRepository<AbsenceTypeEntity> _absenceTypeRepository = absenceTypeRepository;
 
-    public async Task Handle(EditAbsenceCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, NotFound, BadRequest>> Handle(EditAbsenceCommand request, CancellationToken cancellationToken)
     {
         var absence = await _absenceRepository.GetByIdAsync(request.Absence.Id);
         if (absence is null)
         {
-            return;
+            return new NotFound();
         }
 
         absence.StartDate = request.Absence.StartDate;
@@ -29,7 +32,7 @@ internal class EditAbsenceHandler(
             var type = await _absenceTypeRepository.GetByIdAsync(request.Absence.Type);
             if (type == null)
             {
-                return;
+                return new BadRequest($"Type with id {request.Absence.Type} doesn't exist");
             }
             
             absence.AbsenceTypeId = type.Id;
@@ -37,5 +40,7 @@ internal class EditAbsenceHandler(
 
         _absenceRepository.Update(absence);
         await _absenceRepository.SaveAsync(cancellationToken);
+
+        return new Success();
     }
 }

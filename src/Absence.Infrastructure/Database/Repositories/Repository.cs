@@ -59,17 +59,6 @@ internal class Repository<TEntity> : IRepository<TEntity>
         }
     }
 
-    public virtual async Task DeleteByIdAsync(object id, CancellationToken cancellationToken = default)
-    {
-        TEntity? entityToDelete = await GetByIdAsync(id, cancellationToken);
-        if (entityToDelete is null)
-        {
-            return;
-        }
-
-        Delete(entityToDelete);
-    }
-
     public virtual void Delete(TEntity entity)
     {
         AttachIfDetached(entity);
