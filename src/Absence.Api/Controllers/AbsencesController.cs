@@ -39,7 +39,7 @@ public class AbsencesController(ISender sender) : ControllerBase
         );
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<ActionResult> Delete([FromRoute] int id)
     {
         var result = await _sender.Send(new DeleteAbsenceCommand(id));
