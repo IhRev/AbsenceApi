@@ -13,8 +13,8 @@ public class UsersController(ISender sender) : ControllerBase
     private readonly ISender _sender = sender;
 
     [HttpGet("details")]
-    public ActionResult<IEnumerable<AbsenceDTO>> Get()
+    public ActionResult<UserDetails> GetDetails()
     {
-        return Ok();
+        return Ok(new UserDetails() { FirstName = "Ihor", LastName = "Reva" });
     }
 }

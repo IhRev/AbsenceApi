@@ -18,7 +18,7 @@ internal class AddUserHandler(
         var user = new UserEntity()
         {
             FirstName = request.User.FirstName,
-            SecondName = request.User.SecondName,
+            SecondName = request.User.LastName,
             Email = request.User.Credentials.Email,
             UserName = request.User.Credentials.Email,
         };

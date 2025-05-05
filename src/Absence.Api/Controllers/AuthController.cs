@@ -19,7 +19,7 @@ public class AuthController(ISender sender) : ControllerBase
         return response.IsSuccess ? Ok(response) : Unauthorized(response);
     }
 
-    [HttpPost("refresh-token")]
+    [HttpPost("refresh_token")]
     public async Task<ActionResult<AuthResponse>> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
         var response = await _sender.Send(new RefreshTokenCommand(refreshTokenRequest));
