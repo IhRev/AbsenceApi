@@ -1,4 +1,4 @@
-﻿using Absence.Application.Common.DTOs;
+﻿using Absence.Application.UseCases.Users.DTOs;
 using MediatR;
 using OneOf;
 using OneOf.Types;

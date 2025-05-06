@@ -1,8 +1,8 @@
-﻿using Absence.Application.Common.DTOs;
+﻿using Absence.Application.UseCases.Organizations.DTOs;
 using Absence.Domain.Entities;
 using AutoMapper;
 
-namespace Absence.Application.Common.Mappings;
+namespace Absence.Application.Mappings;
 
 internal class OrganizationMapping : Profile
 {

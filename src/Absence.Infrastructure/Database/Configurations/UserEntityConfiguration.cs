@@ -17,7 +17,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             .IsRequired();
 
         builder
-            .Property(_ => _.SecondName)
+            .Property(_ => _.LastName)
             .HasMaxLength(50)
             .IsRequired();
 

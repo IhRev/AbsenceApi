@@ -1,7 +1,7 @@
-﻿using Absence.Application.Common.DTOs;
-using Absence.Application.Common.Responses;
-using Absence.Application.UseCases.Users.Commands;
+﻿using Absence.Application.UseCases.Users.Commands;
+using Absence.Application.UseCases.Users.DTOs;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Absence.Api.Controllers;
@@ -33,6 +33,17 @@ public class AuthController(ISender sender) : ControllerBase
         return response.Match<ActionResult>(
             success => Ok(),
             error => BadRequest(error.Value)
+        );
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<ActionResult> Logout()
+    {
+        var response = await _sender.Send(new LogoutUserCommand());
+        return response.Match<ActionResult>(
+            success => Ok(),
+            notFound => Unauthorized()
         );
     }
 }

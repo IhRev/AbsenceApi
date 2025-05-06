@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Absence.Application.Common.DTOs;
+namespace Absence.Application.UseCases.Organizations.DTOs;
 
 public class CreateOrganizationDTO
 {

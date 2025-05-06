@@ -1,5 +1,5 @@
-﻿using Absence.Application.Common.Responses;
-using Absence.Application.UseCases.Users.Commands;
+﻿using Absence.Application.UseCases.Users.Commands;
+using Absence.Application.UseCases.Users.DTOs;
 using Absence.Domain.Interfaces;
 using MediatR;
 

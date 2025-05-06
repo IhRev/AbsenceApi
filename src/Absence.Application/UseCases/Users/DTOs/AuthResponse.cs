@@ -1,4 +1,4 @@
-﻿namespace Absence.Application.Common.Responses;
+﻿namespace Absence.Application.UseCases.Users.DTOs;
 
 public class AuthResponse
 {

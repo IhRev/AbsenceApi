@@ -22,4 +22,10 @@ internal class UserService(UserManager<UserEntity> userManager) : IUserService
 
     public Task UpdateAsync(UserEntity user) =>
         _userManager.UpdateAsync(user);
+
+    public Task DeleteAsync(UserEntity user) =>
+        _userManager.DeleteAsync(user);
+
+    public Task<IdentityResult> ChangePasswordAsync(UserEntity user, string oldPassword, string newPassword) =>
+        _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
 }

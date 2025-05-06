@@ -1,8 +1,8 @@
-﻿using Absence.Application.Common.DTOs;
-using Absence.Application.Common.Results;
+﻿using Absence.Application.Common.Results;
 using MediatR;
 using OneOf.Types;
 using OneOf;
+using Absence.Application.UseCases.Absences.DTOs;
 
 namespace Absence.Application.UseCases.Absences.Commands;
 

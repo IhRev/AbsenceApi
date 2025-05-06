@@ -1,4 +1,4 @@
-﻿using Absence.Application.Common.DTOs;
+﻿using Absence.Application.UseCases.AbsenceTypes.DTOs;
 using Absence.Application.UseCases.AbsenceTypes.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

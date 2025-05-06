@@ -1,4 +1,4 @@
-﻿using Absence.Application.Common.DTOs;
+﻿using Absence.Application.UseCases.AbsenceTypes.DTOs;
 using MediatR;
 
 namespace Absence.Application.UseCases.AbsenceTypes.Queries;

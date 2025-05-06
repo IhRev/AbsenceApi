@@ -1,4 +1,4 @@
-﻿using Absence.Application.Common.DTOs;
+﻿using Absence.Application.UseCases.AbsenceTypes.DTOs;
 using Absence.Application.UseCases.AbsenceTypes.Queries;
 using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;

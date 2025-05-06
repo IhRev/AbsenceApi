@@ -1,6 +1,6 @@
-﻿namespace Absence.Application.Common.DTOs;
+﻿namespace Absence.Application.UseCases.Absences.DTOs;
 
-public class AbsenceDTO
+public class EditAbsenceDTO
 {
     public required int Id { get; set; }
     public required string Name { get; set; } = null!;

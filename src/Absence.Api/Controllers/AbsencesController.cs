@@ -1,5 +1,5 @@
-using Absence.Application.Common.DTOs;
 using Absence.Application.UseCases.Absences.Commands;
+using Absence.Application.UseCases.Absences.DTOs;
 using Absence.Application.UseCases.Absences.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
