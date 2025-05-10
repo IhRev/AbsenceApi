@@ -16,7 +16,7 @@ public class UsersController(ISender sender) : ControllerBase
     private readonly ISender _sender = sender;
 
     [HttpGet("details")]
-    public async Task<ActionResult<UserDetails>> GetDetails()
+    public async Task<ActionResult<UserDetails>> GetUserDetails()
     {
         var result = await _sender.Send(new GetUserDetailsQuery());
         return result.Match<ActionResult<UserDetails>>(
@@ -25,7 +25,7 @@ public class UsersController(ISender sender) : ControllerBase
         );
     }
 
-    [HttpPut]
+    [HttpPut("details")]
     public async Task<ActionResult> UpdateUserDetails([FromBody] UserDetails userDetails)
     {
         var result = await _sender.Send(new UpdateUserCommand(userDetails));
@@ -36,7 +36,7 @@ public class UsersController(ISender sender) : ControllerBase
     }
 
     [HttpPut("change_password")]
-    public async Task<ActionResult> UpdateUserDetails([FromBody] ChangePasswordRequest request)
+    public async Task<ActionResult> UpdateUserPassword([FromBody] ChangePasswordRequest request)
     {
         var result = await _sender.Send(new ChangePasswordCommand(request));
         return result.Match<ActionResult>(
@@ -56,4 +56,4 @@ public class UsersController(ISender sender) : ControllerBase
             badRequest => Unauthorized()
         );
     }
-} 
+}  
