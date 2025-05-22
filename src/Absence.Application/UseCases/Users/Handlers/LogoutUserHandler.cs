@@ -22,7 +22,7 @@ internal class LogoutUserHandler(IUserService userService, IUser user) : IReques
         }
 
         user.RefreshToken = null;
-        user.RefreshTokenExpireTimeInDays = DateTimeOffset.MinValue;
+        user.RefreshTokenExpires = DateTimeOffset.MinValue;
         await _userService.UpdateAsync(user);
 
         return new Success();

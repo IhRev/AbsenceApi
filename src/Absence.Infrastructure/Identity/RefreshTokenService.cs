@@ -27,7 +27,7 @@ internal class RefreshTokenService(
     private async Task SaveToken(UserEntity user, string token, CancellationToken cancellationToken)
     {
         user.RefreshToken = token;
-        user.RefreshTokenExpireTimeInDays = DateTimeOffset.UtcNow.AddDays(_jwtConfiguration.RefreshTokenExpireTimeInDays);
+        user.RefreshTokenExpires = DateTimeOffset.UtcNow.AddDays(_jwtConfiguration.RefreshTokenExpireTimeInDays);
         await _userService.UpdateAsync(user);
     }
 }

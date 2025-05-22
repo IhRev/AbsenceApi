@@ -28,7 +28,7 @@ internal class ChangePasswordHandler(IUserService userService, IUser user) : IRe
         }
 
         user.RefreshToken = null;
-        user.RefreshTokenExpireTimeInDays = DateTimeOffset.MinValue;
+        user.RefreshTokenExpires = DateTimeOffset.MinValue;
         await _userService.UpdateAsync(user);
 
         return new Success();

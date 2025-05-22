@@ -2,14 +2,10 @@
 
 namespace Absence.Domain.Entities;
 
-public class AbsenceEntity : IIdKeyed<int>
+public class HolidayEntity : IIdKeyed<int>
 {
     public int Id { get; set; }
     public required string Name { get; set; }
     public required DateTimeOffset StartDate { get; set; }
     public required DateTimeOffset EndDate { get; set; }
-    public required int AbsenceTypeId { get; set; }
-    public required string UserId { get; set; }
-    public AbsenceTypeEntity AbsenceType { get; set; } = null!;
-    public UserEntity User { get; set; } = null!;
 }

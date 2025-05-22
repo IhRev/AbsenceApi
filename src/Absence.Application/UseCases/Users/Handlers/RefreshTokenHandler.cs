@@ -25,7 +25,7 @@ internal class RefreshTokenHandler(
 
         if (userEntity == null || 
             userEntity.RefreshToken != request.RefreshTokenRequest.RefreshToken ||
-            userEntity.RefreshTokenExpireTimeInDays <= DateTime.UtcNow)
+            userEntity.RefreshTokenExpires <= DateTime.UtcNow)
         {
             return AuthResponse.Fail("Token is invalid");
         }
