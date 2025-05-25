@@ -20,7 +20,13 @@ internal class GetUserAbsencesHandler(
 
     public async Task<IEnumerable<AbsenceDTO>> Handle(GetUserAbsencesQuery request, CancellationToken cancellationToken)
     {
-        var absences = await _absenceRepository.GetAsync([ q => q.Where(_ => _.UserId == _user.Id)], cancellationToken);
+        var absences = await _absenceRepository.GetAsync(
+            [ 
+                q => q.Where(_ => _.UserId == _user.Id),
+                q => q.Where(_ => _.StartDate < request.EndDate && _.EndDate > request.StartDate)
+            ], 
+            cancellationToken
+        );
         return _mapper.Map<IEnumerable<AbsenceDTO>>(absences);
     }
 }

@@ -15,9 +15,9 @@ public class AbsencesController(ISender sender) : ControllerBase
     private readonly ISender _sender = sender;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get()
+    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var absences = await _sender.Send(new GetUserAbsencesQuery());
+        var absences = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate));
         return Ok(absences);
     } 
 
