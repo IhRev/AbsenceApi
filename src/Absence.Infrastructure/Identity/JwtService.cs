@@ -1,5 +1,6 @@
-﻿using Absence.Domain.Entities;
-using Absence.Domain.Interfaces;
+﻿using Absence.Application.Common.Constants;
+using Absence.Application.Identity;
+using Absence.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,7 +18,8 @@ internal class JwtService(IOptions<JwtConfiguration> jwtConfiguration) : IJwtSer
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(CustomClaimTypes.ShortId, user.ShortId.ToString())
         };
 
         var key = GetSigningKey();
@@ -57,5 +59,5 @@ internal class JwtService(IOptions<JwtConfiguration> jwtConfiguration) : IJwtSer
     }
 
     private SymmetricSecurityKey GetSigningKey() => 
-        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.Secret));
+        new(Encoding.UTF8.GetBytes(_jwtConfiguration.Secret));
 }

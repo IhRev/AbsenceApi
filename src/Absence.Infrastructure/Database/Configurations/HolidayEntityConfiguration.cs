@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;
 
-internal class HolidayEntityConfiguration : EntityConfiguration<AbsenceEntity, int>
+internal class HolidayEntityConfiguration : EntityConfiguration<HolidayEntity, int>
 {
-    public override void Configure(EntityTypeBuilder<AbsenceEntity> builder)
+    public override void Configure(EntityTypeBuilder<HolidayEntity> builder)
     {
         base.Configure(builder);
 
@@ -14,7 +14,6 @@ internal class HolidayEntityConfiguration : EntityConfiguration<AbsenceEntity, i
            .HasMaxLength(30)
            .IsRequired();
 
-
         builder
             .Property(_ => _.StartDate)
             .IsRequired();
@@ -22,5 +21,10 @@ internal class HolidayEntityConfiguration : EntityConfiguration<AbsenceEntity, i
         builder
             .Property(_ => _.EndDate)
             .IsRequired();
+
+        builder
+            .HasOne(_ => _.Organization)
+            .WithMany(_ => _.Holidays)
+            .HasForeignKey(_ => _.OrganizationId);
     }
 }

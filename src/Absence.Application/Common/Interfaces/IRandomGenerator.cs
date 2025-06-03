@@ -1,4 +1,4 @@
-﻿namespace Absence.Domain.Interfaces;
+﻿namespace Absence.Application.Common.Interfaces;
 
 public interface IRandomGenerator
 {

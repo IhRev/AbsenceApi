@@ -18,21 +18,15 @@ public class UsersController(ISender sender) : ControllerBase
     [HttpGet("details")]
     public async Task<ActionResult<UserDetails>> GetUserDetails()
     {
-        var result = await _sender.Send(new GetUserDetailsQuery());
-        return result.Match<ActionResult<UserDetails>>(
-            success => Ok(success.Value),
-            notFound => Unauthorized()
-        );
+        var details = await _sender.Send(new GetUserDetailsQuery());
+        return details;
     }
 
     [HttpPut("details")]
     public async Task<ActionResult> UpdateUserDetails([FromBody] UserDetails userDetails)
     {
-        var result = await _sender.Send(new UpdateUserCommand(userDetails));
-        return result.Match<ActionResult>(
-            success => Ok(),
-            notFound => Unauthorized()
-        );
+        await _sender.Send(new UpdateUserCommand(userDetails));
+        return Ok();
     }
 
     [HttpPut("change_password")]
@@ -41,19 +35,17 @@ public class UsersController(ISender sender) : ControllerBase
         var result = await _sender.Send(new ChangePasswordCommand(request));
         return result.Match<ActionResult>(
             success => Ok(),
-            notFound => Unauthorized(),
-            badRequest => Unauthorized()
+            badRequest => Unauthorized(badRequest.Message)
         );
     }
 
     [HttpDelete]
-    public async Task<ActionResult<UserDetails>> DeleteUser([FromBody] DeleteUserRequest request)
+    public async Task<ActionResult> DeleteUser([FromBody] DeleteUserRequest request)
     {
         var result = await _sender.Send(new DeleteUserCommand(request));
         return result.Match<ActionResult>(
             success => Ok(),
-            notFound => Unauthorized(),
-            badRequest => Unauthorized()
+            badRequest => Unauthorized(badRequest.Message)
         );
     }
 }  

@@ -1,4 +1,6 @@
-﻿using Absence.Domain.Entities;
+﻿using Absence.Application.Common.Interfaces;
+using Absence.Application.Identity;
+using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using Microsoft.Extensions.Options;
 
@@ -27,7 +29,7 @@ internal class RefreshTokenService(
     private async Task SaveToken(UserEntity user, string token, CancellationToken cancellationToken)
     {
         user.RefreshToken = token;
-        user.RefreshTokenExpires = DateTimeOffset.UtcNow.AddDays(_jwtConfiguration.RefreshTokenExpireTimeInDays);
+        user.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(_jwtConfiguration.RefreshTokenExpireTimeInDays);
         await _userService.UpdateAsync(user);
     }
 }

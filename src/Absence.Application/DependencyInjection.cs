@@ -1,4 +1,5 @@
 ﻿using Absence.Application.Common.Adapters;
+using Absence.Application.Common.Interfaces;
 using Absence.Domain.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;

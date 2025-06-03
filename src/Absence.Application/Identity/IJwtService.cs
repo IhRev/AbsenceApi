@@ -1,7 +1,7 @@
 ﻿using Absence.Domain.Entities;
 using System.Security.Claims;
 
-namespace Absence.Domain.Interfaces;
+namespace Absence.Application.Identity;
 
 public interface IJwtService
 {

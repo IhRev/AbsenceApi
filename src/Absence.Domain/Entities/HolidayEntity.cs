@@ -8,4 +8,6 @@ public class HolidayEntity : IIdKeyed<int>
     public required string Name { get; set; }
     public required DateTimeOffset StartDate { get; set; }
     public required DateTimeOffset EndDate { get; set; }
+    public int OrganizationId { get; set; }
+    public OrganizationEntity Organization { get; set; } = null!;
 }

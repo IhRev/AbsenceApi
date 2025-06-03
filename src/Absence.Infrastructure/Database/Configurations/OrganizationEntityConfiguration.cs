@@ -13,5 +13,11 @@ public class OrganizationEntityConfiguration : EntityConfiguration<OrganizationE
             .Property(_ => _.Name)
             .HasMaxLength(100)
             .IsRequired();
+
+        builder
+            .HasOne(_ => _.Owner)
+            .WithMany(_ => _.Organizations)
+            .HasForeignKey(_ => _.OwnerId)
+            .HasPrincipalKey(_ => _.ShortId);
     }
 }

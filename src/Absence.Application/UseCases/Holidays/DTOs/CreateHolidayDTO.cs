@@ -5,4 +5,5 @@ public class CreateHolidayDTO
     public required string Name { get; set; }
     public required DateTimeOffset StartDate { get; set; }
     public required DateTimeOffset EndDate { get; set; }
+    public required int OrganizationId { get; set; }
 }

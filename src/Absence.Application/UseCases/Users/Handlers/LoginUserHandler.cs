@@ -1,6 +1,6 @@
-﻿using Absence.Application.UseCases.Users.Commands;
+﻿using Absence.Application.Identity;
+using Absence.Application.UseCases.Users.Commands;
 using Absence.Application.UseCases.Users.DTOs;
-using Absence.Domain.Interfaces;
 using MediatR;
 
 namespace Absence.Application.UseCases.Users.Handlers;

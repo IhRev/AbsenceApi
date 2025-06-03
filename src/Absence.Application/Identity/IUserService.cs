@@ -1,7 +1,7 @@
 ﻿using Absence.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace Absence.Domain.Interfaces;
+namespace Absence.Application.Identity;
 
 public interface IUserService
 {

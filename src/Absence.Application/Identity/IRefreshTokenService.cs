@@ -1,6 +1,6 @@
 ﻿using Absence.Domain.Entities;
 
-namespace Absence.Domain.Interfaces;
+namespace Absence.Application.Identity;
 
 public interface IRefreshTokenService
 {

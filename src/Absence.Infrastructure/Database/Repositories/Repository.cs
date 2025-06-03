@@ -26,6 +26,20 @@ internal class Repository<TEntity> : IRepository<TEntity>
         Func<IQueryable<TEntity>, IQueryable<TEntity>>[] queries = null!, 
         CancellationToken cancellationToken = default)
     {
+        var query = ApplyQuery(queries);
+        return query.ToListAsync(cancellationToken);
+    }
+
+    public virtual Task<TEntity?> GetFirstOrDefaultAsync(
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>[] queries = null!,
+        CancellationToken cancellationToken = default)
+    {
+        var query = ApplyQuery(queries);
+        return query.FirstOrDefaultAsync(cancellationToken);
+    }
+
+    private IQueryable<TEntity> ApplyQuery(Func<IQueryable<TEntity>, IQueryable<TEntity>>[] queries)
+    {
         IQueryable<TEntity> query = _entities;
 
         if (queries != null)
@@ -33,8 +47,8 @@ internal class Repository<TEntity> : IRepository<TEntity>
             query = queries.Aggregate(query, (current, next) => next(current));
         }
 
-        return query.ToListAsync(cancellationToken);
-    } 
+        return query;
+    }
 
     public virtual Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default) => 
         _entities.FindAsync([id], cancellationToken).AsTask();

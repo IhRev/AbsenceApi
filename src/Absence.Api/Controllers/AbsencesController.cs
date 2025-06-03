@@ -14,18 +14,25 @@ public class AbsencesController(ISender sender) : ControllerBase
 {
     private readonly ISender _sender = sender;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    [Route("organizations")]
+    [HttpGet("{organizationId}/absences")]
+    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var absences = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate));
-        return Ok(absences);
+        var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            badRequest => BadRequest(badRequest.Message)
+        );
     } 
 
     [HttpPost]
     public async Task<ActionResult<int>> Add([FromBody] CreateAbsenceDTO absence)
     {
-        int id = await _sender.Send(new AddAbsenceCommand(absence));
-        return Ok(id);
+        var response = await _sender.Send(new AddAbsenceCommand(absence));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            badRequest => BadRequest(badRequest.Message)
+        );
     }
 
     [HttpPut]
@@ -35,7 +42,8 @@ public class AbsencesController(ISender sender) : ControllerBase
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
-            badRequest => BadRequest()
+            badRequest => BadRequest(badRequest.Message),
+            accessDenied => Forbid()
         );
     }
 
@@ -45,7 +53,8 @@ public class AbsencesController(ISender sender) : ControllerBase
         var result = await _sender.Send(new DeleteAbsenceCommand(id));
         return result.Match<ActionResult>(
             success => Ok(),
-            notFound => NotFound()
+            notFound => NotFound(),
+            accessDenied => Forbid()
         );
     }
 } 

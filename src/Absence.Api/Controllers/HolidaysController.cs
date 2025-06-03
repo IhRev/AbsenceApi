@@ -14,18 +14,26 @@ public class HolidaysController(ISender sender) : ControllerBase
 {
     private readonly ISender _sender = sender;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<HolidayDTO>>> Get()
+    [Route("organizations")]
+    [HttpGet("{organizationId}/holidays")]
+    public async Task<ActionResult<IEnumerable<HolidayDTO>>> Get([FromRoute] int organizationId)
     {
-        var holidays = await _sender.Send(new GetHolidaysQuery());
-        return Ok(holidays);
+        var response = await _sender.Send(new GetHolidaysQuery(organizationId));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            badRequest => BadRequest(badRequest.Message)
+        );
     }
 
     [HttpPost]
     public async Task<ActionResult<int>> Add([FromBody] CreateHolidayDTO holiday)
     {
-        int id = await _sender.Send(new AddHolidayCommand(holiday));
-        return Ok(id);
+        var response = await _sender.Send(new AddHolidayCommand(holiday));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            badRequest => BadRequest(badRequest.Message),
+            accessDenied => Forbid()
+        );
     }
 
     [HttpPut]
@@ -35,7 +43,7 @@ public class HolidaysController(ISender sender) : ControllerBase
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
-            badRequest => BadRequest()
+            accessDenied => Forbid()
         );
     }
 
@@ -45,7 +53,8 @@ public class HolidaysController(ISender sender) : ControllerBase
         var result = await _sender.Send(new DeleteHolidayCommand(id));
         return result.Match<ActionResult>(
             success => Ok(),
-            notFound => NotFound()
+            notFound => NotFound(),
+            accessDenied => Forbid()
         );
     }
 }

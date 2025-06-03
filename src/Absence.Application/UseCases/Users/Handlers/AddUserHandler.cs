@@ -1,6 +1,6 @@
-﻿using Absence.Application.UseCases.Users.Commands;
+﻿using Absence.Application.Identity;
+using Absence.Application.UseCases.Users.Commands;
 using Absence.Domain.Entities;
-using Absence.Domain.Interfaces;
 using MediatR;
 using OneOf;
 using OneOf.Types;

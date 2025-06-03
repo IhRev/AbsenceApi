@@ -1,4 +1,5 @@
-﻿using Absence.Domain.Entities;
+﻿using Absence.Application.Identity;
+using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Database.Repositories;

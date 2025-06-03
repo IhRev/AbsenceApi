@@ -1,6 +1,6 @@
-﻿using Absence.Application.UseCases.Users.Commands;
+﻿using Absence.Application.Identity;
+using Absence.Application.UseCases.Users.Commands;
 using Absence.Application.UseCases.Users.DTOs;
-using Absence.Domain.Interfaces;
 using MediatR;
 using System.Security.Claims;
 
@@ -25,16 +25,13 @@ internal class RefreshTokenHandler(
 
         if (userEntity == null || 
             userEntity.RefreshToken != request.RefreshTokenRequest.RefreshToken ||
-            userEntity.RefreshTokenExpires <= DateTime.UtcNow)
+            userEntity.RefreshTokenExpiresAt <= DateTime.UtcNow)
         {
             return AuthResponse.Fail("Token is invalid");
         }
 
         var newAccessToken = _jwtService.GenerateToken(userEntity);
         var newRefreshToken = await _refreshTokenService.GenerateToken(userEntity, cancellationToken);
-
-        userEntity.RefreshToken = newRefreshToken;
-        await _userService.UpdateAsync(userEntity);
 
         return AuthResponse.Success(newAccessToken, newRefreshToken);
     }

@@ -5,11 +5,13 @@ namespace Absence.Application.UseCases.Absences.DTOs;
 public class CreateAbsenceDTO
 {
     [Required(AllowEmptyStrings = false)]
-    public string Name { get; set; } = null!;
+    public required string Name { get; set; }
     [Required]
     public int Type { get; set; }
     [Required]
     public DateTimeOffset StartDate { get; set; }
     [Required]
     public DateTimeOffset EndDate { get; set; }
+    [Required]
+    public int OrganizationId { get; set; }
 }

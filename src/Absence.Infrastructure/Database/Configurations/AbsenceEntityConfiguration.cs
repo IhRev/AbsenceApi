@@ -30,6 +30,17 @@ public class AbsenceEntityConfiguration : EntityConfiguration<AbsenceEntity, int
         builder
             .HasOne(_ => _.User)
             .WithMany(_ => _.Absences)
-            .HasForeignKey(_ => _.UserId);
+            .HasForeignKey(_ => _.UserId)
+            .HasPrincipalKey(_ => _.ShortId);
+
+        builder
+           .HasOne(_ => _.Organization)
+           .WithMany(_ => _.Absences)
+           .HasForeignKey(_ => _.OrganizationId);
+
+        builder
+            .HasOne(_ => _.AbsenceStatus)
+            .WithMany(_ => _.Absences)
+            .HasForeignKey(_ => _.AbsenceStatusId);
     }
 }

@@ -12,6 +12,21 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             .ToTable("Users");
 
         builder
+            .HasAlternateKey(_ => _.ShortId);
+
+        builder
+            .Property(_ => _.ShortId)
+            .ValueGeneratedOnAdd();
+
+        builder
+            .Property(_ => _.RefreshTokenExpiresAt)
+            .IsRequired(false);
+
+        builder
+            .Property(_ => _.RefreshToken)
+            .IsRequired(false);
+
+        builder
             .Property(_ => _.FirstName)
             .HasMaxLength(50)
             .IsRequired();
@@ -25,10 +40,5 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             .Property(u => u.Email)
             .HasMaxLength(100)
             .IsRequired();
-
-        builder
-            .HasOne(_ => _.Organization)
-            .WithMany(_ => _.Members)
-            .HasForeignKey(_ => _.OrganizationId);
     }
 }
