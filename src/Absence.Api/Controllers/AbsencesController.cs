@@ -1,3 +1,4 @@
+using Absence.Application.Common.Interfaces;
 using Absence.Application.UseCases.Absences.Commands;
 using Absence.Application.UseCases.Absences.DTOs;
 using Absence.Application.UseCases.Absences.Queries;
@@ -10,37 +11,52 @@ namespace Absence.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("absences")]
-public class AbsencesController(ISender sender) : ControllerBase
+public class AbsencesController(ISender sender, IUser user) : ControllerBase
 {
     private readonly ISender _sender = sender;
+    private readonly IUser _user = user;
 
-    [Route("organizations")]
-    [HttpGet("{organizationId}/absences")]
+    [Route("organizations/{organizationId}/absences")]
+    [HttpGet]
     public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId));
+        var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId, _user.ShortId));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message)
+            badRequest => BadRequest(badRequest.Message),
+            accessDenied => Forbid()
         );
-    } 
+    }
+
+    [Route("organizations/{organizationId}/users/{userId}/absences")]
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> GetByUserId([FromRoute] int organizationId, [FromRoute] int userId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId, userId));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            badRequest => BadRequest(badRequest.Message),
+            accessDenied => Forbid()
+        );
+    }
 
     [HttpPost]
     public async Task<ActionResult<int>> Add([FromBody] CreateAbsenceDTO absence)
     {
         var response = await _sender.Send(new AddAbsenceCommand(absence));
         return response.Match<ActionResult>(
-            success => Ok(success.Value),
+            successCreated => Ok(successCreated.Value),
+            successRequested => Ok(successRequested.Value),
             badRequest => BadRequest(badRequest.Message)
         );
     }
 
     [HttpPut]
-    public async Task<ActionResult> Edit([FromBody] EditAbsenceDTO absence)
+    public async Task<ActionResult<string>> Edit([FromBody] EditAbsenceDTO absence)
     {
         var result = await _sender.Send(new EditAbsenceCommand(absence));
         return result.Match<ActionResult>(
-            success => Ok(),
+            success => Ok(success.Value),
             notFound => NotFound(),
             badRequest => BadRequest(badRequest.Message),
             accessDenied => Forbid()
@@ -48,10 +64,33 @@ public class AbsencesController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete([FromRoute] int id)
+    public async Task<ActionResult<string>> Delete([FromRoute] int id)
     {
         var result = await _sender.Send(new DeleteAbsenceCommand(id));
         return result.Match<ActionResult>(
+            success => Ok(success.Value),
+            notFound => NotFound(),
+            accessDenied => Forbid()
+        );
+    }
+
+    [Route("organizations/{organizationId}/absences/events")]
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<AbsenceEventDTO>>> GetEvents([FromRoute] int organizationId)
+    {
+        var response = await _sender.Send(new GetAbsenceEventsQuery(organizationId));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            badRequest => BadRequest(),
+            accessDenied => Forbid()
+        );
+    }
+
+    [HttpPost("events/{eventId}")]
+    public async Task<ActionResult> Respond([FromRoute] int eventId, [FromQuery] bool accepted)
+    {
+        var response = await _sender.Send(new RespondAbsenceEventCommand(eventId, accepted));
+        return response.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
             accessDenied => Forbid()

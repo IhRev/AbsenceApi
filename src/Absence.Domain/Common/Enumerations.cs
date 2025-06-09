@@ -1,9 +1,8 @@
 ﻿namespace Absence.Domain.Common;
 
-public enum AbsenceStatus
+public enum AbsenceEventType
 {
-    PENDING,
-    ACCEPTED,
-    REJECTED,
-    DELETED
+    CREATE,
+    UPDATE,
+    DELETE
 }

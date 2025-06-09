@@ -16,18 +16,18 @@ internal class GetUserAbsencesHandler(
     IRepository<OrganizationUserEntity> organizationUserRepository,
     IMapper mapper,
     IUser user
-) : IRequestHandler<GetUserAbsencesQuery, OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>>
+) : IRequestHandler<GetUserAbsencesQuery, OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>>
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
     private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
     private readonly IMapper _mapper = mapper;
     private readonly IUser _user = user;
 
-    public async Task<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>> Handle(GetUserAbsencesQuery request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>> Handle(GetUserAbsencesQuery request, CancellationToken cancellationToken)
     {
         var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
             [
-                q => q.Where(_ => _.UserId == _user.ShortId),
+                q => q.Where(_ => _.UserId == _user.ShortId && _.UserId == request.UserId),
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId)
             ],
             cancellationToken
@@ -36,10 +36,14 @@ internal class GetUserAbsencesHandler(
         {
             return new BadRequest($"No organization with id {request.OrganizationId} found.");
         }
+        if (_user.ShortId != request.UserId && !organizationUser.IsAdmin)
+        {
+            return new AccessDenied();
+        }
 
         var absences = await _absenceRepository.GetAsync(
             [ 
-                q => q.Where(_ => _.UserId == _user.ShortId),
+                q => q.Where(_ => _.UserId == request.UserId),
                 q => q.Where(_ => _.StartDate < request.EndDate && _.EndDate > request.StartDate),
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId),
             ], 

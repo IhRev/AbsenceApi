@@ -21,6 +21,17 @@ public class OrganizationsController(ISender sender) : ControllerBase
         return Ok(organizations);
     }
 
+    [HttpGet("{organizationId}/members")]
+    public async Task<ActionResult<IEnumerable<MemberDTO>>> Get([FromRoute] int organizationId)
+    {
+        var result = await _sender.Send(new GetOrganizationMembersQuery(organizationId));
+        return result.Match<ActionResult>(
+            success => Ok(success.Value),    
+            badRequest => Ok(badRequest.Message),    
+            accessDenied => Forbid()    
+        );
+    }
+
     [HttpPost]
     public async Task<ActionResult<int>> Add([FromBody] CreateOrganizationDTO organization)
     {

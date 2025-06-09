@@ -11,6 +11,7 @@ public class UserEntity : IdentityUser, IIdKeyed<string>
     public string? RefreshToken { get; set; }
     public DateTimeOffset? RefreshTokenExpiresAt { get; set; }
     public ICollection<AbsenceEntity> Absences { get; set; } = [];
+    public ICollection<AbsenceEventEntity> AbsenceEvents { get; set; } = [];
     public ICollection<OrganizationEntity> Organizations { get; set; } = [];
     public ICollection<OrganizationUserEntity> OrganizationsUsers { get; set; } = [];
     public ICollection<OrganizationUserInvitationEntity> OrganizationUserInvitations { get; set; } = [];

@@ -6,7 +6,7 @@ using OneOf;
 
 namespace Absence.Application.UseCases.Absences.Commands;
 
-public class AddAbsenceCommand(CreateAbsenceDTO absence) : IRequest<OneOf<Success<int>, BadRequest>>
+public class AddAbsenceCommand(CreateAbsenceDTO absence) : IRequest<OneOf<Success<int>, Success<string>, BadRequest>>
 {
     public CreateAbsenceDTO Absence { get; } = absence;
 }
