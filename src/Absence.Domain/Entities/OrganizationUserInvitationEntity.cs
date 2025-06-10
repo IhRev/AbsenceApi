@@ -8,5 +8,5 @@ public class OrganizationUserInvitationEntity : IIdKeyed<int>
     public int OrganizationId { get; set; }
     public int UserId { get; set; }
     public virtual OrganizationEntity Organization { get; set; } = null!;
-    public UserEntity User { get; set; } = null!;
+    public virtual UserEntity User { get; set; } = null!;
 }

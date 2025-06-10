@@ -8,6 +8,6 @@ public class OrganizationUserEntity : IIdKeyed<int>
     public bool IsAdmin { get; set; }
     public int OrganizationId { get; set; }
     public int UserId { get; set; }
-    public virtual required OrganizationEntity Organization { get; set; }
+    public virtual OrganizationEntity Organization { get; set; } = null!;
     public UserEntity User { get; set; } = null!;
 }

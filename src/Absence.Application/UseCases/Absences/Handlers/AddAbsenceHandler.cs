@@ -34,13 +34,13 @@ internal class AddAbsenceHandler(
         var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
             [
                 q => q.Where(_ => _.UserId == _user.ShortId),
-                q => q.Where(_ => _.OrganizationId == request.Absence.OrganizationId)
+                q => q.Where(_ => _.OrganizationId == request.Absence.Organization)
             ],
             cancellationToken
         );
         if (organizationUser is null)
         {
-            return new BadRequest($"No organization with id {request.Absence.OrganizationId} found.");
+            return new BadRequest($"No organization with id {request.Absence.Organization} found.");
         }
 
         var absenceType = await _absenceTypesRepository.GetByIdAsync(request.Absence.Type, cancellationToken);

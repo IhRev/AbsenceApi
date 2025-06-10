@@ -2,7 +2,7 @@
 using Absence.Domain.Entities;
 using AutoMapper;
 
-namespace Absence.Application.Mappings;
+namespace Absence.Application.UseCases.Users.Mappings;
 
 internal class UserMapping : Profile
 {

@@ -2,7 +2,7 @@
 using Absence.Domain.Entities;
 using AutoMapper;
 
-namespace Absence.Application.Mappings;
+namespace Absence.Application.UseCases.AbsenceTypes.Mappings;
 
 internal class AbsenceTypeMapping : Profile
 {

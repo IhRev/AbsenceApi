@@ -50,16 +50,15 @@ internal class EditAbsenceHandler(
         );
         if (organizationUser!.IsAdmin)
         {
-            absence = _mapper.Map(request.Absence, absence);
             if (absence.AbsenceTypeId != request.Absence.Type)
             {
                 var type = await _absenceTypeRepository.GetByIdAsync(request.Absence.Type, cancellationToken);
-                if (type == null)
+                if (type is null)
                 {
                     return new BadRequest($"Type with id {request.Absence.Type} doesn't exist");
                 }
 
-                absence.AbsenceTypeId = type.Id;
+                absence = _mapper.Map(request.Absence, absence);
             }
 
             _absenceRepository.Update(absence);

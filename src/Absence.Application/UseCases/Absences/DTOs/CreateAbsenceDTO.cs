@@ -13,5 +13,5 @@ public class CreateAbsenceDTO
     [Required]
     public DateTimeOffset EndDate { get; set; }
     [Required]
-    public int OrganizationId { get; set; }
+    public int Organization { get; set; }
 }
