@@ -1,4 +1,5 @@
 ﻿using Absence.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;
@@ -13,11 +14,13 @@ internal class OrganizationUserInvitationEntityConfiguration : EntityConfigurati
             .HasOne(_ => _.User)
             .WithMany(_ => _.OrganizationUserInvitations)
             .HasForeignKey(_ => _.UserId)
-            .HasPrincipalKey(_ => _.ShortId);
+            .HasPrincipalKey(_ => _.ShortId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .HasOne(_ => _.Organization)
             .WithMany(_ => _.OrganizationUserInvitations)
-            .HasForeignKey(_ => _.OrganizationId);
+            .HasForeignKey(_ => _.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

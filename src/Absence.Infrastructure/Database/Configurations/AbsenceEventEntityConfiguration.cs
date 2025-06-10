@@ -1,4 +1,5 @@
 ﻿using Absence.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;
@@ -31,23 +32,22 @@ public class AbsenceEventEntityConfiguration : EntityConfiguration<AbsenceEventE
            .IsRequired(false);
 
         builder
-           .Property(_ => _.UserId)
-           .IsRequired(false);
-
-        builder
             .HasOne(_ => _.AbsenceEventType)
             .WithMany(_ => _.AbsenceEvents)
-            .HasForeignKey(_ => _.AbsenceEventTypeId);
+            .HasForeignKey(_ => _.AbsenceEventTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder
             .HasOne(_ => _.Organization)
             .WithMany(_ => _.AbsenceEvents)
-            .HasForeignKey(_ => _.OrganizationId);
+            .HasForeignKey(_ => _.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .HasOne(_ => _.User)
             .WithMany(_ => _.AbsenceEvents)
             .HasPrincipalKey(_ => _.ShortId)
-            .HasForeignKey(_ => _.UserId);
+            .HasForeignKey(_ => _.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

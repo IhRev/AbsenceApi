@@ -1,4 +1,5 @@
 ﻿using Absence.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;
@@ -18,6 +19,7 @@ public class OrganizationEntityConfiguration : EntityConfiguration<OrganizationE
             .HasOne(_ => _.Owner)
             .WithMany(_ => _.Organizations)
             .HasForeignKey(_ => _.OwnerId)
-            .HasPrincipalKey(_ => _.ShortId);
+            .HasPrincipalKey(_ => _.ShortId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Absence.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;
@@ -25,6 +26,7 @@ internal class HolidayEntityConfiguration : EntityConfiguration<HolidayEntity, i
         builder
             .HasOne(_ => _.Organization)
             .WithMany(_ => _.Holidays)
-            .HasForeignKey(_ => _.OrganizationId);
+            .HasForeignKey(_ => _.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
