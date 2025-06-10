@@ -14,8 +14,7 @@ public class HolidaysController(ISender sender) : ControllerBase
 {
     private readonly ISender _sender = sender;
 
-    [Route("organizations")]
-    [HttpGet("{organizationId}/holidays")]
+    [HttpGet("/organizations/{organizationId}/holidays")]
     public async Task<ActionResult<IEnumerable<HolidayDTO>>> Get([FromRoute] int organizationId)
     {
         var response = await _sender.Send(new GetHolidaysQuery(organizationId));

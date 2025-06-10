@@ -8,7 +8,7 @@ namespace Absence.Api.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("absence_types")]
+[Route("absences/types")]
 public class AbsenceTypesController(ISender sender) : ControllerBase
 {
     private readonly ISender _sender = sender;

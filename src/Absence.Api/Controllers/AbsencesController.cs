@@ -16,8 +16,7 @@ public class AbsencesController(ISender sender, IUser user) : ControllerBase
     private readonly ISender _sender = sender;
     private readonly IUser _user = user;
 
-    [Route("organizations/{organizationId}/absences")]
-    [HttpGet]
+    [HttpGet("/organizations/{organizationId}/absences")]
     public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId, _user.ShortId));
@@ -28,8 +27,7 @@ public class AbsencesController(ISender sender, IUser user) : ControllerBase
         );
     }
 
-    [Route("organizations/{organizationId}/users/{userId}/absences")]
-    [HttpGet]
+    [HttpGet("/organizations/{organizationId}/users/{userId}/absences")]
     public async Task<ActionResult<IEnumerable<AbsenceDTO>>> GetByUserId([FromRoute] int organizationId, [FromRoute] int userId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId, userId));
@@ -74,8 +72,7 @@ public class AbsencesController(ISender sender, IUser user) : ControllerBase
         );
     }
 
-    [Route("organizations/{organizationId}/absences/events")]
-    [HttpGet]
+    [HttpGet("/organizations/{organizationId}/absences/events")]
     public async Task<ActionResult<IEnumerable<AbsenceEventDTO>>> GetEvents([FromRoute] int organizationId)
     {
         var response = await _sender.Send(new GetAbsenceEventsQuery(organizationId));
