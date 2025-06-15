@@ -13,13 +13,13 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 
 internal class GetUserAbsencesHandler(
     IRepository<AbsenceEntity> absenceRepository,
-    IRepository<OrganizationUserEntity> organizationUserRepository,
+    IOrganizationUsersRepository organizationUserRepository,
     IMapper mapper,
     IUser user
 ) : IRequestHandler<GetUserAbsencesQuery, OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>>
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
-    private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
+    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IMapper _mapper = mapper;
     private readonly IUser _user = user;
 

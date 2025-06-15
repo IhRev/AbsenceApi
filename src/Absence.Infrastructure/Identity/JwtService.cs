@@ -29,7 +29,7 @@ internal class JwtService(IOptions<JwtConfiguration> jwtConfiguration) : IJwtSer
             issuer: _jwtConfiguration.Issuer,
             audience: _jwtConfiguration.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtConfiguration.RefreshTokenExpireTimeInDays),
+            expires: DateTime.UtcNow.AddMinutes(_jwtConfiguration.JwtTokenExpireTimeInMinutes),
             signingCredentials: credentials
         );
 

@@ -1,7 +1,6 @@
 ﻿using Absence.Application.Common.Interfaces;
 using Absence.Application.UseCases.Organizations.DTOs;
 using Absence.Application.UseCases.Organizations.Queries;
-using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using AutoMapper;
 using MediatR;
@@ -9,14 +8,12 @@ using MediatR;
 namespace Absence.Application.UseCases.Organizations.Handlers;
 
 internal class GetUserOrganizationsHandler(
-    IRepository<OrganizationEntity> organizationRepository,
-    IRepository<OrganizationUserEntity> organizationUserRepository,
+    IOrganizationUsersRepository organizationUserRepository,
     IMapper mapper,
     IUser user
 ) : IRequestHandler<GetUserOrganizationsQuery, IEnumerable<OrganizationDTO>>
 {
-    private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
-    private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
+    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IMapper _mapper = mapper;
     private readonly IUser _user = user;
 

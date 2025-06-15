@@ -12,14 +12,14 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 
 internal class DeleteAbsenceHandler(
     IRepository<AbsenceEntity> absenceRepository,
-    IRepository<OrganizationUserEntity> organizationUserRepository,
+    IOrganizationUsersRepository organizationUserRepository,
     IRepository<AbsenceEventTypeEntity> absenceEventTypeRepository,
     IRepository<AbsenceEventEntity> absenceEventRepository,
     IUser user
 ) : IRequestHandler<DeleteAbsenceCommand, OneOf<Success<string>, NotFound, AccessDenied>>
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
-    private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
+    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IRepository<AbsenceEventTypeEntity> _absenceEventTypeRepository = absenceEventTypeRepository;
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
     private readonly IUser _user = user;

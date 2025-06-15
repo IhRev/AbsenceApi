@@ -12,13 +12,13 @@ namespace Absence.Application.UseCases.Invitations.Handlers;
 
 internal class AcceptInvitationHandler(
     IRepository<OrganizationUserInvitationEntity> organizationUserInvitationRepository,
-    IRepository<OrganizationUserEntity> organizationUserRepository,
+    IOrganizationUsersRepository organizationUserRepository,
     IUser user,
     IMapper mapper
 ) : IRequestHandler<AcceptInvitationCommand, OneOf<Success, NotFound, AccessDenied>>
 {
     private readonly IRepository<OrganizationUserInvitationEntity> _organizationUserInvitationRepository = organizationUserInvitationRepository;
-    private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
+    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IUser _user = user;
     private readonly IMapper _mapper = mapper;
 

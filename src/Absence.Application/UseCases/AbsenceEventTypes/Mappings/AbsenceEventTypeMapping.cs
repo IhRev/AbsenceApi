@@ -9,6 +9,6 @@ internal class AbsenceEventTypeMapping : Profile
     public AbsenceEventTypeMapping()
     {
         CreateMap<AbsenceEventTypeEntity, AbsenceEventTypeDTO>()
-            .ForMember(dest => dest, opt => opt.MapFrom(src => src.Name.ToString()));
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.ToString()));
     }
 }

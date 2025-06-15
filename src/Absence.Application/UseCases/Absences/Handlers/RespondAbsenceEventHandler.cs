@@ -14,7 +14,7 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 public class RespondAbsenceEventHandler(
     IRepository<AbsenceEventEntity> absenceEventRepository,
     IRepository<AbsenceEventTypeEntity> absenceEventTypesRepository,
-    IRepository<OrganizationUserEntity> organizationUserRepository,
+    IOrganizationUsersRepository organizationUserRepository,
     IRepository<AbsenceEntity> absenceRepository,
     IUser user,
     IMapper mapper
@@ -22,7 +22,7 @@ public class RespondAbsenceEventHandler(
 {
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
     private readonly IRepository<AbsenceEventTypeEntity> _absenceEventTypesRepository = absenceEventTypesRepository;
-    private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
+    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
     private readonly IUser _user = user;
     private readonly IMapper _mapper = mapper;

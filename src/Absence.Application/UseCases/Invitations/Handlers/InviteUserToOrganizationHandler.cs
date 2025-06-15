@@ -12,14 +12,14 @@ namespace Absence.Application.UseCases.Invitations.Handlers;
 
 public class InviteUserToOrganizationHandler(
     IRepository<OrganizationUserInvitationEntity> organizationUserInvitationRepository,
-    IRepository<OrganizationUserEntity> organizationUserRepository,
+    IOrganizationUsersRepository organizationUserRepository,
     IRepository<OrganizationEntity> organizationRepository,
     IUserService userService,
     IUser user
 ) : IRequestHandler<InviteUserToOrganizationCommand, OneOf<Success, BadRequest, AccessDenied>>
 {
     private readonly IRepository<OrganizationUserInvitationEntity> _organizationUserInvitationRepository = organizationUserInvitationRepository;
-    private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
+    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
     private readonly IUserService _userService = userService;
     private readonly IUser _user = user;

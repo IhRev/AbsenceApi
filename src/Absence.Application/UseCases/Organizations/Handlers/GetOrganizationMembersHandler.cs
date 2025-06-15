@@ -12,13 +12,13 @@ using AutoMapper;
 namespace Absence.Application.UseCases.Organizations.Handlers;
 
 public class GetOrganizationMembersHandler(
-    IRepository<OrganizationUserEntity> organizationUserRepository,
+    IOrganizationUsersRepository organizationUserRepository,
     IRepository<UserEntity> userRepository,
     IUser user,
     IMapper mapper
 ) : IRequestHandler<GetOrganizationMembersQuery, OneOf<Success<IEnumerable<MemberDTO>>, BadRequest, AccessDenied>>
 {
-    private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
+    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IRepository<UserEntity> _userRepository = userRepository;
     private readonly IUser _user = user;
     private readonly IMapper _mapper = mapper;

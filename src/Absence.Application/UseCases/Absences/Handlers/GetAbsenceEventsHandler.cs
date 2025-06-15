@@ -12,13 +12,13 @@ using AutoMapper;
 namespace Absence.Application.UseCases.Absences.Handlers;
 
 public class GetAbsenceEventsHandler(
-    IRepository<OrganizationUserEntity> organizationUserRepository,
+    IOrganizationUsersRepository organizationUserRepository,
     IRepository<AbsenceEventEntity> absenceEventRepository,
     IUser user,
     IMapper mapper
 ) : IRequestHandler<GetAbsenceEventsQuery, OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest, AccessDenied>>
 {
-    private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
+    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
     private readonly IUser _user = user;
     private readonly IMapper _mapper = mapper;
