@@ -9,7 +9,5 @@ public class EditHolidayDTO
     [Required(AllowEmptyStrings = false)]
     public required string Name { get; set; }
     [Required()]
-    public required DateTimeOffset StartDate { get; set; }
-    [Required()]
-    public required DateTimeOffset EndDate { get; set; }
+    public required DateTimeOffset Date { get; set; }
 }

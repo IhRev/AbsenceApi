@@ -16,11 +16,7 @@ internal class HolidayEntityConfiguration : EntityConfiguration<HolidayEntity, i
            .IsRequired();
 
         builder
-            .Property(_ => _.StartDate)
-            .IsRequired();
-
-        builder
-            .Property(_ => _.EndDate)
+            .Property(_ => _.Date)
             .IsRequired();
 
         builder
