@@ -32,7 +32,8 @@ internal class OrganizationUsersRepository : IOrganizationUsersRepository
         {
             query = queries
                 .Aggregate(query, (current, next) => next(current))
-                .Include(_ => _.Organization);
+                .Include(_ => _.Organization)
+                .Include(_ => _.User);
         }
 
         return query.ToListAsync(cancellationToken);

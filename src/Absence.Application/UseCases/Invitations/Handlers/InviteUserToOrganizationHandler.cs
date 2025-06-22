@@ -14,6 +14,7 @@ public class InviteUserToOrganizationHandler(
     IRepository<OrganizationUserInvitationEntity> organizationUserInvitationRepository,
     IOrganizationUsersRepository organizationUserRepository,
     IRepository<OrganizationEntity> organizationRepository,
+    IRepository<OrganizationUserInvitationEntity> invitationRepository,
     IUserService userService,
     IUser user
 ) : IRequestHandler<InviteUserToOrganizationCommand, OneOf<Success, BadRequest, AccessDenied>>
@@ -26,30 +27,58 @@ public class InviteUserToOrganizationHandler(
 
     public async Task<OneOf<Success, BadRequest, AccessDenied>> Handle(InviteUserToOrganizationCommand request, CancellationToken cancellationToken)
     {
-        var invitedUser = await _userService.FindByEmailAsync(request.Invite.UserEmail);
-        if (invitedUser is null)
-        {
-            return new BadRequest($"User with email {request.Invite.UserEmail} doesn't exist.");
-        }
-
         var organization = _organizationRepository.GetByIdAsync(request.Invite.OrganizationId, cancellationToken);
         if (organization is null)
         {
             return new BadRequest($"Organization with id {request.Invite.OrganizationId} doesn't exist.");
         }
 
-        var organizationUserEntity = await _organizationUserRepository.GetFirstOrDefaultAsync(
+        var inviterOrganization = await _organizationUserRepository.GetFirstOrDefaultAsync(
             [
-                q => q.Where(_ => 
+                q => q.Where(_ =>
                     _.OrganizationId == request.Invite.OrganizationId &&
                     _.UserId == _user.ShortId
                 )
-            ], 
+            ],
             cancellationToken
         );
-        if (organizationUserEntity is null || !organizationUserEntity.IsAdmin)
+        if (inviterOrganization is null || !inviterOrganization.IsAdmin)
         {
             return new AccessDenied();
+        }
+
+        var invitedUser = await _userService.FindByEmailAsync(request.Invite.UserEmail);
+        if (invitedUser is null)
+        {
+            return new BadRequest($"User with email {request.Invite.UserEmail} doesn't exist.");
+        }
+
+        var invitedUserOrganization = await _organizationUserRepository.GetFirstOrDefaultAsync(
+            [
+                q => q.Where(_ =>
+                    _.OrganizationId == request.Invite.OrganizationId &&
+                    _.UserId == invitedUser.ShortId
+                )
+            ],
+            cancellationToken
+        );
+        if (invitedUserOrganization is not null)
+        {
+            return new BadRequest($"Invited user already belongs to organization.");
+        }
+
+        var invitation = await invitationRepository.GetFirstOrDefaultAsync(
+            [
+                q => q.Where(_ => 
+                    _.OrganizationId == request.Invite.OrganizationId && 
+                    _.UserId == invitedUser.ShortId
+                )
+            ],
+            cancellationToken
+        );
+        if (invitation is not null)
+        {
+            return new BadRequest("Invitation already sent.");
         }
 
         await _organizationUserInvitationRepository.InsertAsync(

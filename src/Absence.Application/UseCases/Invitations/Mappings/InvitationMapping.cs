@@ -13,6 +13,7 @@ internal class InvitationMapping : Profile
             .ForMember(dest => dest.Inviter, opt => opt.MapFrom(src => src.User.Email));
 
         CreateMap<OrganizationUserInvitationEntity, OrganizationUserEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.IsAdmin, opt => opt.MapFrom(src => false));
     }
 }

@@ -4,7 +4,6 @@ using MediatR;
 using OneOf.Types;
 using OneOf;
 using Absence.Application.UseCases.Organizations.Queries;
-using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using Absence.Application.Common.Interfaces;
 using AutoMapper;
@@ -13,13 +12,11 @@ namespace Absence.Application.UseCases.Organizations.Handlers;
 
 public class GetOrganizationMembersHandler(
     IOrganizationUsersRepository organizationUserRepository,
-    IRepository<UserEntity> userRepository,
     IUser user,
     IMapper mapper
 ) : IRequestHandler<GetOrganizationMembersQuery, OneOf<Success<IEnumerable<MemberDTO>>, BadRequest, AccessDenied>>
 {
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-    private readonly IRepository<UserEntity> _userRepository = userRepository;
     private readonly IUser _user = user;
     private readonly IMapper _mapper = mapper;
     
@@ -41,19 +38,13 @@ public class GetOrganizationMembersHandler(
             return new AccessDenied();
         }
 
-        var membersIds = (await _organizationUserRepository.GetAsync(
+        var organizationUsers = await _organizationUserRepository.GetAsync(
             [
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId)
             ],
             cancellationToken
-        )).Select(_ => _.UserId).ToList();
-
-        var users = await _userRepository.GetAsync(
-            [
-                q => q.Where(_ => membersIds.Contains(_.ShortId))
-            ], 
-            cancellationToken
         );
-        return new Success<IEnumerable<MemberDTO>>(_mapper.Map<IEnumerable<MemberDTO>>(users));
+
+        return new Success<IEnumerable<MemberDTO>>(_mapper.Map<IEnumerable<MemberDTO>>(organizationUsers));
     }
 }

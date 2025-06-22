@@ -1,7 +1,6 @@
 ﻿using Absence.Application.Common.Interfaces;
 using Absence.Application.UseCases.Invitations.DTOs;
 using Absence.Application.UseCases.Invitations.Queries;
-using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using AutoMapper;
 using MediatR;
@@ -10,12 +9,12 @@ namespace Absence.Application.UseCases.Invitations.Handlers;
 
 public class GetUserInvitationsHandler(
     IUser user,
-    IRepository<OrganizationUserInvitationEntity> organizationUserInvitationRepository,
+    IOrganizationUserInvitationsRepository organizationUserInvitationRepository,
     IMapper mapper
 ) : IRequestHandler<GetUserInvitationsQuery, IEnumerable<InvitationDTO>>
 {
     private readonly IUser _user = user;
-    private readonly IRepository<OrganizationUserInvitationEntity> _organizationUserInvitationRepository = organizationUserInvitationRepository;
+    private readonly IOrganizationUserInvitationsRepository _organizationUserInvitationRepository = organizationUserInvitationRepository;
     private readonly IMapper _mapper = mapper;
 
     public async Task<IEnumerable<InvitationDTO>> Handle(GetUserInvitationsQuery request, CancellationToken cancellationToken)

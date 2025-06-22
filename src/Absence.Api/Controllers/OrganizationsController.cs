@@ -26,9 +26,9 @@ public class OrganizationsController(ISender sender) : ControllerBase
     {
         var result = await _sender.Send(new GetOrganizationMembersQuery(organizationId));
         return result.Match<ActionResult>(
-            success => Ok(success.Value),    
-            badRequest => Ok(badRequest.Message),    
-            accessDenied => Forbid()    
+            success => Ok(success.Value),
+            badRequest => BadRequest(badRequest.Message),
+            accessDenied => Forbid()
         );
     }
 
@@ -37,5 +37,40 @@ public class OrganizationsController(ISender sender) : ControllerBase
     {
         var id = await _sender.Send(new AddOrganizationCommand(organization));
         return Ok(id);
+    }
+
+    [HttpDelete("{organizationId}")]
+    public async Task<ActionResult> Delete([FromRoute] int organizationId)
+    {
+        var result = await _sender.Send(new DeleteOrganizationCommand(organizationId));
+        return result.Match<ActionResult>(
+            success => Ok(),
+            notFound => NotFound(),
+            accessDenied => Forbid()
+        );
+    }
+
+    [HttpPut("{organizationId}/members/{memberId}")]
+    public async Task<ActionResult> ChangeAccess([FromRoute] int organizationId, [FromRoute] int memberId , [FromQuery] bool isAdmin)
+    {
+        var result = await _sender.Send(new ChangeMemberAccessCommand(organizationId, memberId, isAdmin));
+        return result.Match<ActionResult>(
+            success => Ok(),
+            notFound => NotFound(),
+            accessDenied => Forbid(),
+            badRequest => BadRequest(badRequest.Message)
+        );
+    }
+
+    [HttpPut]
+    public async Task<ActionResult> Edit([FromBody] EditOrganizationDTO editOrganizationDTO)
+    {
+        var result = await _sender.Send(new EditOrganizationCommand(editOrganizationDTO));
+        return result.Match<ActionResult>(
+            success => Ok(),
+            notFound => NotFound(),
+            badRequest => BadRequest(badRequest.Message),
+            accessDenied => Forbid()
+        );
     }
 }
