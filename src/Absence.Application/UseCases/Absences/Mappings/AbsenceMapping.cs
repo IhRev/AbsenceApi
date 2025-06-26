@@ -12,7 +12,10 @@ internal class AbsenceMapping : Profile
             .ForMember(dest => dest.AbsenceTypeId, opt => opt.MapFrom(src => src.Type))
             .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Organization))
             .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.UserId, opt => opt.Ignore());
+            .ForMember(dest => dest.UserId, opt => opt.Ignore())
+            .ForMember(dest => dest.AbsenceType, opt => opt.Ignore())
+            .ForMember(dest => dest.User, opt => opt.Ignore())
+            .ForMember(dest => dest.Organization, opt => opt.Ignore());
 
         CreateMap<CreateAbsenceDTO, AbsenceEventEntity>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -20,7 +23,10 @@ internal class AbsenceMapping : Profile
             .ForMember(dest => dest.AbsenceEventTypeId, opt => opt.Ignore())
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
             .ForMember(dest => dest.AbsenceTypeId, opt => opt.MapFrom(src => src.Type))
-            .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Organization));
+            .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Organization))
+            .ForMember(dest => dest.Organization, opt => opt.Ignore())
+            .ForMember(dest => dest.User, opt => opt.Ignore())
+            .ForMember(dest => dest.AbsenceEventType, opt => opt.Ignore());
 
         CreateMap<EditAbsenceDTO, AbsenceEventEntity>()
             .ForMember(dest => dest.AbsenceId, opt => opt.MapFrom(src => src.Id))
@@ -28,12 +34,18 @@ internal class AbsenceMapping : Profile
             .ForMember(dest => dest.AbsenceTypeId, opt => opt.MapFrom(src => src.Type))
             .ForMember(dest => dest.AbsenceEventTypeId, opt => opt.Ignore())
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
-            .ForMember(dest => dest.OrganizationId, opt => opt.Ignore());
+            .ForMember(dest => dest.OrganizationId, opt => opt.Ignore())
+            .ForMember(dest => dest.Organization, opt => opt.Ignore())
+            .ForMember(dest => dest.User, opt => opt.Ignore())
+            .ForMember(dest => dest.AbsenceEventType, opt => opt.Ignore());
 
         CreateMap<EditAbsenceDTO, AbsenceEntity>()
             .ForMember(dest => dest.AbsenceTypeId, opt => opt.MapFrom(src => src.Type))
             .ForMember(dest => dest.OrganizationId, opt => opt.Ignore())
-            .ForMember(dest => dest.UserId, opt => opt.Ignore());
+            .ForMember(dest => dest.UserId, opt => opt.Ignore())
+            .ForMember(dest => dest.AbsenceType, opt => opt.Ignore())
+            .ForMember(dest => dest.User, opt => opt.Ignore())
+            .ForMember(dest => dest.Organization, opt => opt.Ignore());
 
         CreateMap<AbsenceEventEntity, AbsenceDTO>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.AbsenceId ?? 0));

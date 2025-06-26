@@ -40,7 +40,7 @@ internal class GetUserAbsencesHandler(
         {
             return new AccessDenied();
         }
-
+ 
         var absences = await _absenceRepository.GetAsync(
             [ 
                 q => q.Where(_ => _.UserId == request.UserId),

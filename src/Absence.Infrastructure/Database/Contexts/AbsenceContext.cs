@@ -13,6 +13,8 @@ public class AbsenceContext(DbContextOptions options) : IdentityDbContext<UserEn
     public virtual DbSet<OrganizationEntity> Organizations { get; set; }
     public virtual DbSet<OrganizationUserEntity> OrganizationUsers { get; set; }
     public virtual DbSet<OrganizationUserInvitationEntity> OrganizationUserInvitations { get; set; }
+    public virtual DbSet<AbsenceEventEntity> AbsenceEvents { get; set; }
+    public virtual DbSet<AbsenceEventTypeEntity> AbsenceEventTypes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

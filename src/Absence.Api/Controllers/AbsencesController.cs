@@ -54,7 +54,7 @@ public class AbsencesController(ISender sender, IUser user) : ControllerBase
     {
         var result = await _sender.Send(new EditAbsenceCommand(absence));
         return result.Match<ActionResult>(
-            success => Ok(success.Value),
+            success => Ok(new { Message = success.Value }),
             notFound => NotFound(),
             badRequest => BadRequest(badRequest.Message),
             accessDenied => Forbid()
@@ -66,7 +66,7 @@ public class AbsencesController(ISender sender, IUser user) : ControllerBase
     {
         var result = await _sender.Send(new DeleteAbsenceCommand(id));
         return result.Match<ActionResult>(
-            success => Ok(success.Value),
+            success => Ok(new { Message = success.Value }),
             notFound => NotFound(),
             accessDenied => Forbid()
         );
