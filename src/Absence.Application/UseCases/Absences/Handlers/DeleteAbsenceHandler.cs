@@ -4,6 +4,7 @@ using Absence.Application.UseCases.Absences.Commands;
 using Absence.Domain.Common;
 using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
+using AutoMapper;
 using MediatR;
 using OneOf;
 using OneOf.Types;
@@ -15,7 +16,8 @@ internal class DeleteAbsenceHandler(
     IOrganizationUsersRepository organizationUserRepository,
     IRepository<AbsenceEventTypeEntity> absenceEventTypeRepository,
     IRepository<AbsenceEventEntity> absenceEventRepository,
-    IUser user
+    IUser user,
+    IMapper mapper
 ) : IRequestHandler<DeleteAbsenceCommand, OneOf<Success<string>, NotFound, AccessDenied>>
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
@@ -23,6 +25,7 @@ internal class DeleteAbsenceHandler(
     private readonly IRepository<AbsenceEventTypeEntity> _absenceEventTypeRepository = absenceEventTypeRepository;
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
     private readonly IUser _user = user;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<OneOf<Success<string>, NotFound, AccessDenied>> Handle(DeleteAbsenceCommand request, CancellationToken cancellationToken)
     {
@@ -51,11 +54,7 @@ internal class DeleteAbsenceHandler(
         }
         else
         {
-            var absenceEvent = new AbsenceEventEntity()
-            {
-                OrganizationId = organizationUser.OrganizationId,
-                UserId = organizationUser.UserId
-            };
+            var absenceEvent = _mapper.Map<AbsenceEventEntity>(absence);
             var eventType = await _absenceEventTypeRepository.GetFirstOrDefaultAsync(
                 [
                     q => q.Where(_ => _.Name == AbsenceEventType.DELETE)
