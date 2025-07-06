@@ -61,5 +61,9 @@ internal class AbsenceMapping : Profile
         CreateMap<AbsenceEventEntity, AbsenceEventDTO>()
             .ForMember(dest => dest.AbsenceType, opt => opt.MapFrom(src => src.AbsenceTypeId))
             .ForMember(dest => dest.AbsenceEventType, opt => opt.MapFrom(src => src.AbsenceEventTypeId));
+
+        CreateMap<AbsenceEventEntity, AbsenceEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.AbsenceType, opt => opt.Ignore());
     }
 }

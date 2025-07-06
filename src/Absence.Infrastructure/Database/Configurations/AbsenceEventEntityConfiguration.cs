@@ -17,19 +17,19 @@ public class AbsenceEventEntityConfiguration : EntityConfiguration<AbsenceEventE
         builder
            .Property(_ => _.Name)
            .HasMaxLength(30)
-           .IsRequired(false);
+           .IsRequired();
 
         builder
             .Property(_ => _.StartDate)
-            .IsRequired(false);
+            .IsRequired();
 
         builder
             .Property(_ => _.EndDate)
-            .IsRequired(false);
+            .IsRequired();
 
         builder
            .Property(_ => _.AbsenceTypeId)
-           .IsRequired(false);
+           .IsRequired();
 
         builder
             .HasOne(_ => _.AbsenceEventType)
