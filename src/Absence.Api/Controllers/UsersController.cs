@@ -35,7 +35,7 @@ public class UsersController(ISender sender) : ControllerBase
         var result = await _sender.Send(new ChangePasswordCommand(request));
         return result.Match<ActionResult>(
             success => Ok(),
-            badRequest => Unauthorized(badRequest.Message)
+            badRequest => BadRequest(badRequest.Message)
         );
     }
 
@@ -45,7 +45,7 @@ public class UsersController(ISender sender) : ControllerBase
         var result = await _sender.Send(new DeleteUserCommand(request));
         return result.Match<ActionResult>(
             success => Ok(),
-            badRequest => Unauthorized(badRequest.Message)
+            badRequest => BadRequest(badRequest.Message)
         );
     }
 }  

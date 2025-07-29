@@ -20,7 +20,7 @@ internal class ChangePasswordHandler(IUserService userService, IUser user) : IRe
         var result = await _userService.ChangePasswordAsync(user!, request.Request.OldPassword, request.Request.NewPassword);
         if (!result.Succeeded)
         {
-            return new BadRequest(result.ToString());
+            return new BadRequest(result.Errors.First().Description);
         }
 
         user!.RefreshToken = null;
