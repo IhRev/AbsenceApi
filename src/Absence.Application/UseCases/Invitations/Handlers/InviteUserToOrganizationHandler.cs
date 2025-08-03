@@ -27,7 +27,7 @@ public class InviteUserToOrganizationHandler(
 
     public async Task<OneOf<Success, BadRequest, AccessDenied>> Handle(InviteUserToOrganizationCommand request, CancellationToken cancellationToken)
     {
-        var organization = _organizationRepository.GetByIdAsync(request.Invite.OrganizationId, cancellationToken);
+        var organization = await _organizationRepository.GetByIdAsync(request.Invite.OrganizationId, cancellationToken);
         if (organization is null)
         {
             return new BadRequest($"Organization with id {request.Invite.OrganizationId} doesn't exist.");
@@ -71,7 +71,7 @@ public class InviteUserToOrganizationHandler(
             [
                 q => q.Where(_ => 
                     _.OrganizationId == request.Invite.OrganizationId && 
-                    _.UserId == invitedUser.ShortId
+                    _.Invited == invitedUser.ShortId
                 )
             ],
             cancellationToken
@@ -84,7 +84,8 @@ public class InviteUserToOrganizationHandler(
         await _organizationUserInvitationRepository.InsertAsync(
             new OrganizationUserInvitationEntity()
             {
-                UserId = invitedUser.ShortId,
+                Invited = invitedUser.ShortId,
+                Inviter = _user.ShortId,
                 OrganizationId = request.Invite.OrganizationId
             }, 
             cancellationToken

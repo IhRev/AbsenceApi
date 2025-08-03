@@ -21,7 +21,7 @@ public class GetUserInvitationsHandler(
     {
         var invitations = await _organizationUserInvitationRepository.GetAsync(
             [
-                q => q.Where(_ => _.UserId == _user.ShortId)
+                q => q.Where(_ => _.Invited == _user.ShortId)
             ], 
             cancellationToken
         );

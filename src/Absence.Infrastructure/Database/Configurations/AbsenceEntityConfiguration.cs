@@ -34,7 +34,7 @@ public class AbsenceEntityConfiguration : EntityConfiguration<AbsenceEntity, int
             .WithMany(_ => _.Absences)
             .HasForeignKey(_ => _.UserId)
             .HasPrincipalKey(_ => _.ShortId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
            .HasOne(_ => _.Organization)

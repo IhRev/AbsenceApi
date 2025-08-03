@@ -33,7 +33,7 @@ internal class OrganizationUserInvitationsRepository : IOrganizationUserInvitati
             query = queries
                 .Aggregate(query, (current, next) => next(current))
                 .Include(_ => _.Organization)
-                .Include(_ => _.User);
+                .Include(_ => _.InviterUser);
         }
 
         return query.ToListAsync(cancellationToken);

@@ -14,5 +14,6 @@ public class UserEntity : IdentityUser, IIdKeyed<string>
     public ICollection<AbsenceEventEntity> AbsenceEvents { get; set; } = [];
     public ICollection<OrganizationEntity> Organizations { get; set; } = [];
     public ICollection<OrganizationUserEntity> OrganizationsUsers { get; set; } = [];
-    public ICollection<OrganizationUserInvitationEntity> OrganizationUserInvitations { get; set; } = [];
+    public ICollection<OrganizationUserInvitationEntity> InvitationsSent { get; set; } = [];
+    public ICollection<OrganizationUserInvitationEntity> InvitationsReceived { get; set; } = [];
 }

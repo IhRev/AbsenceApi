@@ -30,7 +30,7 @@ internal class AcceptInvitationHandler(
             return new NotFound();
         }
 
-        if (invitation.UserId != _user.ShortId)
+        if (invitation.Invited != _user.ShortId)
         {
             return new AccessDenied();
         }
