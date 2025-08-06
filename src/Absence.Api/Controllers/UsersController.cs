@@ -19,7 +19,7 @@ public class UsersController(ISender sender) : ControllerBase
     public async Task<ActionResult<UserDetails>> GetUserDetails()
     {
         var details = await _sender.Send(new GetUserDetailsQuery());
-        return details;
+        return Ok(details);
     }
 
     [HttpPut("details")]

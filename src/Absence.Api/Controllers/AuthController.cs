@@ -16,7 +16,7 @@ public class AuthController(ISender sender) : ControllerBase
     public async Task<ActionResult<AuthResponse>> Login([FromBody] UserCredentials credentials)
     {
         var response = await _sender.Send(new LoginUserCommand(credentials));
-        return response.IsSuccess ? Ok(response) : Unauthorized(response);
+        return response.IsSuccess ? Ok(response) : BadRequest(response);
     }
 
     [HttpPost("refresh_token")]
