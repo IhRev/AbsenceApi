@@ -40,9 +40,9 @@ public class OrganizationsController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{organizationId}")]
-    public async Task<ActionResult> Delete([FromRoute] int organizationId)
+    public async Task<ActionResult> Delete([FromRoute] int organizationId, [FromBody] DeleteOrganizationRequest request)
     {
-        var result = await _sender.Send(new DeleteOrganizationCommand(organizationId));
+        var result = await _sender.Send(new DeleteOrganizationCommand(organizationId, request));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
