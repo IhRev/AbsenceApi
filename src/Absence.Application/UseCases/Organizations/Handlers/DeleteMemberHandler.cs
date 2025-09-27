@@ -1,22 +1,22 @@
-﻿using Absence.Application.Common.Results;
+﻿using Absence.Application.Common.Interfaces;
+using Absence.Application.Common.Results;
 using Absence.Application.UseCases.Organizations.Commands;
-using MediatR;
-using OneOf.Types;
-using OneOf;
-using Absence.Application.Common.Interfaces;
 using Absence.Domain.Interfaces;
+using MediatR;
+using OneOf;
+using OneOf.Types;
 
 namespace Absence.Application.UseCases.Organizations.Handlers;
 
-public class ChangeMemberAccessHandler(
-    IUser user,
+internal class DeleteMemberHandler(
+    IUser user, 
     IOrganizationUsersRepository organizationUsersRepository
-) : IRequestHandler<ChangeMemberAccessCommand, OneOf<Success, NotFound, AccessDenied, BadRequest>>
+) : IRequestHandler<DeleteMemberCommand, OneOf<Success, NotFound, BadRequest, AccessDenied>>
 {
     private readonly IUser _user = user;
     private readonly IOrganizationUsersRepository _organizationUsersRepository = organizationUsersRepository;
 
-    public async Task<OneOf<Success, NotFound, AccessDenied, BadRequest>> Handle(ChangeMemberAccessCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, NotFound, BadRequest, AccessDenied>> Handle(DeleteMemberCommand request, CancellationToken cancellationToken)
     {
         var organizationOwner = await _organizationUsersRepository.GetFirstOrDefaultAsync(
             [
@@ -35,22 +35,16 @@ public class ChangeMemberAccessHandler(
 
         var organizationUser = await _organizationUsersRepository.GetFirstOrDefaultAsync(
             [
-                q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == request.UserId)
+                q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == request.MemberId)
             ],
             cancellationToken
         );
         if (organizationUser is null)
         {
-            return new BadRequest($"User with id {request.UserId} doesn't belong to organization.");
+            return new BadRequest($"User with id {request.MemberId} doesn't belong to organization.");
         }
 
-        if (organizationUser.IsAdmin == request.IsAdmin)
-        {
-            return new BadRequest("Cannot change access to the same.");
-        } 
-
-        organizationUser.IsAdmin = request.IsAdmin;
-        _organizationUsersRepository.Update(organizationUser);
+        _organizationUsersRepository.Delete(organizationUser);
         await _organizationUsersRepository.SaveAsync(cancellationToken);
 
         return new Success();

@@ -14,13 +14,13 @@ public class GetOrganizationMembersHandler(
     IOrganizationUsersRepository organizationUserRepository,
     IUser user,
     IMapper mapper
-) : IRequestHandler<GetOrganizationMembersQuery, OneOf<Success<IEnumerable<MemberDTO>>, BadRequest, AccessDenied>>
+) : IRequestHandler<GetOrganizationMembersQuery, OneOf<Success<IEnumerable<MemberDTO>>, BadRequest>>
 {
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IUser _user = user;
     private readonly IMapper _mapper = mapper;
     
-    public async Task<OneOf<Success<IEnumerable<MemberDTO>>, BadRequest, AccessDenied>> Handle(GetOrganizationMembersQuery request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success<IEnumerable<MemberDTO>>, BadRequest>> Handle(GetOrganizationMembersQuery request, CancellationToken cancellationToken)
     {
         var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
             [
@@ -32,10 +32,6 @@ public class GetOrganizationMembersHandler(
         if (organizationUser is null)
         {
             return new BadRequest($"No organization with id {request.OrganizationId} found.");
-        }
-        if (!organizationUser.IsAdmin)
-        {
-            return new AccessDenied();
         }
 
         var organizationUsers = await _organizationUserRepository.GetAsync(

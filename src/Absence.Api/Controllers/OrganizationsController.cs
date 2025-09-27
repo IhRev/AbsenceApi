@@ -27,8 +27,7 @@ public class OrganizationsController(ISender sender) : ControllerBase
         var result = await _sender.Send(new GetOrganizationMembersQuery(organizationId));
         return result.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message),
-            accessDenied => Forbid()
+            badRequest => BadRequest(badRequest.Message)
         );
     }
 
@@ -59,6 +58,18 @@ public class OrganizationsController(ISender sender) : ControllerBase
             notFound => NotFound(),
             accessDenied => Forbid(),
             badRequest => BadRequest(badRequest.Message)
+        );
+    }
+
+    [HttpDelete("{organizationId}/members/{memberId}")]
+    public async Task<ActionResult> DeleteMember([FromRoute] int organizationId, [FromRoute] int memberId)
+    {
+        var result = await _sender.Send(new DeleteMemberCommand(organizationId, memberId));
+        return result.Match<ActionResult>(
+            success => Ok(),
+            notFound => NotFound(),
+            badRequest => BadRequest(badRequest.Message),
+            accessDenied => Forbid()
         );
     }
 
