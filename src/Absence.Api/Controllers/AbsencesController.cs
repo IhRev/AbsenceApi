@@ -5,6 +5,7 @@ using Absence.Application.UseCases.Absences.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OneOf.Types;
 
 namespace Absence.Api.Controllers;
 
@@ -44,7 +45,7 @@ public class AbsencesController(ISender sender, IUser user) : ControllerBase
         var response = await _sender.Send(new AddAbsenceCommand(absence));
         return response.Match<ActionResult>(
             successCreated => Ok(successCreated.Value),
-            successRequested => Ok(successRequested.Value),
+            successRequested => Ok(new { Message = successRequested.Value }),
             badRequest => BadRequest(badRequest.Message)
         );
     }
