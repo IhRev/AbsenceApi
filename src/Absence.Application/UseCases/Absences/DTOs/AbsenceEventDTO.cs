@@ -7,6 +7,6 @@ public class AbsenceEventDTO
     public DateTimeOffset StartDate { get; set; }
     public DateTimeOffset EndDate { get; set; }
     public int AbsenceType { get; set; }
-    public int UserId { get; set; }
+    public required string User { get; set; }
     public int AbsenceEventType { get; set; }
 } 

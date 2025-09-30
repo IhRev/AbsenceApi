@@ -3,7 +3,6 @@ using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Database.Repositories;
-using Absence.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace Absence.Infrastructure;
+namespace Absence.Infrastructure.Identity;
 
 public static class DependencyInjection
 {
@@ -75,6 +74,7 @@ public static class DependencyInjection
         services
             .AddScoped(typeof(IRepository<>), typeof(Repository<>))
             .AddScoped<IOrganizationUsersRepository, OrganizationUsersRepository>()
+            .AddScoped<IAbsenceEventRepository, AbsenceEventRepository>()
             .AddScoped<IOrganizationUserInvitationsRepository, OrganizationUserInvitationsRepository>()
             .AddScoped<IUserService, UserService>()
             .AddScoped<IJwtService, JwtService>()

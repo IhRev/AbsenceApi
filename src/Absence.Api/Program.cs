@@ -1,6 +1,6 @@
 using Absence.Api;
 using Absence.Application;
-using Absence.Infrastructure;
+using Absence.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel();

@@ -5,7 +5,6 @@ using MediatR;
 using OneOf.Types;
 using OneOf;
 using Absence.Domain.Interfaces;
-using Absence.Domain.Entities;
 using Absence.Application.Common.Interfaces;
 using AutoMapper;
 
@@ -13,13 +12,13 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 
 public class GetAbsenceEventsHandler(
     IOrganizationUsersRepository organizationUserRepository,
-    IRepository<AbsenceEventEntity> absenceEventRepository,
+    IAbsenceEventRepository absenceEventRepository,
     IUser user,
     IMapper mapper
 ) : IRequestHandler<GetAbsenceEventsQuery, OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest, AccessDenied>>
 {
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-    private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
+    private readonly IAbsenceEventRepository _absenceEventRepository = absenceEventRepository;
     private readonly IUser _user = user;
     private readonly IMapper _mapper = mapper;
 
