@@ -39,7 +39,8 @@ public class GetHolidaysHandler(
 
         var holidays = await _holidayRepository.GetAsync(
             [
-                q => q.Where(_ => _.OrganizationId == request.OrganizationId)
+                q => q.Where(_ => _.OrganizationId == request.OrganizationId),
+                q => q.Where(_ => _.Date > request.StartDate && _.Date < request.EndDate),
             ],
             cancellationToken
         );

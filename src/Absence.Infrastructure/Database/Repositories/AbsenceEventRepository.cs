@@ -24,7 +24,7 @@ internal class AbsenceEventRepository : IAbsenceEventRepository
         DisposeAsync(false).GetAwaiter().GetResult();
     }
 
-    public Task<List<AbsenceEventEntity>> GetAsync(Func<IQueryable<AbsenceEventEntity>, IQueryable<AbsenceEventEntity>>[] queries = null!, CancellationToken cancellationToken = default)
+    public Task<List<AbsenceEventEntity>> GetAsync(Func<IQueryable<AbsenceEventEntity>, IQueryable<AbsenceEventEntity>>[]? queries = null!, CancellationToken cancellationToken = default)
     {
         IQueryable<AbsenceEventEntity> query = _entities;
 
@@ -63,7 +63,7 @@ internal class AbsenceEventRepository : IAbsenceEventRepository
     public void DeleteRange(IEnumerable<AbsenceEventEntity> entities) =>
         _repository.DeleteRange(entities);
 
-    public Task<AbsenceEventEntity?> GetFirstOrDefaultAsync(Func<IQueryable<AbsenceEventEntity>, IQueryable<AbsenceEventEntity>>[] queries = null!, CancellationToken cancellationToken = default) =>
+    public Task<AbsenceEventEntity?> GetFirstOrDefaultAsync(Func<IQueryable<AbsenceEventEntity>, IQueryable<AbsenceEventEntity>>[]? queries = null, CancellationToken cancellationToken = default) =>
         _repository.GetFirstOrDefaultAsync(queries, cancellationToken);
 
     public Task<AbsenceEventEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default) =>

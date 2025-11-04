@@ -15,9 +15,9 @@ public class HolidaysController(ISender sender) : ControllerBase
     private readonly ISender _sender = sender;
 
     [HttpGet("/organizations/{organizationId}/holidays")]
-    public async Task<ActionResult<IEnumerable<HolidayDTO>>> Get([FromRoute] int organizationId)
+    public async Task<ActionResult<IEnumerable<HolidayDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var response = await _sender.Send(new GetHolidaysQuery(organizationId));
+        var response = await _sender.Send(new GetHolidaysQuery(organizationId, startDate, endDate));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
             badRequest => BadRequest(badRequest.Message)
