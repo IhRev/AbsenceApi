@@ -27,7 +27,7 @@ internal class GetUserAbsencesHandler(
     {
         var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
             [
-                q => q.Where(_ => _.UserId == _user.ShortId && _.UserId == request.UserId),
+                q => q.Where(_ => _.UserId == _user.ShortId),
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId)
             ],
             cancellationToken
@@ -36,11 +36,23 @@ internal class GetUserAbsencesHandler(
         {
             return new BadRequest($"No organization with id {request.OrganizationId} found.");
         }
-        if (_user.ShortId != request.UserId && !organizationUser.IsAdmin)
+        if (request.UserId != _user.ShortId && !organizationUser.IsAdmin)
         {
             return new AccessDenied();
         }
- 
+
+        var requestedUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
+            [
+                q => q.Where(_ => _.UserId == request.UserId),
+                q => q.Where(_ => _.OrganizationId == request.OrganizationId)
+            ],
+            cancellationToken
+        );
+        if (requestedUser is null)
+        {
+            return new BadRequest($"No user with id {request.UserId} found in organization with id {request.OrganizationId}.");
+        }
+
         var absences = await _absenceRepository.GetAsync(
             [ 
                 q => q.Where(_ => _.UserId == request.UserId),
