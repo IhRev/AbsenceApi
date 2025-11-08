@@ -1,37 +1,33 @@
-using Absence.Application.Common.Interfaces;
 using Absence.Application.UseCases.Absences.Commands;
 using Absence.Application.UseCases.Absences.DTOs;
 using Absence.Application.UseCases.Absences.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OneOf.Types;
 
 namespace Absence.Api.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("absences")]
-public class AbsencesController(ISender sender, IUser user) : ControllerBase
+public class AbsencesController(ISender sender) : ControllerBase
 {
     private readonly ISender _sender = sender;
-    private readonly IUser _user = user;
 
     [HttpGet("/organizations/{organizationId}/absences")]
     public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId, _user.ShortId));
+        var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message),
-            accessDenied => Forbid()
+            badRequest => BadRequest(badRequest.Message)
         );
     }
 
-    [HttpGet("/organizations/{organizationId}/users/{userId}/absences")]
-    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> GetByUserId([FromRoute] int organizationId, [FromRoute] int userId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    [HttpPost("/organizations/{organizationId}/absences")]
+    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> GetByUserIds([FromRoute] int organizationId, [FromBody] List<int> userIds, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId, userId));
+        var response = await _sender.Send(new GetUsersAbsencesQuery(startDate, endDate, organizationId, userIds));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
             badRequest => BadRequest(badRequest.Message),
