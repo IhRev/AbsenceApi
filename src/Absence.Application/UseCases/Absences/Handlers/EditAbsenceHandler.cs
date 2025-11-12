@@ -58,8 +58,8 @@ internal class EditAbsenceHandler(
                     return new BadRequest($"Type with id {request.Absence.Type} doesn't exist");
                 }
 
-                absence = _mapper.Map(request.Absence, absence);
             }
+            absence = _mapper.Map(request.Absence, absence);
 
             _absenceRepository.Update(absence);
             await _absenceRepository.SaveAsync(cancellationToken);
