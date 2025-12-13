@@ -8,6 +8,7 @@ internal class UserMapping : Profile
 {
     public UserMapping()
     {
-        CreateMap<UserEntity, UserDetails>();
+        CreateMap<UserEntity, UserDetails>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ShortId));
     }
 }
