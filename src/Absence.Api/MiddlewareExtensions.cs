@@ -14,9 +14,7 @@ public static class MiddlewareExtensions
                 c.RoutePrefix = string.Empty;
             });
         }
-        app.UseCors("AllowSpecificOrigin");
         app.MapFallbackToFile("/index.html");
-        //app.UseHttpsRedirection();
         app.UseExceptionHandler(options => { });
         app.UseAuthentication();
         app.UseAuthorization();

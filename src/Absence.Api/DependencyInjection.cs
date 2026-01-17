@@ -50,18 +50,6 @@ public static class DependencyInjection
             });
 
         services
-            .AddCors(options =>
-            {
-                options.AddPolicy(
-                    "AllowSpecificOrigin",
-                    builder => builder
-                                .AllowAnyOrigin()
-                                .AllowAnyMethod()
-                                .AllowAnyHeader()
-                );
-            });
-
-        services
             .Configure<JwtConfiguration>(configuration.GetSection("JwtConfiguration"));
 
         services
