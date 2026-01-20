@@ -4,6 +4,7 @@ using Absence.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel();
+builder.Configuration.AddEnvironmentVariables();
 
 const string connectionStringName = "AbsenceDB";
 
