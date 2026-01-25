@@ -6,8 +6,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Organizations.Commands;
 
-public class DeleteOrganizationCommand(int id, DTOs.DeleteOrganizationRequest request) : IRequest<OneOf<Success, AccessDenied, NotFound>>
-{
-    public int Id { get; } = id;
-    public DeleteOrganizationRequest Request { get; } = request;
-}
+public record DeleteOrganizationCommand(int Id, DeleteOrganizationRequest Request) : IRequest<OneOf<Success, AccessDenied, NotFound>>;

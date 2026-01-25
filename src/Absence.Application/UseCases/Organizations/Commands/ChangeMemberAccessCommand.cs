@@ -5,9 +5,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Organizations.Commands;
 
-public class ChangeMemberAccessCommand(int organizationId, int userId, bool isAdmin) : IRequest<OneOf<Success, NotFound, AccessDenied, BadRequest>>
-{
-    public int OrganizationId { get; } = organizationId;
-    public int UserId { get; } = userId;
-    public bool IsAdmin { get; } = isAdmin;
-}
+public record ChangeMemberAccessCommand(int OrganizationId, int UserId, bool IsAdmin) : IRequest<OneOf<Success, NotFound, AccessDenied, BadRequest>>;

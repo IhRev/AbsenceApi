@@ -12,8 +12,7 @@ public class AbsenceEventEntity : IIdKeyed<int>
     public int AbsenceTypeId { get; set; }
     public int UserId { get; set; }
     public int OrganizationId { get; set; }
-    public int AbsenceEventTypeId { get; set; }
+    public AbsenceEventType AbsenceEventType { get; set; }
     public OrganizationEntity Organization { get; set; } = null!;
     public UserEntity User { get; set; } = null!;
-    public AbsenceEventTypeEntity AbsenceEventType { get; set; } = null!;
 }

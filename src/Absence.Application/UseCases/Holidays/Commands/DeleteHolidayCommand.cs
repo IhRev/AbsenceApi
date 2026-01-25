@@ -5,7 +5,4 @@ using Absence.Application.Common.Results;
 
 namespace Absence.Application.UseCases.Holidays.Commands;
 
-public class DeleteHolidayCommand(int id) : IRequest<OneOf<Success, NotFound, AccessDenied>>
-{
-    public int Id { get; } = id;
-}
+public record DeleteHolidayCommand(int Id) : IRequest<OneOf<Success, NotFound, AccessDenied>>;

@@ -1,7 +1,7 @@
 ﻿using Absence.Application.Common.Interfaces;
 using Absence.Application.UseCases.Invitations.DTOs;
 using Absence.Application.UseCases.Invitations.Queries;
-using Absence.Domain.Interfaces;
+using Absence.Domain.Repositories;
 using AutoMapper;
 using MediatR;
 
@@ -13,18 +13,14 @@ public class GetUserInvitationsHandler(
     IMapper mapper
 ) : IRequestHandler<GetUserInvitationsQuery, IEnumerable<InvitationDTO>>
 {
-    private readonly IUser _user = user;
-    private readonly IOrganizationUserInvitationsRepository _organizationUserInvitationRepository = organizationUserInvitationRepository;
-    private readonly IMapper _mapper = mapper;
-
     public async Task<IEnumerable<InvitationDTO>> Handle(GetUserInvitationsQuery request, CancellationToken cancellationToken)
     {
-        var invitations = await _organizationUserInvitationRepository.GetAsync(
+        var invitations = await organizationUserInvitationRepository.GetAsync(
             [
-                q => q.Where(_ => _.Invited == _user.ShortId)
+                q => q.Where(_ => _.Invited == user.ShortId)
             ], 
             cancellationToken
         );
-        return _mapper.Map<IEnumerable<InvitationDTO>>(invitations);
+        return mapper.Map<IEnumerable<InvitationDTO>>(invitations);
     }
 }

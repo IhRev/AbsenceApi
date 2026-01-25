@@ -1,4 +1,5 @@
-﻿using Absence.Application.UseCases.AbsenceTypes.DTOs;
+﻿using Absence.Application.UseCases.AbsenceTypes.Commands;
+using Absence.Application.UseCases.AbsenceTypes.DTOs;
 using Absence.Application.UseCases.AbsenceTypes.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -11,12 +12,23 @@ namespace Absence.Api.Controllers;
 [Route("absences/types")]
 public class AbsenceTypesController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender = sender;
-
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AbsenceTypeDTO>>> Get()
+    public async Task<ActionResult<IEnumerable<AbsenceTypeDTO>>> Get([FromQuery] int organizationId)
     {
-        var types = await _sender.Send(new GetAllAbsenceTypesQuery());
-        return Ok(types);
+        var response = await sender.Send(new GetAllAbsenceTypesQuery(organizationId));
+        return response.Match<ActionResult>( 
+            success => Ok(success.Value),
+            badRequest => BadRequest(badRequest.Message)
+        );
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<IEnumerable<AbsenceTypeDTO>>> Add([FromQuery] int organizationId, [FromBody] CreateAbsenceTypeDTO absenceType)
+    {
+        var response = await sender.Send(new CreateAbsenceTypeCommand(organizationId, absenceType));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            badRequest => BadRequest(badRequest.Message)
+        );
     }
 }

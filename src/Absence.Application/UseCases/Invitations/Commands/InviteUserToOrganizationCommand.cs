@@ -6,7 +6,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Invitations.Commands;
 
-public class InviteUserToOrganizationCommand(InviteUserToOrganizationDTO invite) : IRequest<OneOf<Success, BadRequest, AccessDenied>>
-{
-    public InviteUserToOrganizationDTO Invite { get; } = invite;
-}
+public record InviteUserToOrganizationCommand(InviteUserToOrganizationDTO Invite) : IRequest<OneOf<Success, BadRequest, AccessDenied>>;

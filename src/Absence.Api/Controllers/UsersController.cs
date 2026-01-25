@@ -13,26 +13,24 @@ namespace Absence.Api.Controllers;
 [Route("users")]
 public class UsersController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender = sender;
-
     [HttpGet("details")]
     public async Task<ActionResult<UserDetails>> GetUserDetails()
     {
-        var details = await _sender.Send(new GetUserDetailsQuery());
+        var details = await sender.Send(new GetUserDetailsQuery());
         return Ok(details);
     }
 
     [HttpPut("details")]
     public async Task<ActionResult> UpdateUserDetails([FromBody] UserDetails userDetails)
     {
-        await _sender.Send(new UpdateUserCommand(userDetails));
+        await sender.Send(new UpdateUserCommand(userDetails));
         return Ok();
     }
 
     [HttpPut("change_password")]
     public async Task<ActionResult> UpdateUserPassword([FromBody] ChangePasswordRequest request)
     {
-        var result = await _sender.Send(new ChangePasswordCommand(request));
+        var result = await sender.Send(new ChangePasswordCommand(request));
         return result.Match<ActionResult>(
             success => Ok(),
             badRequest => BadRequest(badRequest.Message)
@@ -42,7 +40,7 @@ public class UsersController(ISender sender) : ControllerBase
     [HttpDelete]
     public async Task<ActionResult> DeleteUser([FromBody] DeleteUserRequest request)
     {
-        var result = await _sender.Send(new DeleteUserCommand(request));
+        var result = await sender.Send(new DeleteUserCommand(request));
         return result.Match<ActionResult>(
             success => Ok(),
             badRequest => BadRequest(badRequest.Message)

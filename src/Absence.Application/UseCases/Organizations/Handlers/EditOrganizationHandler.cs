@@ -5,7 +5,7 @@ using OneOf.Types;
 using OneOf;
 using Absence.Application.Common.Interfaces;
 using Absence.Domain.Entities;
-using Absence.Domain.Interfaces;
+using Absence.Domain.Repositories;
 
 namespace Absence.Application.UseCases.Organizations.Handlers;
 
@@ -14,17 +14,14 @@ public class EditOrganizationHandler(
     IUser user
 ) : IRequestHandler<EditOrganizationCommand, OneOf<Success, NotFound, BadRequest, AccessDenied>>
 {
-    private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
-    private readonly IUser _user = user;
-
     public async Task<OneOf<Success, NotFound, BadRequest, AccessDenied>> Handle(EditOrganizationCommand request, CancellationToken cancellationToken)
     {
-        var organization = await _organizationRepository.GetByIdAsync(request.Organization.Id);
+        var organization = await organizationRepository.GetByIdAsync(request.Organization.Id);
         if (organization is null)
         {
             return new NotFound();
         }
-        if (organization.OwnerId != _user.ShortId)
+        if (organization.OwnerId != user.ShortId)
         {
             return new AccessDenied();
         }
@@ -35,8 +32,8 @@ public class EditOrganizationHandler(
         }
 
         organization.Name = request.Organization.Name;
-        _organizationRepository.Update(organization);
-        await _organizationRepository.SaveAsync(cancellationToken);
+        organizationRepository.Update(organization);
+        await organizationRepository.SaveAsync(cancellationToken);
 
         return new Success();
     }

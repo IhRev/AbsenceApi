@@ -10,19 +10,16 @@ namespace Absence.Application.UseCases.Users.Handlers;
 
 internal class DeleteUserHandler(IUserService userService, IUser user) : IRequestHandler<DeleteUserCommand, OneOf<Success, BadRequest>>
 {
-    private readonly IUserService _userService = userService;
-    private readonly IUser _user = user;
-
     public async Task<OneOf<Success, BadRequest>> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userService.FindByIdAsync(_user.Id);
+        var userEntity = await userService.FindByIdAsync(user.Id);
 
-        if (!await _userService.CheckPasswordAsync(user!, request.Request.Password))
+        if (!await userService.CheckPasswordAsync(userEntity!, request.Request.Password))
         {
             return new BadRequest("Password is invalid.");
         }
 
-        await _userService.DeleteAsync(user!);
+        await userService.DeleteAsync(userEntity!);
 
         return new Success();
     }

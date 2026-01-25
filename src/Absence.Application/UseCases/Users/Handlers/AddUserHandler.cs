@@ -11,8 +11,6 @@ internal class AddUserHandler(
     IUserService userRepository
 ) : IRequestHandler<AddUserCommand, OneOf<Success, Error<string>>>
 {
-    private readonly IUserService _userRepository = userRepository;
-
     public async Task<OneOf<Success, Error<string>>> Handle(AddUserCommand request, CancellationToken cancellationToken)
     {
         var user = new UserEntity()
@@ -23,7 +21,7 @@ internal class AddUserHandler(
             UserName = request.User.Credentials.Email,
         };
 
-        var result = await _userRepository.CreateAsync(user, request.User.Credentials.Password);
+        var result = await userRepository.CreateAsync(user, request.User.Credentials.Password);
         if (!result.Succeeded)
         {
             return new Error<string>(result.ToString());

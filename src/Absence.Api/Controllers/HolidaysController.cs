@@ -12,12 +12,10 @@ namespace Absence.Api.Controllers;
 [Route("holidays")]
 public class HolidaysController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender = sender;
-
     [HttpGet("/organizations/{organizationId}/holidays")]
     public async Task<ActionResult<IEnumerable<HolidayDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var response = await _sender.Send(new GetHolidaysQuery(organizationId, startDate, endDate));
+        var response = await sender.Send(new GetHolidaysQuery(organizationId, startDate, endDate));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
             badRequest => BadRequest(badRequest.Message)
@@ -27,7 +25,7 @@ public class HolidaysController(ISender sender) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<int>> Add([FromBody] CreateHolidayDTO holiday)
     {
-        var response = await _sender.Send(new AddHolidayCommand(holiday));
+        var response = await sender.Send(new AddHolidayCommand(holiday));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
             badRequest => BadRequest(badRequest.Message),
@@ -38,7 +36,7 @@ public class HolidaysController(ISender sender) : ControllerBase
     [HttpPut]
     public async Task<ActionResult> Edit([FromBody] EditHolidayDTO holiday)
     {
-        var result = await _sender.Send(new EditHolidayCommand(holiday));
+        var result = await sender.Send(new EditHolidayCommand(holiday));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
@@ -49,7 +47,7 @@ public class HolidaysController(ISender sender) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete([FromRoute] int id)
     {
-        var result = await _sender.Send(new DeleteHolidayCommand(id));
+        var result = await sender.Send(new DeleteHolidayCommand(id));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),

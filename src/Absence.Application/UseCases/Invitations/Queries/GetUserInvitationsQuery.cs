@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Absence.Application.UseCases.Invitations.Queries;
 
-public class GetUserInvitationsQuery : IRequest<IEnumerable<InvitationDTO>>;
+public record GetUserInvitationsQuery : IRequest<IEnumerable<InvitationDTO>>;

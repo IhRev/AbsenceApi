@@ -4,9 +4,9 @@ using MediatR;
 using OneOf.Types;
 using OneOf;
 using Absence.Domain.Entities;
-using Absence.Domain.Interfaces;
 using Absence.Application.Common.Interfaces;
 using AutoMapper;
+using Absence.Domain.Repositories;
 
 namespace Absence.Application.UseCases.Holidays.Handlers;
 
@@ -17,22 +17,17 @@ public class EditHolidayHandler(
     IMapper mapper
 ) : IRequestHandler<EditHolidayCommand, OneOf<Success, NotFound, AccessDenied>>
 {
-    private readonly IRepository<HolidayEntity> _holidayRepository = holidayRepository;
-    private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
-    private readonly IUser _user = user;
-    private readonly IMapper _mapper = mapper;
-
     public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(EditHolidayCommand request, CancellationToken cancellationToken)
     {
-        var holiday = await _holidayRepository.GetByIdAsync(request.Holiday.Id);
+        var holiday = await holidayRepository.GetByIdAsync(request.Holiday.Id);
         if (holiday is null)
         {
             return new NotFound();
         }
 
-        var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
+        var organizationUser = await organizationUserRepository.GetFirstOrDefaultAsync(
             [
-                q => q.Where(_ => _.UserId == _user.ShortId),
+                q => q.Where(_ => _.UserId == user.ShortId),
                 q => q.Where(_ => _.OrganizationId == holiday.OrganizationId)
             ],
             cancellationToken
@@ -46,9 +41,9 @@ public class EditHolidayHandler(
             return new AccessDenied();
         }
 
-        holiday = _mapper.Map(request.Holiday, holiday);
-        _holidayRepository.Update(holiday);
-        await _holidayRepository.SaveAsync(cancellationToken);
+        holiday = mapper.Map(request.Holiday, holiday);
+        holidayRepository.Update(holiday);
+        await holidayRepository.SaveAsync(cancellationToken);
 
         return new Success();
     }

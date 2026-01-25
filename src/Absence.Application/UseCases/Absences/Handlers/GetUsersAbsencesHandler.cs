@@ -3,7 +3,7 @@ using Absence.Application.Common.Results;
 using Absence.Application.UseCases.Absences.DTOs;
 using Absence.Application.UseCases.Absences.Queries;
 using Absence.Domain.Entities;
-using Absence.Domain.Interfaces;
+using Absence.Domain.Repositories;
 using AutoMapper;
 using MediatR;
 using OneOf;
@@ -18,16 +18,11 @@ internal class GetUsersAbsencesHandler(
     IUser user
 ) : IRequestHandler<GetUsersAbsencesQuery, OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>>
 {
-    private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
-    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-    private readonly IMapper _mapper = mapper;
-    private readonly IUser _user = user;
-
     public async Task<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>> Handle(GetUsersAbsencesQuery request, CancellationToken cancellationToken)
     {
-        var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
+        var organizationUser = await organizationUserRepository.GetFirstOrDefaultAsync(
             [
-                q => q.Where(_ => _.UserId == _user.ShortId),
+                q => q.Where(_ => _.UserId == user.ShortId),
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId)
             ],
             cancellationToken
@@ -41,7 +36,7 @@ internal class GetUsersAbsencesHandler(
             return new AccessDenied();
         }
 
-        var absences = await _absenceRepository.GetAsync(
+        var absences = await absenceRepository.GetAsync(
             [
                 q => q.Where(_ => request.UserIds.Contains(_.UserId)),
                 q => q.Where(_ => _.StartDate < request.EndDate && _.EndDate > request.StartDate),
@@ -49,6 +44,6 @@ internal class GetUsersAbsencesHandler(
             ],
             cancellationToken
         );
-        return new Success<IEnumerable<AbsenceDTO>>(_mapper.Map<IEnumerable<AbsenceDTO>>(absences)); throw new NotImplementedException();
+        return new Success<IEnumerable<AbsenceDTO>>(mapper.Map<IEnumerable<AbsenceDTO>>(absences));
     }
 }

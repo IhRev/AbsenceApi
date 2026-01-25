@@ -9,5 +9,6 @@ internal class AbsenceTypeMapping : Profile
     public AbsenceTypeMapping()
     {
         CreateMap<AbsenceTypeEntity, AbsenceTypeDTO>();
+        CreateMap<CreateAbsenceTypeDTO, AbsenceTypeEntity>();
     }
 }

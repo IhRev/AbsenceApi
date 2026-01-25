@@ -5,7 +5,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Users.Commands;
 
-public class AddUserCommand(RegisterDTO user) : IRequest<OneOf<Success, Error<string>>>
-{
-    public RegisterDTO User { get; } = user;
-}
+public record AddUserCommand(RegisterDTO User) : IRequest<OneOf<Success, Error<string>>>;

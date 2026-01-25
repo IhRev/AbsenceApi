@@ -6,7 +6,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Users.Commands;
 
-public class ChangePasswordCommand(ChangePasswordRequest request) : IRequest<OneOf<Success, BadRequest>>
-{
-    public ChangePasswordRequest Request { get; } = request;
-} 
+public record ChangePasswordCommand(ChangePasswordRequest Request) : IRequest<OneOf<Success, BadRequest>>;

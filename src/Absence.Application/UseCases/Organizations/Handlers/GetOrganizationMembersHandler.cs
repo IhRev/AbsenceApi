@@ -4,9 +4,9 @@ using MediatR;
 using OneOf.Types;
 using OneOf;
 using Absence.Application.UseCases.Organizations.Queries;
-using Absence.Domain.Interfaces;
 using Absence.Application.Common.Interfaces;
 using AutoMapper;
+using Absence.Domain.Repositories;
 
 namespace Absence.Application.UseCases.Organizations.Handlers;
 
@@ -16,15 +16,11 @@ public class GetOrganizationMembersHandler(
     IMapper mapper
 ) : IRequestHandler<GetOrganizationMembersQuery, OneOf<Success<IEnumerable<MemberDTO>>, BadRequest>>
 {
-    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-    private readonly IUser _user = user;
-    private readonly IMapper _mapper = mapper;
-    
     public async Task<OneOf<Success<IEnumerable<MemberDTO>>, BadRequest>> Handle(GetOrganizationMembersQuery request, CancellationToken cancellationToken)
     {
-        var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
+        var organizationUser = await organizationUserRepository.GetFirstOrDefaultAsync(
             [
-                q => q.Where(_ => _.UserId == _user.ShortId),
+                q => q.Where(_ => _.UserId == user.ShortId),
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId)
             ],
             cancellationToken
@@ -34,13 +30,13 @@ public class GetOrganizationMembersHandler(
             return new BadRequest($"No organization with id {request.OrganizationId} found.");
         }
 
-        var organizationUsers = await _organizationUserRepository.GetAsync(
+        var organizationUsers = await organizationUserRepository.GetAsync(
             [
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId)
             ],
             cancellationToken
         );
 
-        return new Success<IEnumerable<MemberDTO>>(_mapper.Map<IEnumerable<MemberDTO>>(organizationUsers));
+        return new Success<IEnumerable<MemberDTO>>(mapper.Map<IEnumerable<MemberDTO>>(organizationUsers));
     }
 }

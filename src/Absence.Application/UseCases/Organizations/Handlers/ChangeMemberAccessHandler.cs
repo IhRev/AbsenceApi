@@ -4,7 +4,7 @@ using MediatR;
 using OneOf.Types;
 using OneOf;
 using Absence.Application.Common.Interfaces;
-using Absence.Domain.Interfaces;
+using Absence.Domain.Repositories;
 
 namespace Absence.Application.UseCases.Organizations.Handlers;
 
@@ -13,14 +13,11 @@ public class ChangeMemberAccessHandler(
     IOrganizationUsersRepository organizationUsersRepository
 ) : IRequestHandler<ChangeMemberAccessCommand, OneOf<Success, NotFound, AccessDenied, BadRequest>>
 {
-    private readonly IUser _user = user;
-    private readonly IOrganizationUsersRepository _organizationUsersRepository = organizationUsersRepository;
-
     public async Task<OneOf<Success, NotFound, AccessDenied, BadRequest>> Handle(ChangeMemberAccessCommand request, CancellationToken cancellationToken)
     {
-        var organizationOwner = await _organizationUsersRepository.GetFirstOrDefaultAsync(
+        var organizationOwner = await organizationUsersRepository.GetFirstOrDefaultAsync(
             [
-                q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == _user.ShortId)
+                q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == user.ShortId)
             ],
             cancellationToken
         );
@@ -33,7 +30,7 @@ public class ChangeMemberAccessHandler(
             return new AccessDenied();
         }
 
-        var organizationUser = await _organizationUsersRepository.GetFirstOrDefaultAsync(
+        var organizationUser = await organizationUsersRepository.GetFirstOrDefaultAsync(
             [
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == request.UserId)
             ],
@@ -50,8 +47,8 @@ public class ChangeMemberAccessHandler(
         } 
 
         organizationUser.IsAdmin = request.IsAdmin;
-        _organizationUsersRepository.Update(organizationUser);
-        await _organizationUsersRepository.SaveAsync(cancellationToken);
+        organizationUsersRepository.Update(organizationUser);
+        await organizationUsersRepository.SaveAsync(cancellationToken);
 
         return new Success();
     }

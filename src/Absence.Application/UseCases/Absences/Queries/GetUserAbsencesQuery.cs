@@ -6,10 +6,5 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Absences.Queries;
 
-public class GetUserAbsencesQuery(DateTime startDate, DateTime endDate, int organizationId) 
-    : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>>
-{
-    public DateTime StartDate { get; } = startDate;
-    public DateTime EndDate { get; } = endDate;
-    public int OrganizationId { get; } = organizationId;
-}
+public record GetUserAbsencesQuery(DateTime StartDate, DateTime EndDate, int OrganizationId) 
+    : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>>;

@@ -12,12 +12,10 @@ namespace Absence.Api.Controllers;
 [Route("absences")]
 public class AbsencesController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender = sender;
-
     [HttpGet("/organizations/{organizationId}/absences")]
     public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId));
+        var response = await sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
             badRequest => BadRequest(badRequest.Message)
@@ -27,7 +25,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpPost("/organizations/{organizationId}/absences")]
     public async Task<ActionResult<IEnumerable<AbsenceDTO>>> GetByUserIds([FromRoute] int organizationId, [FromBody] List<int> userIds, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var response = await _sender.Send(new GetUsersAbsencesQuery(startDate, endDate, organizationId, userIds));
+        var response = await sender.Send(new GetUsersAbsencesQuery(startDate, endDate, organizationId, userIds));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
             badRequest => BadRequest(badRequest.Message),
@@ -38,7 +36,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<int>> Add([FromBody] CreateAbsenceDTO absence)
     {
-        var response = await _sender.Send(new AddAbsenceCommand(absence));
+        var response = await sender.Send(new AddAbsenceCommand(absence));
         return response.Match<ActionResult>(
             successCreated => Ok(successCreated.Value),
             successRequested => Ok(new { Message = successRequested.Value }),
@@ -49,7 +47,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpPut]
     public async Task<ActionResult<string>> Edit([FromBody] EditAbsenceDTO absence)
     {
-        var result = await _sender.Send(new EditAbsenceCommand(absence));
+        var result = await sender.Send(new EditAbsenceCommand(absence));
         return result.Match<ActionResult>(
             success => Ok(new { Message = success.Value }),
             notFound => NotFound(),
@@ -61,7 +59,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult<string>> Delete([FromRoute] int id)
     {
-        var result = await _sender.Send(new DeleteAbsenceCommand(id));
+        var result = await sender.Send(new DeleteAbsenceCommand(id));
         return result.Match<ActionResult>(
             success => Ok(new { Message = success.Value }),
             notFound => NotFound(),
@@ -72,7 +70,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpGet("/organizations/{organizationId}/absences/events")]
     public async Task<ActionResult<IEnumerable<AbsenceEventDTO>>> GetEvents([FromRoute] int organizationId)
     {
-        var response = await _sender.Send(new GetAbsenceEventsQuery(organizationId));
+        var response = await sender.Send(new GetAbsenceEventsQuery(organizationId));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
             badRequest => BadRequest(),
@@ -83,7 +81,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpPost("events/{eventId}")]
     public async Task<ActionResult> Respond([FromRoute] int eventId, [FromQuery] bool accepted)
     {
-        var response = await _sender.Send(new RespondAbsenceEventCommand(eventId, accepted));
+        var response = await sender.Send(new RespondAbsenceEventCommand(eventId, accepted));
         return response.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),

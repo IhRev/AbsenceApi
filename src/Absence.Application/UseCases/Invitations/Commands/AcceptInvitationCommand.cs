@@ -5,8 +5,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Invitations.Commands;
 
-public class AcceptInvitationCommand(int id, bool accespted) : IRequest<OneOf<Success, NotFound, AccessDenied>>
-{
-    public int Id { get; } = id;
-    public bool Accespted { get; } = accespted;
-}
+public record AcceptInvitationCommand(int Id, bool Accespted) : IRequest<OneOf<Success, NotFound, AccessDenied>>;

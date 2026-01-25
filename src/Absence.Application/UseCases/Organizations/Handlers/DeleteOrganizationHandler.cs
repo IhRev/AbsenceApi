@@ -3,7 +3,7 @@ using Absence.Application.Common.Results;
 using Absence.Application.Identity;
 using Absence.Application.UseCases.Organizations.Commands;
 using Absence.Domain.Entities;
-using Absence.Domain.Interfaces;
+using Absence.Domain.Repositories;
 using MediatR;
 using OneOf;
 using OneOf.Types;
@@ -16,30 +16,26 @@ public class DeleteOrganizationHandler(
     IUserService userService
 ) : IRequestHandler<DeleteOrganizationCommand, OneOf<Success, AccessDenied, NotFound>>
 {
-    private readonly IUser _user = user;
-    private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
-    private readonly IUserService _userService = userService;
-
     public async Task<OneOf<Success, AccessDenied, NotFound>> Handle(DeleteOrganizationCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userService.FindByIdAsync(_user.Id);
-        if (!await _userService.CheckPasswordAsync(user!, request.Request.Password))
+        var userEntity = await userService.FindByIdAsync(user.Id);
+        if (!await userService.CheckPasswordAsync(userEntity!, request.Request.Password))
         {
             return new AccessDenied();
         }
 
-        var organization = await _organizationRepository.GetByIdAsync(request.Id, cancellationToken);
+        var organization = await organizationRepository.GetByIdAsync(request.Id, cancellationToken);
         if (organization is null)
         {
             return new NotFound();
         }
-        if (organization.OwnerId != _user.ShortId)
+        if (organization.OwnerId != user.ShortId)
         {
             return new AccessDenied();
         }
 
-        _organizationRepository.Delete(organization);
-        await _organizationRepository.SaveAsync(cancellationToken);
+        organizationRepository.Delete(organization);
+        await organizationRepository.SaveAsync(cancellationToken);
 
         return new Success();
     }

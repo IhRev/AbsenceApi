@@ -16,8 +16,8 @@ public class AuthResponse
     }
 
     public static AuthResponse Success(string accessToken, string refreshToken) => 
-        new AuthResponse(true, accessToken: accessToken, refreshToken: refreshToken);
+        new(true, accessToken: accessToken, refreshToken: refreshToken);
 
     public static AuthResponse Fail(string message) =>
-        new AuthResponse(false, message: message);
+        new(false, message: message);
 }

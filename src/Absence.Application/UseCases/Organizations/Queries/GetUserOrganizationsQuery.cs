@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Absence.Application.UseCases.Organizations.Queries;
 
-public class GetUserOrganizationsQuery : IRequest<IEnumerable<OrganizationDTO>>;
+public record GetUserOrganizationsQuery : IRequest<IEnumerable<OrganizationDTO>>;

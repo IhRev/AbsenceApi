@@ -20,19 +20,17 @@ internal class AbsenceMapping : Profile
         CreateMap<CreateAbsenceDTO, AbsenceEventEntity>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.AbsenceId, opt => opt.Ignore())
-            .ForMember(dest => dest.AbsenceEventTypeId, opt => opt.Ignore())
+            .ForMember(dest => dest.AbsenceEventType, opt => opt.Ignore())
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
             .ForMember(dest => dest.AbsenceTypeId, opt => opt.MapFrom(src => src.Type))
             .ForMember(dest => dest.OrganizationId, opt => opt.MapFrom(src => src.Organization))
             .ForMember(dest => dest.Organization, opt => opt.Ignore())
-            .ForMember(dest => dest.User, opt => opt.Ignore())
-            .ForMember(dest => dest.AbsenceEventType, opt => opt.Ignore());
+            .ForMember(dest => dest.User, opt => opt.Ignore());
 
         CreateMap<EditAbsenceDTO, AbsenceEventEntity>()
             .ForMember(dest => dest.AbsenceId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.AbsenceTypeId, opt => opt.MapFrom(src => src.Type))
-            .ForMember(dest => dest.AbsenceEventTypeId, opt => opt.Ignore())
             .ForMember(dest => dest.UserId, opt => opt.Ignore())
             .ForMember(dest => dest.OrganizationId, opt => opt.Ignore())
             .ForMember(dest => dest.Organization, opt => opt.Ignore())
@@ -60,7 +58,7 @@ internal class AbsenceMapping : Profile
 
         CreateMap<AbsenceEventEntity, AbsenceEventDTO>()
             .ForMember(dest => dest.AbsenceType, opt => opt.MapFrom(src => src.AbsenceTypeId))
-            .ForMember(dest => dest.AbsenceEventType, opt => opt.MapFrom(src => src.AbsenceEventTypeId))
+            .ForMember(dest => dest.AbsenceEventType, opt => opt.MapFrom(src => (int)src.AbsenceEventType))
             .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User.Email));
 
         CreateMap<AbsenceEventEntity, AbsenceEntity>()

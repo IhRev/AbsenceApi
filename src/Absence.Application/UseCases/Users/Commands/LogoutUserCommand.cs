@@ -2,4 +2,4 @@
 
 namespace Absence.Application.UseCases.Users.Commands;
 
-public class LogoutUserCommand : IRequest;
+public record LogoutUserCommand : IRequest;

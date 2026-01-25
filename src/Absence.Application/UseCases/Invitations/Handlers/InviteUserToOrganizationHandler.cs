@@ -2,11 +2,11 @@
 using MediatR;
 using OneOf.Types;
 using OneOf;
-using Absence.Domain.Interfaces;
 using Absence.Domain.Entities;
 using Absence.Application.Common.Interfaces;
 using Absence.Application.UseCases.Invitations.Commands;
 using Absence.Application.Identity;
+using Absence.Domain.Repositories;
 
 namespace Absence.Application.UseCases.Invitations.Handlers;
 
@@ -19,25 +19,19 @@ public class InviteUserToOrganizationHandler(
     IUser user
 ) : IRequestHandler<InviteUserToOrganizationCommand, OneOf<Success, BadRequest, AccessDenied>>
 {
-    private readonly IRepository<OrganizationUserInvitationEntity> _organizationUserInvitationRepository = organizationUserInvitationRepository;
-    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-    private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
-    private readonly IUserService _userService = userService;
-    private readonly IUser _user = user;
-
     public async Task<OneOf<Success, BadRequest, AccessDenied>> Handle(InviteUserToOrganizationCommand request, CancellationToken cancellationToken)
     {
-        var organization = await _organizationRepository.GetByIdAsync(request.Invite.OrganizationId, cancellationToken);
+        var organization = await organizationRepository.GetByIdAsync(request.Invite.OrganizationId, cancellationToken);
         if (organization is null)
         {
             return new BadRequest($"Organization with id {request.Invite.OrganizationId} doesn't exist.");
         }
 
-        var inviterOrganization = await _organizationUserRepository.GetFirstOrDefaultAsync(
+        var inviterOrganization = await organizationUserRepository.GetFirstOrDefaultAsync(
             [
                 q => q.Where(_ =>
                     _.OrganizationId == request.Invite.OrganizationId &&
-                    _.UserId == _user.ShortId
+                    _.UserId == user.ShortId
                 )
             ],
             cancellationToken
@@ -47,13 +41,13 @@ public class InviteUserToOrganizationHandler(
             return new AccessDenied();
         }
 
-        var invitedUser = await _userService.FindByEmailAsync(request.Invite.UserEmail);
+        var invitedUser = await userService.FindByEmailAsync(request.Invite.UserEmail);
         if (invitedUser is null)
         {
             return new BadRequest($"User with email {request.Invite.UserEmail} doesn't exist.");
         }
 
-        var invitedUserOrganization = await _organizationUserRepository.GetFirstOrDefaultAsync(
+        var invitedUserOrganization = await organizationUserRepository.GetFirstOrDefaultAsync(
             [
                 q => q.Where(_ =>
                     _.OrganizationId == request.Invite.OrganizationId &&
@@ -81,16 +75,16 @@ public class InviteUserToOrganizationHandler(
             return new BadRequest("Invitation already sent.");
         }
 
-        await _organizationUserInvitationRepository.InsertAsync(
+        await organizationUserInvitationRepository.InsertAsync(
             new OrganizationUserInvitationEntity()
             {
                 Invited = invitedUser.ShortId,
-                Inviter = _user.ShortId,
+                Inviter = user.ShortId,
                 OrganizationId = request.Invite.OrganizationId
             }, 
             cancellationToken
         );
-        await _organizationUserInvitationRepository.SaveAsync(cancellationToken);
+        await organizationUserInvitationRepository.SaveAsync(cancellationToken);
 
         return new Success();
     }

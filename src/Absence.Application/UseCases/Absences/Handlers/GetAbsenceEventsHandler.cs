@@ -4,9 +4,9 @@ using Absence.Application.UseCases.Absences.Queries;
 using MediatR;
 using OneOf.Types;
 using OneOf;
-using Absence.Domain.Interfaces;
 using Absence.Application.Common.Interfaces;
 using AutoMapper;
+using Absence.Domain.Repositories;
 
 namespace Absence.Application.UseCases.Absences.Handlers;
 
@@ -17,16 +17,11 @@ public class GetAbsenceEventsHandler(
     IMapper mapper
 ) : IRequestHandler<GetAbsenceEventsQuery, OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest, AccessDenied>>
 {
-    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-    private readonly IAbsenceEventRepository _absenceEventRepository = absenceEventRepository;
-    private readonly IUser _user = user;
-    private readonly IMapper _mapper = mapper;
-
     public async Task<OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest, AccessDenied>> Handle(GetAbsenceEventsQuery request, CancellationToken cancellationToken)
     {
-        var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
+        var organizationUser = await organizationUserRepository.GetFirstOrDefaultAsync(
             [
-                q => q.Where(_ => _.UserId == _user.ShortId),
+                q => q.Where(_ => _.UserId == user.ShortId),
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId)
             ],
             cancellationToken
@@ -40,11 +35,11 @@ public class GetAbsenceEventsHandler(
             return new AccessDenied();
         }
 
-        var events = await _absenceEventRepository.GetAsync(
+        var events = await absenceEventRepository.GetAsync(
             [
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId)
             ]
         );
-        return new Success<IEnumerable<AbsenceEventDTO>>(_mapper.Map<IEnumerable<AbsenceEventDTO>>(events));
+        return new Success<IEnumerable<AbsenceEventDTO>>(mapper.Map<IEnumerable<AbsenceEventDTO>>(events));
     }
 }

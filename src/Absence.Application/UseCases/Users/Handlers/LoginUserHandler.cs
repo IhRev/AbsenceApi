@@ -11,20 +11,16 @@ internal class LoginUserHandler(
     IRefreshTokenService refreshTokenService
 ) : IRequestHandler<LoginUserCommand, AuthResponse>
 {
-    private readonly IUserService _userService = userService;
-    private readonly IJwtService _jwtService = jwtService;
-    private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
-
     public async Task<AuthResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userService.FindByEmailAsync(request.Credentials.Email);
-        if (user == null || !await _userService.CheckPasswordAsync(user, request.Credentials.Password))
+        var userEntity = await userService.FindByEmailAsync(request.Credentials.Email);
+        if (userEntity == null || !await userService.CheckPasswordAsync(userEntity, request.Credentials.Password))
         {
             return AuthResponse.Fail("Incorrect email or password");
         }
 
-        var accessToken = _jwtService.GenerateToken(user);
-        var refreshToken = await _refreshTokenService.GenerateToken(user, cancellationToken);
+        var accessToken = jwtService.GenerateToken(userEntity);
+        var refreshToken = await refreshTokenService.GenerateToken(userEntity, cancellationToken);
 
         return AuthResponse.Success(accessToken, refreshToken);
     }

@@ -6,7 +6,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Organizations.Queries;
 
-public class GetOrganizationMembersQuery(int organizationId) : IRequest<OneOf<Success<IEnumerable<MemberDTO>>, BadRequest>>
-{
-    public int OrganizationId { get; } = organizationId;
-}
+public record GetOrganizationMembersQuery(int OrganizationId) : IRequest<OneOf<Success<IEnumerable<MemberDTO>>, BadRequest>>;

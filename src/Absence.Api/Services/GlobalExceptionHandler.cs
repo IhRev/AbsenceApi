@@ -6,11 +6,9 @@ namespace Absence.Api.Services;
 
 public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
-    private readonly ILogger<GlobalExceptionHandler> _logger = logger;
-
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        _logger.LogCritical(exception, "Exception for user: {User}", httpContext.User?.FindFirst(ClaimTypes.Name));
+        logger.LogCritical(exception, "Exception for user: {User}", httpContext.User?.FindFirst(ClaimTypes.Name));
 
         await httpContext.Response.WriteAsJsonAsync(new ProblemDetails()
         {

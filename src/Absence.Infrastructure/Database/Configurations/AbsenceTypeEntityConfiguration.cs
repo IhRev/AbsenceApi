@@ -1,4 +1,5 @@
 ﻿using Absence.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;
@@ -13,5 +14,11 @@ public class AbsenceTypeEntityConfiguration : EntityConfiguration<AbsenceTypeEnt
            .Property(_ => _.Name)
            .HasMaxLength(30)
            .IsRequired();
+
+        builder
+            .HasOne(_ => _.Organization)
+            .WithMany(_ => _.AbsenceTypes)
+            .HasForeignKey(_ => _.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

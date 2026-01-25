@@ -1,7 +1,7 @@
 ﻿using Absence.Application.Common.Interfaces;
 using Absence.Application.Common.Results;
 using Absence.Application.UseCases.Organizations.Commands;
-using Absence.Domain.Interfaces;
+using Absence.Domain.Repositories;
 using MediatR;
 using OneOf;
 using OneOf.Types;
@@ -13,14 +13,11 @@ internal class DeleteMemberHandler(
     IOrganizationUsersRepository organizationUsersRepository
 ) : IRequestHandler<DeleteMemberCommand, OneOf<Success, NotFound, BadRequest, AccessDenied>>
 {
-    private readonly IUser _user = user;
-    private readonly IOrganizationUsersRepository _organizationUsersRepository = organizationUsersRepository;
-
     public async Task<OneOf<Success, NotFound, BadRequest, AccessDenied>> Handle(DeleteMemberCommand request, CancellationToken cancellationToken)
     {
-        var organizationOwner = await _organizationUsersRepository.GetFirstOrDefaultAsync(
+        var organizationOwner = await organizationUsersRepository.GetFirstOrDefaultAsync(
             [
-                q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == _user.ShortId)
+                q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == user.ShortId)
             ],
             cancellationToken
         );
@@ -33,7 +30,7 @@ internal class DeleteMemberHandler(
             return new AccessDenied();
         }
 
-        var organizationUser = await _organizationUsersRepository.GetFirstOrDefaultAsync(
+        var organizationUser = await organizationUsersRepository.GetFirstOrDefaultAsync(
             [
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == request.MemberId)
             ],
@@ -44,8 +41,8 @@ internal class DeleteMemberHandler(
             return new BadRequest($"User with id {request.MemberId} doesn't belong to organization.");
         }
 
-        _organizationUsersRepository.Delete(organizationUser);
-        await _organizationUsersRepository.SaveAsync(cancellationToken);
+        organizationUsersRepository.Delete(organizationUser);
+        await organizationUsersRepository.SaveAsync(cancellationToken);
 
         return new Success();
     }

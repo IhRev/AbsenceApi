@@ -1,8 +1,9 @@
 ﻿using Absence.Application.Identity;
 using Absence.Domain.Entities;
-using Absence.Domain.Interfaces;
+using Absence.Domain.Repositories;
 using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Database.Repositories;
+using Absence.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace Absence.Infrastructure.Identity;
+namespace Absence.Infrastructure;
 
 public static class DependencyInjection
 {

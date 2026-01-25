@@ -5,7 +5,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Absences.Commands;
 
-public class DeleteAbsenceCommand(int id) : IRequest<OneOf<Success<string>, NotFound, AccessDenied>>
-{
-    public int Id { get; } = id;
-}
+public record DeleteAbsenceCommand(int Id) : IRequest<OneOf<Success<string>, NotFound, AccessDenied>>;

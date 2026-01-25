@@ -6,7 +6,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Users.Commands;
 
-public class DeleteUserCommand(DeleteUserRequest request) : IRequest<OneOf<Success, BadRequest>>
-{
-    public DeleteUserRequest Request { get; } = request;
-}
+public record DeleteUserCommand(DeleteUserRequest Request) : IRequest<OneOf<Success, BadRequest>>;

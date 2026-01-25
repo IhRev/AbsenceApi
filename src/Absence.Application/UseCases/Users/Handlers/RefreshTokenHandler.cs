@@ -12,16 +12,12 @@ internal class RefreshTokenHandler(
     IRefreshTokenService refreshTokenService
 ) : IRequestHandler<RefreshTokenCommand, AuthResponse>
 {
-    private readonly IUserService _userService = userService;
-    private readonly IJwtService _jwtService = jwtService;
-    private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
-
     public async Task<AuthResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var principal = _jwtService.GetPrincipalFromExpiredToken(request.RefreshTokenRequest.AccessToken);
+        var principal = jwtService.GetPrincipalFromExpiredToken(request.RefreshTokenRequest.AccessToken);
 
         var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-        var userEntity = await _userService.FindByIdAsync(userId);
+        var userEntity = await userService.FindByIdAsync(userId);
 
         if (userEntity == null || 
             userEntity.RefreshToken != request.RefreshTokenRequest.RefreshToken ||
@@ -30,8 +26,8 @@ internal class RefreshTokenHandler(
             return AuthResponse.Fail("Token is invalid");
         }
 
-        var newAccessToken = _jwtService.GenerateToken(userEntity);
-        var newRefreshToken = await _refreshTokenService.GenerateToken(userEntity, cancellationToken);
+        var newAccessToken = jwtService.GenerateToken(userEntity);
+        var newRefreshToken = await refreshTokenService.GenerateToken(userEntity, cancellationToken);
 
         return AuthResponse.Success(newAccessToken, newRefreshToken);
     }

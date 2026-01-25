@@ -10,22 +10,19 @@ namespace Absence.Application.UseCases.Users.Handlers;
 
 internal class ChangePasswordHandler(IUserService userService, IUser user) : IRequestHandler<ChangePasswordCommand, OneOf<Success, BadRequest>>
 {
-    private readonly IUserService _userService = userService;
-    private readonly IUser _user = user;
-
     public async Task<OneOf<Success, BadRequest>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
-        var user = await _userService.FindByIdAsync(_user.Id);
+        var userEntity = await userService.FindByIdAsync(user.Id);
 
-        var result = await _userService.ChangePasswordAsync(user!, request.Request.OldPassword, request.Request.NewPassword);
+        var result = await userService.ChangePasswordAsync(userEntity!, request.Request.OldPassword, request.Request.NewPassword);
         if (!result.Succeeded)
         {
             return new BadRequest(result.Errors.First().Description);
         }
 
-        user!.RefreshToken = null;
-        user.RefreshTokenExpiresAt = DateTimeOffset.MinValue;
-        await _userService.UpdateAsync(user);
+        userEntity!.RefreshToken = null;
+        userEntity.RefreshTokenExpiresAt = DateTimeOffset.MinValue;
+        await userService.UpdateAsync(userEntity);
 
         return new Success();
     }

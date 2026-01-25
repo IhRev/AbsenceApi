@@ -2,7 +2,7 @@
 using Absence.Application.Common.Results;
 using Absence.Application.UseCases.Holidays.Commands;
 using Absence.Domain.Entities;
-using Absence.Domain.Interfaces;
+using Absence.Domain.Repositories;
 using AutoMapper;
 using MediatR;
 using OneOf;
@@ -17,16 +17,11 @@ internal class AddHolidayHandler(
     IRepository<OrganizationUserEntity> organizationUserRepository
 ) : IRequestHandler<AddHolidayCommand, OneOf<Success<int>, BadRequest, AccessDenied>>
 {
-    private readonly IRepository<HolidayEntity> _holidayRepository = holidayRepository;
-    private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
-    private readonly IMapper _mapper = mapper;
-    private readonly IUser _user = user;
-
     public async Task<OneOf<Success<int>, BadRequest, AccessDenied>> Handle(AddHolidayCommand request, CancellationToken cancellationToken)
     {
-        var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
+        var organizationUser = await organizationUserRepository.GetFirstOrDefaultAsync(
            [
-               q => q.Where(_ => _.UserId == _user.ShortId),
+               q => q.Where(_ => _.UserId == user.ShortId),
                 q => q.Where(_ => _.OrganizationId == request.Holiday.OrganizationId)
            ],
            cancellationToken
@@ -40,9 +35,9 @@ internal class AddHolidayHandler(
             return new AccessDenied();
         }
 
-        var holiday = _mapper.Map<HolidayEntity>(request.Holiday);
-        await _holidayRepository.InsertAsync(holiday, cancellationToken);
-        await _holidayRepository.SaveAsync(cancellationToken);
+        var holiday = mapper.Map<HolidayEntity>(request.Holiday);
+        await holidayRepository.InsertAsync(holiday, cancellationToken);
+        await holidayRepository.SaveAsync(cancellationToken);
         return new Success<int>(holiday.Id);
     }
 }
