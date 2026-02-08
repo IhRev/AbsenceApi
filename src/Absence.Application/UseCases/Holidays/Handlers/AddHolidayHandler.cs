@@ -11,7 +11,7 @@ using OneOf.Types;
 namespace Absence.Application.UseCases.Holidays.Handlers;
 
 internal class AddHolidayHandler(
-    IRepository<HolidayEntity> holidayRepository,
+    IRepository<EventEntity> holidayRepository,
     IMapper mapper,
     IUser user,
     IRepository<OrganizationUserEntity> organizationUserRepository
@@ -35,7 +35,7 @@ internal class AddHolidayHandler(
             return new AccessDenied();
         }
 
-        var holiday = mapper.Map<HolidayEntity>(request.Holiday);
+        var holiday = mapper.Map<EventEntity>(request.Holiday);
         await holidayRepository.InsertAsync(holiday, cancellationToken);
         await holidayRepository.SaveAsync(cancellationToken);
         return new Success<int>(holiday.Id);

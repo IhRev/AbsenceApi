@@ -10,7 +10,7 @@ using Absence.Domain.Repositories;
 namespace Absence.Application.UseCases.Holidays.Handlers;
 
 public class DeleteHolidayHandler(
-    IRepository<HolidayEntity> holidayRepository,
+    IRepository<EventEntity> holidayRepository,
     IRepository<OrganizationUserEntity> organizationUserRepository,
     IUser user
 ) : IRequestHandler<DeleteHolidayCommand, OneOf<Success, NotFound, AccessDenied>>

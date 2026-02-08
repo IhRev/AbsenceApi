@@ -9,9 +9,11 @@ public class AbsenceEntity : IIdKeyed<int>
     public required DateTimeOffset StartDate { get; set; }
     public required DateTimeOffset EndDate { get; set; }
     public required int AbsenceTypeId { get; set; }
-    public int UserId { get; set; }
     public int OrganizationId { get; set; }
+    public int UserId { get; set; }
+    public int ApprovedBy { get; set; }
     public AbsenceTypeEntity AbsenceType { get; set; } = null!;
-    public UserEntity User { get; set; } = null!;
     public OrganizationEntity Organization { get; set; } = null!;
+    public UserEntity User { get; set; } = null!;
+    public UserEntity ApprovedByUser { get; set; } = null!;
 }

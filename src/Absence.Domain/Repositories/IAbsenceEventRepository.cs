@@ -4,25 +4,25 @@ namespace Absence.Domain.Repositories;
 
 public interface IAbsenceEventRepository
 {
-    void Delete(AbsenceEventEntity entity);
+    void Delete(AbsenceRequestEntity entity);
 
-    void DeleteRange(IEnumerable<AbsenceEventEntity> entities);
+    void DeleteRange(IEnumerable<AbsenceRequestEntity> entities);
 
     ValueTask DisposeAsync();
 
-    Task<List<AbsenceEventEntity>> GetAsync(Func<IQueryable<AbsenceEventEntity>, IQueryable<AbsenceEventEntity>>[]? queries = null, CancellationToken cancellationToken = default);
+    Task<List<AbsenceRequestEntity>> GetAsync(Func<IQueryable<AbsenceRequestEntity>, IQueryable<AbsenceRequestEntity>>[]? queries = null, CancellationToken cancellationToken = default);
     
-    Task<AbsenceEventEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default);
+    Task<AbsenceRequestEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default);
    
-    Task<AbsenceEventEntity?> GetFirstOrDefaultAsync(Func<IQueryable<AbsenceEventEntity>, IQueryable<AbsenceEventEntity>>[]? queries = null, CancellationToken cancellationToken = default);
+    Task<AbsenceRequestEntity?> GetFirstOrDefaultAsync(Func<IQueryable<AbsenceRequestEntity>, IQueryable<AbsenceRequestEntity>>[]? queries = null, CancellationToken cancellationToken = default);
    
-    Task InsertAsync(AbsenceEventEntity entity, CancellationToken cancellationToken = default);
+    Task InsertAsync(AbsenceRequestEntity entity, CancellationToken cancellationToken = default);
     
-    Task InsertRangeAsync(IEnumerable<AbsenceEventEntity> entities, CancellationToken cancellationToken = default);
+    Task InsertRangeAsync(IEnumerable<AbsenceRequestEntity> entities, CancellationToken cancellationToken = default);
    
     Task SaveAsync(CancellationToken cancellationToken = default);
     
-    void Update(AbsenceEventEntity entity);
+    void Update(AbsenceRequestEntity entity);
     
-    void UpdateRange(IEnumerable<AbsenceEventEntity> entities);
+    void UpdateRange(IEnumerable<AbsenceRequestEntity> entities);
 }

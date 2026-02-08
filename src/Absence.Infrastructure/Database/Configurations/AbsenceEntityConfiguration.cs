@@ -30,16 +30,23 @@ public class AbsenceEntityConfiguration : EntityConfiguration<AbsenceEntity, int
             .OnDelete(DeleteBehavior.Restrict);
 
         builder
+           .HasOne(_ => _.Organization)
+           .WithMany(_ => _.Absences)
+           .HasForeignKey(_ => _.OrganizationId)
+           .OnDelete(DeleteBehavior.Restrict);
+
+        builder
             .HasOne(_ => _.User)
             .WithMany(_ => _.Absences)
             .HasForeignKey(_ => _.UserId)
             .HasPrincipalKey(_ => _.ShortId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder
-           .HasOne(_ => _.Organization)
-           .WithMany(_ => _.Absences)
-           .HasForeignKey(_ => _.OrganizationId)
-           .OnDelete(DeleteBehavior.Cascade);
+            .HasOne(_ => _.ApprovedByUser)
+            .WithMany(_ => _.ApprovedAbsences)
+            .HasForeignKey(_ => _.ApprovedBy)
+            .HasPrincipalKey(_ => _.ShortId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

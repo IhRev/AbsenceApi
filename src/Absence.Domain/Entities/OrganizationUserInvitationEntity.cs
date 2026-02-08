@@ -9,6 +9,6 @@ public class OrganizationUserInvitationEntity : IIdKeyed<int>
     public int Inviter { get; set; }
     public int Invited { get; set; }
     public OrganizationEntity Organization { get; set; } = null!;
-    public UserEntity InvitedUser { get; set; } = null!;
     public UserEntity InviterUser { get; set; } = null!;
+    public UserEntity InvitedUser { get; set; } = null!;
 }

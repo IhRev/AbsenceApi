@@ -19,14 +19,6 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             .ValueGeneratedOnAdd();
 
         builder
-            .Property(_ => _.RefreshTokenExpiresAt)
-            .IsRequired(false);
-
-        builder
-            .Property(_ => _.RefreshToken)
-            .IsRequired(false);
-
-        builder
             .Property(_ => _.FirstName)
             .HasMaxLength(50)
             .IsRequired();
@@ -37,8 +29,21 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             .IsRequired();
 
         builder
+            .Property(_ => _.RefreshTokenExpiresAt)
+            .IsRequired(false);
+
+        builder
+            .Property(_ => _.RefreshToken)
+            .IsRequired(false);
+
+        builder
             .Property(u => u.Email)
             .HasMaxLength(100)
+            .IsRequired();
+
+        builder
+            .Property(_ => _.IsDeleted)
+            .HasDefaultValue(false)
             .IsRequired();
     }
 }

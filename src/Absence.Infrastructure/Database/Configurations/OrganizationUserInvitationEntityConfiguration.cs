@@ -11,23 +11,23 @@ internal class OrganizationUserInvitationEntityConfiguration : EntityConfigurati
         base.Configure(builder);
 
         builder
+            .HasOne(_ => _.Organization)
+            .WithMany(_ => _.OrganizationUserInvitations)
+            .HasForeignKey(_ => _.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder
             .HasOne(_ => _.InvitedUser)
             .WithMany(_ => _.InvitationsReceived)
             .HasForeignKey(_ => _.Invited)
             .HasPrincipalKey(_ => _.ShortId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder
             .HasOne(_ => _.InviterUser)
             .WithMany(_ => _.InvitationsSent)
             .HasForeignKey(_ => _.Inviter)
             .HasPrincipalKey(_ => _.ShortId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder
-            .HasOne(_ => _.Organization)
-            .WithMany(_ => _.OrganizationUserInvitations)
-            .HasForeignKey(_ => _.OrganizationId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

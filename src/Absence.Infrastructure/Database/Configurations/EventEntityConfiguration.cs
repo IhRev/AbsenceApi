@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;
 
-internal class HolidayEntityConfiguration : EntityConfiguration<HolidayEntity, int>
+internal class EventEntityConfiguration : EntityConfiguration<EventEntity, int>
 {
-    public override void Configure(EntityTypeBuilder<HolidayEntity> builder)
+    public override void Configure(EntityTypeBuilder<EventEntity> builder)
     {
         base.Configure(builder);
 
@@ -20,9 +20,13 @@ internal class HolidayEntityConfiguration : EntityConfiguration<HolidayEntity, i
             .IsRequired();
 
         builder
+            .Property(_ => _.NonWorkingDay)
+            .IsRequired();
+
+        builder
             .HasOne(_ => _.Organization)
-            .WithMany(_ => _.Holidays)
+            .WithMany(_ => _.Events)
             .HasForeignKey(_ => _.OrganizationId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

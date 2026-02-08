@@ -14,7 +14,7 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 internal class DeleteAbsenceHandler(
     IRepository<AbsenceEntity> absenceRepository,
     IOrganizationUsersRepository organizationUserRepository,
-    IRepository<AbsenceEventEntity> absenceEventRepository,
+    IRepository<AbsenceRequestEntity> absenceEventRepository,
     IUser user,
     IMapper mapper
 ) : IRequestHandler<DeleteAbsenceCommand, OneOf<Success<string>, NotFound, AccessDenied>>
@@ -46,8 +46,8 @@ internal class DeleteAbsenceHandler(
         }
         else
         {
-            var absenceEvent = mapper.Map<AbsenceEventEntity>(absence);
-            absenceEvent.AbsenceEventType = AbsenceEventType.DELETE;
+            var absenceEvent = mapper.Map<AbsenceRequestEntity>(absence);
+            absenceEvent.RequestType = AbsenceEventType.DELETE;
             await absenceEventRepository.InsertAsync(absenceEvent, cancellationToken);
             await absenceEventRepository.SaveAsync(cancellationToken);
             return new Success<string>("Absence delete requested.");

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;
 
-public class OrganizationEntityConfiguration : EntityConfiguration<OrganizationEntity, int>
+public class OrganizationEntityConfiguration : SoftDeleteEntityConfiguration<OrganizationEntity, int>
 {
     public override void Configure(EntityTypeBuilder<OrganizationEntity> builder)
     {
@@ -17,7 +17,7 @@ public class OrganizationEntityConfiguration : EntityConfiguration<OrganizationE
 
         builder
             .HasOne(_ => _.Owner)
-            .WithMany(_ => _.Organizations)
+            .WithMany(_ => _.OwnedOrganizations)
             .HasForeignKey(_ => _.OwnerId)
             .HasPrincipalKey(_ => _.ShortId)
             .OnDelete(DeleteBehavior.Restrict);

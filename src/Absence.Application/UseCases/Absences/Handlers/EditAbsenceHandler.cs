@@ -15,7 +15,7 @@ internal class EditAbsenceHandler(
     IRepository<AbsenceEntity> absenceRepository, 
     IRepository<AbsenceTypeEntity> absenceTypeRepository,
     IUser user,
-    IRepository<AbsenceEventEntity> absenceEventRepository,
+    IRepository<AbsenceRequestEntity> absenceEventRepository,
     IOrganizationUsersRepository organizationUserRepository,
     IMapper mapper
 ) : IRequestHandler<EditAbsenceCommand, OneOf<Success<string>, NotFound, BadRequest, AccessDenied>>
@@ -58,8 +58,8 @@ internal class EditAbsenceHandler(
         }
         else
         {
-            var absenceEvent = mapper.Map<AbsenceEventEntity>(request.Absence);
-            absenceEvent.AbsenceEventType = AbsenceEventType.CREATE;
+            var absenceEvent = mapper.Map<AbsenceRequestEntity>(request.Absence);
+            absenceEvent.RequestType = AbsenceEventType.CREATE;
             absenceEvent.OrganizationId = organizationUser.OrganizationId;
             absenceEvent.UserId = organizationUser.UserId;
             await absenceEventRepository.InsertAsync(absenceEvent, cancellationToken);

@@ -12,7 +12,7 @@ using Absence.Domain.Repositories;
 namespace Absence.Application.UseCases.Absences.Handlers;
 
 public class RespondAbsenceEventHandler(
-    IRepository<AbsenceEventEntity> absenceEventRepository,
+    IRepository<AbsenceRequestEntity> absenceEventRepository,
     IOrganizationUsersRepository organizationUserRepository,
     IRepository<AbsenceEntity> absenceRepository,
     IUser user,
@@ -41,7 +41,7 @@ public class RespondAbsenceEventHandler(
 
         if (request.Accepted)
         {
-            switch (absenceEvent.AbsenceEventType)
+            switch (absenceEvent.RequestType)
             {
                 case AbsenceEventType.CREATE:
                     await AddAbsence(absenceEvent, cancellationToken);
@@ -53,7 +53,7 @@ public class RespondAbsenceEventHandler(
                     await DeleteAbsence(absenceEvent, cancellationToken);
                     break;
                 default:
-                    throw new ArgumentException($"Incorrect event type {absenceEvent.AbsenceEventType}");
+                    throw new ArgumentException($"Incorrect event type {absenceEvent.RequestType}");
             }
             await absenceRepository.SaveAsync(cancellationToken);
         }
@@ -63,20 +63,20 @@ public class RespondAbsenceEventHandler(
         return new Success();
     }
 
-    private Task AddAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
+    private Task AddAbsence(AbsenceRequestEntity absenceEvent, CancellationToken cancellationToken = default)
     {
         var absence = mapper.Map<AbsenceEntity>(absenceEvent);
         return absenceRepository.InsertAsync(absence, cancellationToken);
     }
 
-    private async Task UpdateAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
+    private async Task UpdateAbsence(AbsenceRequestEntity absenceEvent, CancellationToken cancellationToken = default)
     {
         var absence = await absenceRepository.GetByIdAsync(absenceEvent.AbsenceId!, cancellationToken);
         absence = mapper.Map(absenceEvent, absence);
         absenceRepository.Update(absence!);
     }
 
-    private async Task DeleteAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
+    private async Task DeleteAbsence(AbsenceRequestEntity absenceEvent, CancellationToken cancellationToken = default)
     {
         var absence = await absenceRepository.GetByIdAsync(absenceEvent.AbsenceId!, cancellationToken);
         absenceRepository.Delete(absence!);

@@ -12,7 +12,7 @@ using Absence.Domain.Repositories;
 namespace Absence.Application.UseCases.Holidays.Handlers;
 
 public class GetHolidaysHandler(
-    IRepository<HolidayEntity> holidayRepository,
+    IRepository<EventEntity> holidayRepository,
     IRepository<OrganizationUserEntity> organizationUserRepository,
     IMapper mapper,
     IUser user

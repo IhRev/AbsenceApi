@@ -14,7 +14,7 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 internal class AddAbsenceHandler(
     IRepository<AbsenceEntity> absenceRepository, 
     IRepository<AbsenceTypeEntity> absenceTypesRepository, 
-    IRepository<AbsenceEventEntity> absenceEventRepository,
+    IRepository<AbsenceRequestEntity> absenceEventRepository,
     IOrganizationUsersRepository organizationUserRepository,
     IMapper mapper,
     IUser user
@@ -50,9 +50,9 @@ internal class AddAbsenceHandler(
         }
         else
         {
-            var absenceEvent = mapper.Map<AbsenceEventEntity>(request.Absence);
+            var absenceEvent = mapper.Map<AbsenceRequestEntity>(request.Absence);
             absenceEvent.UserId = user.ShortId;
-            absenceEvent.AbsenceEventType = AbsenceEventType.CREATE;
+            absenceEvent.RequestType = AbsenceEventType.CREATE;
             await absenceEventRepository.InsertAsync(absenceEvent, cancellationToken);
             await absenceEventRepository.SaveAsync(cancellationToken);
             return new Success<string>("Absence create requested.");

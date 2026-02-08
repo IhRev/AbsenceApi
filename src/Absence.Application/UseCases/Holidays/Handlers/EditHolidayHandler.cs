@@ -11,7 +11,7 @@ using Absence.Domain.Repositories;
 namespace Absence.Application.UseCases.Holidays.Handlers;
 
 public class EditHolidayHandler(
-    IRepository<HolidayEntity> holidayRepository,
+    IRepository<EventEntity> holidayRepository,
     IRepository<OrganizationUserEntity> organizationUserRepository,
     IUser user,
     IMapper mapper

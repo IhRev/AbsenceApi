@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;
 
-public class AbsenceTypeEntityConfiguration : EntityConfiguration<AbsenceTypeEntity, int>
+public class AbsenceTypeEntityConfiguration : SoftDeleteEntityConfiguration<AbsenceTypeEntity, int>
 {
     public override void Configure(EntityTypeBuilder<AbsenceTypeEntity> builder)
     {
@@ -16,9 +16,22 @@ public class AbsenceTypeEntityConfiguration : EntityConfiguration<AbsenceTypeEnt
            .IsRequired();
 
         builder
+           .Property(_ => _.Code)
+           .HasMaxLength(5)
+           .IsRequired();
+
+        builder
+           .Property(_ => _.RequiresApproval)
+           .IsRequired();
+
+        builder
+           .Property(_ => _.CountsTowardAnnualLeave)
+           .IsRequired();
+
+        builder
             .HasOne(_ => _.Organization)
             .WithMany(_ => _.AbsenceTypes)
             .HasForeignKey(_ => _.OrganizationId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
