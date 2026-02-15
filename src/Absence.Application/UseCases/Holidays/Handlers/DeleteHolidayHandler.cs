@@ -5,7 +5,7 @@ using Absence.Domain.Entities;
 using Absence.Application.UseCases.Holidays.Commands;
 using Absence.Application.Common.Results;
 using Absence.Application.Common.Interfaces;
-using Absence.Domain.Repositories;
+using Absence.Domain.Interfaces;
 
 namespace Absence.Application.UseCases.Holidays.Handlers;
 

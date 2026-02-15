@@ -6,7 +6,7 @@ using OneOf;
 using Absence.Domain.Entities;
 using Absence.Application.Common.Interfaces;
 using AutoMapper;
-using Absence.Domain.Repositories;
+using Absence.Domain.Interfaces;
 
 namespace Absence.Application.UseCases.Holidays.Handlers;
 

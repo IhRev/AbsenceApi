@@ -5,7 +5,7 @@ using OneOf.Types;
 using OneOf;
 using Absence.Application.Common.Interfaces;
 using Absence.Domain.Entities;
-using Absence.Domain.Repositories;
+using Absence.Domain.Interfaces;
 
 namespace Absence.Application.UseCases.Organizations.Handlers;
 

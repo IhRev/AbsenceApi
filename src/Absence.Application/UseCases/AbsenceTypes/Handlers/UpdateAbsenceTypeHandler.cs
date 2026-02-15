@@ -11,25 +11,30 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.AbsenceTypes.Handlers;
 
-internal class CreateAbsenceTypeHandler(
+public class UpdateAbsenceTypeHandler(
     IRepository<DepartmentEntity> departmentRepository,
     IRepository<AbsenceTypeEntity> absenceTypesRepository,
     IUser user,
     IMapper mapper
-) : IRequestHandler<CreateAbsenceTypeCommand, OneOf<Success<int>, BadRequest>>
+) : IRequestHandler<UpdateAbsenceTypeCommand, OneOf<Success, NotFound, BadRequest>>
 {
-    public async Task<OneOf<Success<int>, BadRequest>> Handle(CreateAbsenceTypeCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, NotFound, BadRequest>> Handle(UpdateAbsenceTypeCommand request, CancellationToken cancellationToken)
     {
         if (!await departmentRepository.BelongsToOrganization(request.OrganizationId, user.ShortId))
         {
             return new BadRequest($"No organization with id {request.OrganizationId} found.");
         }
 
-        var absenceType = mapper.Map<AbsenceTypeEntity>(request.AbsenceType);
-        absenceType.OrganizationId = request.OrganizationId;
-        await absenceTypesRepository.InsertAsync(absenceType, cancellationToken);
+        var absenceType = await absenceTypesRepository.GetByIdAsync(request.AbsenceType.Id, cancellationToken);
+        if (absenceType is null || absenceType.IsDeleted)
+        {
+            return new NotFound(;
+        }
+
+        mapper.Map(request.AbsenceType, absenceType);
+        absenceTypesRepository.Update(absenceType);
         await absenceTypesRepository.SaveAsync(cancellationToken);
 
-        return new Success<int>(absenceType.Id);
+        return new Success();
     }
 }

@@ -3,7 +3,9 @@ using Absence.Application.Common.Results;
 using Absence.Application.UseCases.AbsenceTypes.DTOs;
 using Absence.Application.UseCases.AbsenceTypes.Queries;
 using Absence.Domain.Entities;
-using Absence.Domain.Repositories;
+using Absence.Domain.Extensions;
+using Absence.Domain.Interfaces;
+using Absence.Domain.Specifications;
 using AutoMapper;
 using MediatR;
 using OneOf;
@@ -13,29 +15,20 @@ namespace Absence.Application.UseCases.AbsenceTypes.Handlers;
 
 internal class GetAllAbsenceTypesHandler(
     IRepository<AbsenceTypeEntity> absenceTypeRepository,
-    IOrganizationUsersRepository organizationUserRepository,
+    IRepository<DepartmentEntity> departmentRepository,
     IUser user,
     IMapper mapper
 ) : IRequestHandler<GetAllAbsenceTypesQuery, OneOf<Success<IEnumerable<AbsenceTypeDTO>>, BadRequest>>
 {
     public async Task<OneOf<Success<IEnumerable<AbsenceTypeDTO>>, BadRequest>> Handle(GetAllAbsenceTypesQuery request, CancellationToken cancellationToken = default)
     {
-        var organizationUser = await organizationUserRepository.GetFirstOrDefaultAsync(
-            [
-                q => q.Where(_ => _.UserId == user.ShortId),
-                q => q.Where(_ => _.OrganizationId == request.OrganizationId)
-            ],
-            cancellationToken
-        );
-        if (organizationUser is null)
+        if (!await departmentRepository.BelongsToOrganization(request.OrganizationId, user.ShortId))
         {
             return new BadRequest($"No organization with id {request.OrganizationId} found.");
         }
 
         var absenceTypes = await absenceTypeRepository.GetAsync(
-            [ 
-                q => q.Where(_ => _.OrganizationId == request.OrganizationId) 
-            ], 
+            new AbsenceTypeSpec(request.OrganizationId), 
             cancellationToken
         );
         return new Success<IEnumerable<AbsenceTypeDTO>>(mapper.Map<IEnumerable<AbsenceTypeDTO>>(absenceTypes));

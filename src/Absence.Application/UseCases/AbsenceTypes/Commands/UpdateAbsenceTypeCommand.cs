@@ -6,5 +6,5 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.AbsenceTypes.Commands;
 
-public record CreateAbsenceTypeCommand(int OrganizationId, CreateAbsenceTypeDTO AbsenceType) 
-    : IRequest<OneOf<Success<int>, BadRequest>>;
+public record UpdateAbsenceTypeCommand(int OrganizationId, UpdateAbsenceTypeDTO AbsenceType)
+    : IRequest<OneOf<Success, NotFound, BadRequest>>;

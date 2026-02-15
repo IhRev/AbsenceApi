@@ -8,6 +8,7 @@ using Absence.Application.Common.Interfaces;
 using Absence.Domain.Common;
 using AutoMapper;
 using Absence.Domain.Repositories;
+using Absence.Domain.Interfaces;
 
 namespace Absence.Application.UseCases.Absences.Handlers;
 

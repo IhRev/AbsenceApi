@@ -2,7 +2,7 @@
 using Absence.Application.Common.Results;
 using Absence.Application.UseCases.Holidays.Commands;
 using Absence.Domain.Entities;
-using Absence.Domain.Repositories;
+using Absence.Domain.Interfaces;
 using AutoMapper;
 using MediatR;
 using OneOf;

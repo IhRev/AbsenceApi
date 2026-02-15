@@ -1,4 +1,4 @@
-﻿using Absence.Domain.Common;
+﻿using Absence.Domain.Interfaces;
 
 namespace Absence.Domain.Entities;
 
@@ -9,6 +9,6 @@ public class DepartmentEntity : IIdKeyed<int>, ISoftDelete
     public bool IsDeleted { get; set; }
     public int OrganizationId { get; set; }
     public OrganizationEntity Organization { get; set; } = null!;
-    public ICollection<DepartmentUserEnitty> DepartmentUsers { get; set; } = [];
+    public ICollection<DepartmentUserEntity> DepartmentUsers { get; set; } = [];
     public ICollection<UserOrganizationRoleEntity> UserOrganizationRoles { get; set; } = [];
 }

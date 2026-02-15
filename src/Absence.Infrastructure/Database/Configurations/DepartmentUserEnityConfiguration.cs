@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;
 
-public class DepartmentUserEnityConfiguration : EntityConfiguration<DepartmentUserEnitty, int>
+public class DepartmentUserEnityConfiguration : EntityConfiguration<DepartmentUserEntity, int>
 {
-    public override void Configure(EntityTypeBuilder<DepartmentUserEnitty> builder)
+    public override void Configure(EntityTypeBuilder<DepartmentUserEntity> builder)
     {
         base.Configure(builder);
 

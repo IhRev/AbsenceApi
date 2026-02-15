@@ -8,6 +8,7 @@ using MediatR;
 using OneOf.Types;
 using OneOf;
 using Absence.Domain.Repositories;
+using Absence.Domain.Interfaces;
 
 namespace Absence.Application.UseCases.Absences.Handlers;
 

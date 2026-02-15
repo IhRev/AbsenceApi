@@ -1,4 +1,4 @@
-﻿using Absence.Domain.Common;
+﻿using Absence.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace Absence.Domain.Entities;
@@ -17,7 +17,7 @@ public class UserEntity : IdentityUser, IIdKeyed<string>, ISoftDelete
     public ICollection<AbsenceEntity> ApprovedAbsences { get; set; } = [];
     public ICollection<AbsenceRequestEntity> AbsenceRequests { get; set; } = [];
     public ICollection<OrganizationEntity> OwnedOrganizations { get; set; } = [];
-    public ICollection<DepartmentUserEnitty> DepartmentUsers { get; set; } = [];
+    public ICollection<DepartmentUserEntity> DepartmentUsers { get; set; } = [];
     public ICollection<OrganizationUserInvitationEntity> InvitationsSent { get; set; } = [];
     public ICollection<OrganizationUserInvitationEntity> InvitationsReceived { get; set; } = [];
 }

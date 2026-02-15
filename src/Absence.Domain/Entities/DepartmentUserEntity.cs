@@ -1,8 +1,8 @@
-﻿using Absence.Domain.Common;
+﻿using Absence.Domain.Interfaces;
 
 namespace Absence.Domain.Entities;
 
-public class DepartmentUserEnitty : IIdKeyed<int>
+public class DepartmentUserEntity : IIdKeyed<int>
 {
     public int Id { get; set; }
     public int DepartmentId { get; set; }

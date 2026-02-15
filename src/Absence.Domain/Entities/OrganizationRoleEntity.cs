@@ -1,4 +1,4 @@
-﻿using Absence.Domain.Common;
+﻿using Absence.Domain.Interfaces;
 
 namespace Absence.Domain.Entities;
 

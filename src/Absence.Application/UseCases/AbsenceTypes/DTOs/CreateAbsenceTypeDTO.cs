@@ -3,5 +3,7 @@
 public class CreateAbsenceTypeDTO
 {
     public required string Name { get; set; }
-    public bool CountsTowardAnnualLeave { get; set; }
+    public required string Code { get; set; }
+    public required bool RequiresApproval { get; set; }
+    public required bool CountsTowardAnnualLeave { get; set; }
 }

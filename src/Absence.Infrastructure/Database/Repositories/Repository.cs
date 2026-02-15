@@ -1,54 +1,31 @@
-﻿using Absence.Domain.Repositories;
+﻿using Absence.Domain.Interfaces;
 using Absence.Infrastructure.Database.Contexts;
+using Ardalis.Specification;
+using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Absence.Infrastructure.Database.Repositories;
 
-internal class Repository<TEntity> : IRepository<TEntity>
+internal class Repository<TEntity>(
+    AbsenceContext context, 
+    ISpecificationEvaluator specificationEvaluator
+) : IRepository<TEntity>
     where TEntity : class
 {
-    private bool _isDisposed = false;
-    protected readonly AbsenceContext _context;
-    protected readonly DbSet<TEntity> _entities;
+    protected readonly AbsenceContext _context = context;
+    protected readonly DbSet<TEntity> _entities = context.Set<TEntity>();
+    protected readonly ISpecificationEvaluator _specificationEvaluator = specificationEvaluator;
 
     public Repository(AbsenceContext context)
+        : this(context, SpecificationEvaluator.Default)
     {
-        _context = context;
-        _entities = context.Set<TEntity>();
     }
 
-    ~Repository()
-    {
-        DisposeAsync(false).GetAwaiter().GetResult();
-    }
+    public virtual Task<List<TEntity>> GetAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default) =>
+        ApplySpecification(specification).ToListAsync(cancellationToken);
 
-    public virtual Task<List<TEntity>> GetAsync(
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>[] queries = null!, 
-        CancellationToken cancellationToken = default)
-    {
-        var query = ApplyQuery(queries);
-        return query.ToListAsync(cancellationToken);
-    }
-
-    public virtual Task<TEntity?> GetFirstOrDefaultAsync(
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>[] queries = null!,
-        CancellationToken cancellationToken = default)
-    {
-        var query = ApplyQuery(queries);
-        return query.FirstOrDefaultAsync(cancellationToken);
-    }
-
-    private IQueryable<TEntity> ApplyQuery(Func<IQueryable<TEntity>, IQueryable<TEntity>>[] queries)
-    {
-        IQueryable<TEntity> query = _entities;
-
-        if (queries != null)
-        {
-            query = queries.Aggregate(query, (current, next) => next(current));
-        }
-
-        return query;
-    }
+    public virtual Task<TEntity?> GetFirstOrDefaultAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default) =>
+        ApplySpecification(specification).FirstOrDefaultAsync(cancellationToken);
 
     public virtual Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default) => 
         _entities.FindAsync([id], cancellationToken).AsTask();
@@ -59,11 +36,8 @@ internal class Repository<TEntity> : IRepository<TEntity>
     public virtual Task InsertRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default) =>
         _entities.AddRangeAsync(entities, cancellationToken);
 
-    public virtual void Update(TEntity entity)
-    {
-        _entities.Attach(entity);
+    public virtual void Update(TEntity entity) => 
         _context.Entry(entity).State = EntityState.Modified;
-    }
 
     public virtual void UpdateRange(IEnumerable<TEntity> entities)
     {
@@ -73,50 +47,21 @@ internal class Repository<TEntity> : IRepository<TEntity>
         }
     }
 
-    public virtual void Delete(TEntity entity)
-    {
-        AttachIfDetached(entity);
-
+    public virtual void Delete(TEntity entity) => 
         _entities.Remove(entity);
-    }
 
-    public virtual void DeleteRange(IEnumerable<TEntity> entities)
-    {
-        foreach (var entity in entities)
-        {
-            AttachIfDetached(entity);
-        }
-
+    public virtual void DeleteRange(IEnumerable<TEntity> entities) => 
         _entities.RemoveRange(entities);
-    }
 
-    public async ValueTask DisposeAsync()
+    public virtual void DeleteRangeAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default)
     {
-        await DisposeAsync(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected async ValueTask DisposeAsync(bool isDisposing)
-    {
-        if (_isDisposed)
-            return;
-
-        if (isDisposing)
-        {
-            await _context.DisposeAsync();
-        }
-
-        _isDisposed = true;
-    }
-
-    private void AttachIfDetached(TEntity entity)
-    {
-        if (_context.Entry(entity).State == EntityState.Detached)
-        {
-            _entities.Attach(entity);
-        }
+        var query = ApplySpecification(specification);
+        DeleteRange(query);
     }
 
     public Task SaveAsync(CancellationToken cancellationToken = default) =>
         _context.SaveChangesAsync(cancellationToken);
+
+    protected virtual IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> specification, bool evaluateCriteriaOnly = false) =>
+        _specificationEvaluator.GetQuery(_entities, specification, evaluateCriteriaOnly);
 }

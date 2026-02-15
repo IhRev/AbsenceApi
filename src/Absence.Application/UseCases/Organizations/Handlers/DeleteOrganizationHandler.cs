@@ -3,7 +3,7 @@ using Absence.Application.Common.Results;
 using Absence.Application.Identity;
 using Absence.Application.UseCases.Organizations.Commands;
 using Absence.Domain.Entities;
-using Absence.Domain.Repositories;
+using Absence.Domain.Interfaces;
 using MediatR;
 using OneOf;
 using OneOf.Types;

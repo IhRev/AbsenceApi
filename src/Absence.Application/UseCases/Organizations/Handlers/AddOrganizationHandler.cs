@@ -1,6 +1,7 @@
 ﻿using Absence.Application.Common.Interfaces;
 using Absence.Application.UseCases.Organizations.Commands;
 using Absence.Domain.Entities;
+using Absence.Domain.Interfaces;
 using Absence.Domain.Repositories;
 using AutoMapper;
 using MediatR;

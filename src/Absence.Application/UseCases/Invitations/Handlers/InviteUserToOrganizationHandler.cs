@@ -7,6 +7,7 @@ using Absence.Application.Common.Interfaces;
 using Absence.Application.UseCases.Invitations.Commands;
 using Absence.Application.Identity;
 using Absence.Domain.Repositories;
+using Absence.Domain.Interfaces;
 
 namespace Absence.Application.UseCases.Invitations.Handlers;
 

@@ -1,4 +1,4 @@
-﻿namespace Absence.Domain.Common;
+﻿namespace Absence.Domain.Interfaces;
 
 public interface IIdKeyed<TId>
 {

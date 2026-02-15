@@ -1,8 +1,8 @@
 ﻿namespace Absence.Application.UseCases.AbsenceTypes.DTOs;
 
-public class AbsenceTypeDTO
+public class UpdateAbsenceTypeDTO
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required string Name { get; set; }
     public required string Code { get; set; }
     public required bool RequiresApproval { get; set; }

@@ -3,6 +3,7 @@ using Absence.Application.Common.Results;
 using Absence.Application.UseCases.Absences.Commands;
 using Absence.Domain.Common;
 using Absence.Domain.Entities;
+using Absence.Domain.Interfaces;
 using Absence.Domain.Repositories;
 using AutoMapper;
 using MediatR;

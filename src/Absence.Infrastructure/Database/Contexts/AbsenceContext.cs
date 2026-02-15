@@ -1,5 +1,5 @@
-﻿using Absence.Domain.Common;
-using Absence.Domain.Entities;
+﻿using Absence.Domain.Entities;
+using Absence.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +12,7 @@ public class AbsenceContext(DbContextOptions options) : IdentityDbContext<UserEn
     public virtual DbSet<AbsenceRequestEntity> AbsenceRequests { get; set; }
     public virtual DbSet<AbsenceTypeEntity> AbsenceTypes { get; set; }
     public virtual DbSet<DepartmentEntity> Departments { get; set; }
-    public virtual DbSet<DepartmentUserEnitty> DepartmentUsers { get; set; }
+    public virtual DbSet<DepartmentUserEntity> DepartmentUsers { get; set; }
     public virtual DbSet<EventEntity> Events { get; set; }
     public virtual DbSet<LeaveBalanceEntity> LeaveBalance { get; set; }
     public virtual DbSet<OrganizationEntity> Organizations { get; set; }
