@@ -28,7 +28,7 @@ public class UpdateAbsenceTypeHandler(
         var absenceType = await absenceTypesRepository.GetByIdAsync(request.AbsenceType.Id, cancellationToken);
         if (absenceType is null || absenceType.IsDeleted)
         {
-            return new NotFound(;
+            return new NotFound();
         }
 
         mapper.Map(request.AbsenceType, absenceType);

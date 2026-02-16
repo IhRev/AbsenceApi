@@ -15,4 +15,9 @@
     <PackageReference Include="OneOf" Version="3.0.271" />
   </ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="Absence.Application.Tests"/>
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+
 </Project>
