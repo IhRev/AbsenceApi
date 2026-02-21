@@ -18,7 +18,7 @@ public class AbsenceTypesController(ISender sender) : ControllerBase
         var response = await sender.Send(new GetAllAbsenceTypesQuery(organizationId));
         return response.Match<ActionResult>( 
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message)
+            accessDenied => Forbid()
         );
     }
 
@@ -28,7 +28,29 @@ public class AbsenceTypesController(ISender sender) : ControllerBase
         var response = await sender.Send(new CreateAbsenceTypeCommand(organizationId, absenceType));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message)
+            accessDenied => Forbid()
+        );
+    }
+
+    [HttpPut]
+    public async Task<ActionResult> Edit([FromQuery] int organizationId, [FromBody] UpdateAbsenceTypeDTO absenceType)
+    {
+        var response = await sender.Send(new UpdateAbsenceTypeCommand(organizationId, absenceType));
+        return response.Match<ActionResult>(
+            success => Ok(),
+            notFound => NotFound(),
+            accessDenied => Forbid()
+        );
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete([FromRoute] int id)
+    {
+        var response = await sender.Send(new DeleteAbsenceTypeCommand(id));
+        return response.Match<ActionResult>(
+            success => Ok(),
+            notFound => NotFound(),
+            accessDenied => Forbid()
         );
     }
 }

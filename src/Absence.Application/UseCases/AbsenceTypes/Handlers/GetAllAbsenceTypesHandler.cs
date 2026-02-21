@@ -1,4 +1,5 @@
-﻿using Absence.Application.Common.Interfaces;
+﻿using Absence.Application.Common.Constants;
+using Absence.Application.Common.Interfaces;
 using Absence.Application.Common.Results;
 using Absence.Application.UseCases.AbsenceTypes.DTOs;
 using Absence.Application.UseCases.AbsenceTypes.Queries;
@@ -15,16 +16,16 @@ namespace Absence.Application.UseCases.AbsenceTypes.Handlers;
 
 internal class GetAllAbsenceTypesHandler(
     IRepository<AbsenceTypeEntity> absenceTypeRepository,
-    IRepository<DepartmentEntity> departmentRepository,
+    IRepository<UserOrganizationRoleEntity> userOrganizationRoleRepository,
     IUser user,
     IMapper mapper
-) : IRequestHandler<GetAllAbsenceTypesQuery, OneOf<Success<IEnumerable<AbsenceTypeDTO>>, BadRequest>>
+) : IRequestHandler<GetAllAbsenceTypesQuery, OneOf<Success<IEnumerable<AbsenceTypeDTO>>, AccessDenied>>
 {
-    public async Task<OneOf<Success<IEnumerable<AbsenceTypeDTO>>, BadRequest>> Handle(GetAllAbsenceTypesQuery request, CancellationToken cancellationToken = default)
+    public async Task<OneOf<Success<IEnumerable<AbsenceTypeDTO>>, AccessDenied>> Handle(GetAllAbsenceTypesQuery request, CancellationToken cancellationToken = default)
     {
-        if (!await departmentRepository.BelongsToOrganization(request.OrganizationId, user.ShortId))
+        if (!await userOrganizationRoleRepository.HasPermission(request.OrganizationId, user.ShortId, Permissions.VIEW, cancellationToken))
         {
-            return new BadRequest($"No organization with id {request.OrganizationId} found.");
+            return new AccessDenied();
         }
 
         var absenceTypes = await absenceTypeRepository.GetAsync(

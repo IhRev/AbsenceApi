@@ -7,4 +7,4 @@ using OneOf.Types;
 namespace Absence.Application.UseCases.AbsenceTypes.Commands;
 
 public record UpdateAbsenceTypeCommand(int OrganizationId, UpdateAbsenceTypeDTO AbsenceType)
-    : IRequest<OneOf<Success, NotFound, BadRequest>>;
+    : IRequest<OneOf<Success, NotFound, AccessDenied>>;

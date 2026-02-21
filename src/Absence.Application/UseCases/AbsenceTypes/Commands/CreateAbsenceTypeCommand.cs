@@ -7,4 +7,4 @@ using OneOf.Types;
 namespace Absence.Application.UseCases.AbsenceTypes.Commands;
 
 public record CreateAbsenceTypeCommand(int OrganizationId, CreateAbsenceTypeDTO AbsenceType) 
-    : IRequest<OneOf<Success<int>, BadRequest>>;
+    : IRequest<OneOf<Success<int>, AccessDenied>>;

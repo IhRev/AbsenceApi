@@ -1,4 +1,6 @@
-﻿using Absence.Application.Common.Interfaces;
+﻿using Absence.Application.Common.Constants;
+using Absence.Application.Common.Interfaces;
+using Absence.Application.Common.Results;
 using Absence.Application.UseCases.AbsenceTypes.Commands;
 using Absence.Domain.Entities;
 using Absence.Domain.Extensions;
@@ -10,12 +12,12 @@ using OneOf.Types;
 namespace Absence.Application.UseCases.AbsenceTypes.Handlers;
 
 public class DeleteAbsenceTypeHandler(
-    IRepository<DepartmentEntity> departmentRepository,
+    IRepository<UserOrganizationRoleEntity> userOrganizationRoleRepository,
     IRepository<AbsenceTypeEntity> absenceTypesRepository,
     IUser user
-) : IRequestHandler<DeleteAbsenceTypeCommand, OneOf<Success, NotFound>>
+) : IRequestHandler<DeleteAbsenceTypeCommand, OneOf<Success, NotFound, AccessDenied>>
 {
-    public async Task<OneOf<Success, NotFound>> Handle(DeleteAbsenceTypeCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(DeleteAbsenceTypeCommand request, CancellationToken cancellationToken)
     {
         var absenceType = await absenceTypesRepository.GetByIdAsync(request.Id, cancellationToken);
         if (absenceType is null || absenceType.IsDeleted)
@@ -23,9 +25,9 @@ public class DeleteAbsenceTypeHandler(
             return new NotFound();
         }
 
-        if (!await departmentRepository.BelongsToOrganization(absenceType.OrganizationId, user.ShortId))
+        if (!await userOrganizationRoleRepository.HasPermission(absenceType.OrganizationId, user.ShortId, Permissions.MANAGE_ABSENCE_TYPES, cancellationToken))
         {
-            return new NotFound();
+            return new AccessDenied();
         }
 
         absenceTypesRepository.Delete(absenceType);

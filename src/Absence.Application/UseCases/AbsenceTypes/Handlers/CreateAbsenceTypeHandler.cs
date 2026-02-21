@@ -1,4 +1,5 @@
-﻿using Absence.Application.Common.Interfaces;
+﻿using Absence.Application.Common.Constants;
+using Absence.Application.Common.Interfaces;
 using Absence.Application.Common.Results;
 using Absence.Application.UseCases.AbsenceTypes.Commands;
 using Absence.Domain.Entities;
@@ -12,17 +13,17 @@ using OneOf.Types;
 namespace Absence.Application.UseCases.AbsenceTypes.Handlers;
 
 internal class CreateAbsenceTypeHandler(
-    IRepository<DepartmentEntity> departmentRepository,
+    IRepository<UserOrganizationRoleEntity> userOrganizationRoleRepository,
     IRepository<AbsenceTypeEntity> absenceTypesRepository,
     IUser user,
     IMapper mapper
-) : IRequestHandler<CreateAbsenceTypeCommand, OneOf<Success<int>, BadRequest>>
+) : IRequestHandler<CreateAbsenceTypeCommand, OneOf<Success<int>, AccessDenied>>
 {
-    public async Task<OneOf<Success<int>, BadRequest>> Handle(CreateAbsenceTypeCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success<int>, AccessDenied>> Handle(CreateAbsenceTypeCommand request, CancellationToken cancellationToken)
     {
-        if (!await departmentRepository.BelongsToOrganization(request.OrganizationId, user.ShortId))
+        if (!await userOrganizationRoleRepository.HasPermission(request.OrganizationId, user.ShortId, Permissions.MANAGE_ABSENCE_TYPES, cancellationToken))
         {
-            return new BadRequest($"No organization with id {request.OrganizationId} found.");
+            return new AccessDenied();
         }
 
         var absenceType = mapper.Map<AbsenceTypeEntity>(request.AbsenceType);
