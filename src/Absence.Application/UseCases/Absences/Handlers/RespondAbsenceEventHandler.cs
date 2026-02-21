@@ -7,14 +7,12 @@ using Absence.Domain.Entities;
 using Absence.Application.Common.Interfaces;
 using Absence.Domain.Common;
 using AutoMapper;
-using Absence.Domain.Repositories;
 using Absence.Domain.Interfaces;
 
 namespace Absence.Application.UseCases.Absences.Handlers;
 
 public class RespondAbsenceEventHandler(
     IRepository<AbsenceRequestEntity> absenceEventRepository,
-    IOrganizationUsersRepository organizationUserRepository,
     IRepository<AbsenceEntity> absenceRepository,
     IUser user,
     IMapper mapper
@@ -22,46 +20,47 @@ public class RespondAbsenceEventHandler(
 {
     public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(RespondAbsenceEventCommand request, CancellationToken cancellationToken)
     {
-        var absenceEvent = await absenceEventRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (absenceEvent is null)
-        {
-            return new NotFound();
-        }
+        //var absenceEvent = await absenceEventRepository.GetByIdAsync(request.Id, cancellationToken);
+        //if (absenceEvent is null)
+        //{
+        //    return new NotFound();
+        //}
 
-        var organizationUser = await organizationUserRepository.GetFirstOrDefaultAsync(
-            [
-                q => q.Where(_ => _.UserId == user.ShortId),
-                q => q.Where(_ => _.OrganizationId == absenceEvent.OrganizationId)
-            ],
-            cancellationToken
-        );
-        if (organizationUser is null || !organizationUser.IsAdmin)
-        {
-            return new AccessDenied();
-        }
+        //var organizationUser = await organizationUserRepository.GetFirstOrDefaultAsync(
+        //    [
+        //        q => q.Where(_ => _.UserId == user.ShortId),
+        //        q => q.Where(_ => _.OrganizationId == absenceEvent.OrganizationId)
+        //    ],
+        //    cancellationToken
+        //);
+        //if (organizationUser is null || !organizationUser.IsAdmin)
+        //{
+        //    return new AccessDenied();
+        //}
 
-        if (request.Accepted)
-        {
-            switch (absenceEvent.RequestType)
-            {
-                case AbsenceEventType.CREATE:
-                    await AddAbsence(absenceEvent, cancellationToken);
-                    break;
-                case AbsenceEventType.UPDATE:
-                    await UpdateAbsence(absenceEvent, cancellationToken);
-                    break;
-                case AbsenceEventType.DELETE:
-                    await DeleteAbsence(absenceEvent, cancellationToken);
-                    break;
-                default:
-                    throw new ArgumentException($"Incorrect event type {absenceEvent.RequestType}");
-            }
-            await absenceRepository.SaveAsync(cancellationToken);
-        }
+        //if (request.Accepted)
+        //{
+        //    switch (absenceEvent.RequestType)
+        //    {
+        //        case AbsenceEventType.CREATE:
+        //            await AddAbsence(absenceEvent, cancellationToken);
+        //            break;
+        //        case AbsenceEventType.UPDATE:
+        //            await UpdateAbsence(absenceEvent, cancellationToken);
+        //            break;
+        //        case AbsenceEventType.DELETE:
+        //            await DeleteAbsence(absenceEvent, cancellationToken);
+        //            break;
+        //        default:
+        //            throw new ArgumentException($"Incorrect event type {absenceEvent.RequestType}");
+        //    }
+        //    await absenceRepository.SaveAsync(cancellationToken);
+        //}
 
-        absenceEventRepository.Delete(absenceEvent);
-        await absenceEventRepository.SaveAsync(cancellationToken);
-        return new Success();
+        //absenceEventRepository.Delete(absenceEvent);
+        //await absenceEventRepository.SaveAsync(cancellationToken);
+        //return new Success();
+        throw new NotImplementedException();
     }
 
     private Task AddAbsence(AbsenceRequestEntity absenceEvent, CancellationToken cancellationToken = default)

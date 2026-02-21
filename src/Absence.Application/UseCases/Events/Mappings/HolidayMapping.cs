@@ -10,7 +10,7 @@ internal class HolidayMapping : Profile
     {
         CreateMap<EventEntity, HolidayDTO>();
 
-        CreateMap<EditHolidayDTO, EventEntity>()
+        CreateMap<EditEventDTO, EventEntity>()
             .ForMember(dest => dest.OrganizationId, opt => opt.Ignore());
 
         CreateMap<CreateHolidayDTO, EventEntity>()

@@ -4,6 +4,8 @@ namespace Absence.Domain.Interfaces;
 
 public interface IRepository<TEntity> where TEntity : class
 {
+    Task<bool> AnyAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default);
+
     void Delete(TEntity entity);
 
     void DeleteRange(IEnumerable<TEntity> entities);
@@ -23,6 +25,6 @@ public interface IRepository<TEntity> where TEntity : class
     Task SaveAsync(CancellationToken cancellationToken = default);
     
     void Update(TEntity entity);
-
+     
     void UpdateRange(IEnumerable<TEntity> entities);
 }

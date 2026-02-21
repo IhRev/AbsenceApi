@@ -10,6 +10,7 @@ public class OrganizationEntity : IIdKeyed<int>, ISoftDelete
     public int OwnerId { get; set; }
     public UserEntity Owner { get; set; } = null!;
     public ICollection<OrganizationRoleEntity> OrganizationRoles { get; set; } = [];
+    public ICollection<UserOrganizationRoleEntity> UserOrganizationRoles { get; set; } = [];
     public ICollection<LeaveBalanceEntity> LeaveBalance { get; set; } = [];
     public ICollection<AbsenceEntity> Absences { get; set; } = [];
     public ICollection<AbsenceTypeEntity> AbsenceTypes { get; set; } = [];

@@ -21,6 +21,9 @@ internal class Repository<TEntity>(
     {
     }
 
+    public virtual Task<bool> AnyAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default) =>
+        ApplySpecification(specification).AnyAsync(cancellationToken);
+
     public virtual Task<List<TEntity>> GetAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default) =>
         ApplySpecification(specification).ToListAsync(cancellationToken);
 

@@ -6,4 +6,4 @@ using OneOf;
 
 namespace Absence.Application.UseCases.Holidays.Commands;
 
-public record EditHolidayCommand(EditHolidayDTO Holiday) : IRequest<OneOf<Success, NotFound, AccessDenied>>;
+public record AddEventCommand(CreateHolidayDTO Holiday) : IRequest<OneOf<Success<int>, AccessDenied>>;

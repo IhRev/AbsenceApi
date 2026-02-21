@@ -1,7 +1,6 @@
 ﻿using Absence.Application.Identity;
 using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
-using Absence.Domain.Repositories;
 using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Database.Repositories;
 using Absence.Infrastructure.Identity;
@@ -75,9 +74,6 @@ public static class DependencyInjection
 
         services
             .AddScoped(typeof(IRepository<>), typeof(Repository<>))
-            .AddScoped<IOrganizationUsersRepository, OrganizationUsersRepository>()
-            .AddScoped<IAbsenceEventRepository, AbsenceEventRepository>()
-            .AddScoped<IOrganizationUserInvitationsRepository, OrganizationUserInvitationsRepository>()
             .AddScoped<IUserService, UserService>()
             .AddScoped<IJwtService, JwtService>()
             .AddScoped<IRefreshTokenService, RefreshTokenService>();

@@ -15,4 +15,12 @@ public static class RepositoryExtensions
             new DepartmentSpec(organizationId, userId),
             cancellationToken
         )) != null;
+
+    public static Task<bool> HasPermission(
+        this IRepository<UserOrganizationRoleEntity> userOrganizationRoleRepository,
+        int organizationId,
+        int userId,
+        string permission,
+        CancellationToken cancellationToken = default
+    ) => userOrganizationRoleRepository.AnyAsync(new HasPermissionSpec(permission, organizationId, userId), cancellationToken);
 }

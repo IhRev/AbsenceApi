@@ -24,9 +24,16 @@ public class UserOrganizationRoleEntityConfiguration : EntityConfiguration<UserO
             .OnDelete(DeleteBehavior.Restrict);
 
         builder
+            .HasOne(x => x.Organization)
+            .WithMany(x => x.UserOrganizationRoles)
+            .HasForeignKey(x => x.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder
             .HasOne(x => x.Department)
             .WithMany(x => x.UserOrganizationRoles)
             .HasForeignKey(x => x.DepartmentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
     }
 }

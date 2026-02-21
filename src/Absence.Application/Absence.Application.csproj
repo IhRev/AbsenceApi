@@ -16,7 +16,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="Absence.Application.Tests"/>
+		<InternalsVisibleTo Include="Absence.Application.Tests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
 

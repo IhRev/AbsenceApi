@@ -9,34 +9,33 @@ namespace Absence.Api.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("holidays")]
-public class HolidaysController(ISender sender) : ControllerBase
+[Route("events")]
+public class EventsController(ISender sender) : ControllerBase
 {
-    [HttpGet("/organizations/{organizationId}/holidays")]
+    [HttpGet("/organizations/{organizationId}/events")]
     public async Task<ActionResult<IEnumerable<HolidayDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var response = await sender.Send(new GetHolidaysQuery(organizationId, startDate, endDate));
+        var response = await sender.Send(new GetEventsQuery(organizationId, startDate, endDate));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message)
+            accessDenied => Forbid()
         );
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Add([FromBody] CreateHolidayDTO holiday)
+    public async Task<ActionResult<int>> Add([FromBody] CreateHolidayDTO @event)
     {
-        var response = await sender.Send(new AddHolidayCommand(holiday));
+        var response = await sender.Send(new AddEventCommand(@event));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message),
             accessDenied => Forbid()
         );
     }
 
     [HttpPut]
-    public async Task<ActionResult> Edit([FromBody] EditHolidayDTO holiday)
+    public async Task<ActionResult> Edit([FromBody] EditEventDTO @event)
     {
-        var result = await sender.Send(new EditHolidayCommand(holiday));
+        var result = await sender.Send(new EditEventCommand(@event));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
@@ -47,7 +46,7 @@ public class HolidaysController(ISender sender) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete([FromRoute] int id)
     {
-        var result = await sender.Send(new DeleteHolidayCommand(id));
+        var result = await sender.Send(new DeleteEventCommand(id));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),

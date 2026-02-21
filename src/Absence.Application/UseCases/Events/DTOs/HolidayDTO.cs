@@ -4,5 +4,6 @@ public class HolidayDTO
 {
     public int Id { get; set; }
     public required string Name { get; set; }
+    public bool NonWorkingDay { get; set; }
     public required DateTimeOffset Date { get; set; }
 }

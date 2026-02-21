@@ -8,17 +8,19 @@ namespace Absence.Infrastructure.Database.Contexts;
 
 public class AbsenceContext(DbContextOptions options) : IdentityDbContext<UserEntity>(options)
 {
-    public virtual DbSet<AbsenceEntity> Absences { get; set; }
-    public virtual DbSet<AbsenceRequestEntity> AbsenceRequests { get; set; }
-    public virtual DbSet<AbsenceTypeEntity> AbsenceTypes { get; set; }
+    public virtual DbSet<OrganizationEntity> Organizations { get; set; }
+    public virtual DbSet<OrganizationRoleEntity> OrganizationRoles { get; set; }
+    public virtual DbSet<UserOrganizationRoleEntity> UserOrganizationRoles { get; set; }
+    public virtual DbSet<PermissionEntity> Permissions { get; set; }
+    public virtual DbSet<OrganizationRolePermissionEntity> OrganizationRolePermissions { get; set; }
+    public virtual DbSet<OrganizationUserInvitationEntity> OrganizationUserInvitations { get; set; }
     public virtual DbSet<DepartmentEntity> Departments { get; set; }
     public virtual DbSet<DepartmentUserEntity> DepartmentUsers { get; set; }
     public virtual DbSet<EventEntity> Events { get; set; }
     public virtual DbSet<LeaveBalanceEntity> LeaveBalance { get; set; }
-    public virtual DbSet<OrganizationEntity> Organizations { get; set; }
-    public virtual DbSet<OrganizationRoleEntity> OrganizationRoles { get; set; }
-    public virtual DbSet<OrganizationUserInvitationEntity> OrganizationUserInvitations { get; set; }
-    public virtual DbSet<UserOrganizationRoleEntity> UserOrganizationRoles { get; set; }
+    public virtual DbSet<AbsenceTypeEntity> AbsenceTypes { get; set; }
+    public virtual DbSet<AbsenceEntity> Absences { get; set; }
+    public virtual DbSet<AbsenceRequestEntity> AbsenceRequests { get; set; }
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {

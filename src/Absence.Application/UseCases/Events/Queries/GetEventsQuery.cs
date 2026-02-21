@@ -6,4 +6,4 @@ using OneOf;
 
 namespace Absence.Application.UseCases.Holidays.Queries;
 
-public record GetHolidaysQuery(int OrganizationId, DateTime StartDate, DateTime EndDate) : IRequest<OneOf<Success<IEnumerable<HolidayDTO>>, BadRequest>>;
+public record GetEventsQuery(int OrganizationId, DateTime StartDate, DateTime EndDate) : IRequest<OneOf<Success<IEnumerable<HolidayDTO>>, AccessDenied>>;

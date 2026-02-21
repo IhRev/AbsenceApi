@@ -2,12 +2,14 @@
 
 namespace Absence.Application.UseCases.Holidays.DTOs;
 
-public class CreateHolidayDTO
+public class EditEventDTO
 {
+    [Required]
+    public int Id { get; set; }
     [Required(AllowEmptyStrings = false)]
     public required string Name { get; set; }
-    [Required()]
+    [Required]
+    public bool NonWorkingDay { get; set; }
+    [Required]
     public required DateTimeOffset Date { get; set; }
-    [Required()]
-    public required int OrganizationId { get; set; }
 }
