@@ -1,6 +1,6 @@
-﻿namespace Absence.Application.UseCases.Holidays.DTOs;
+﻿namespace Absence.Application.UseCases.Events.DTOs;
 
-public class HolidayDTO
+public class EventDTO
 {
     public int Id { get; set; }
     public required string Name { get; set; }

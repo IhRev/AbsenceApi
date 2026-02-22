@@ -1,6 +1,6 @@
-﻿using Absence.Application.UseCases.Holidays.Commands;
-using Absence.Application.UseCases.Holidays.DTOs;
-using Absence.Application.UseCases.Holidays.Queries;
+﻿using Absence.Application.UseCases.Events.Commands;
+using Absence.Application.UseCases.Events.DTOs;
+using Absence.Application.UseCases.Events.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +13,7 @@ namespace Absence.Api.Controllers;
 public class EventsController(ISender sender) : ControllerBase
 {
     [HttpGet("/organizations/{organizationId}/events")]
-    public async Task<ActionResult<IEnumerable<HolidayDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    public async Task<ActionResult<IEnumerable<EventDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         var response = await sender.Send(new GetEventsQuery(organizationId, startDate, endDate));
         return response.Match<ActionResult>(
@@ -23,7 +23,7 @@ public class EventsController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Add([FromBody] CreateHolidayDTO @event)
+    public async Task<ActionResult<int>> Add([FromBody] CreateEventDTO @event)
     {
         var response = await sender.Send(new AddEventCommand(@event));
         return response.Match<ActionResult>(

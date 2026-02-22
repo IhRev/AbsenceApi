@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Absence.Application.UseCases.Holidays.DTOs;
+namespace Absence.Application.UseCases.Events.DTOs;
 
 public class EditEventDTO
 {

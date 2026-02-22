@@ -1,7 +1,7 @@
 ﻿using Absence.Application.Common.Constants;
 using Absence.Application.Common.Interfaces;
 using Absence.Application.Common.Results;
-using Absence.Application.UseCases.Holidays.Commands;
+using Absence.Application.UseCases.Events.Commands;
 using Absence.Domain.Entities;
 using Absence.Domain.Extensions;
 using Absence.Domain.Interfaces;
@@ -10,10 +10,10 @@ using MediatR;
 using OneOf;
 using OneOf.Types;
 
-namespace Absence.Application.UseCases.Holidays.Handlers;
+namespace Absence.Application.UseCases.Events.Handlers;
 
-public class EditHolidayHandler(
-    IRepository<EventEntity> holidayRepository,
+public class EditEventHandler(
+    IRepository<EventEntity> eventRepository,
     IRepository<UserOrganizationRoleEntity> userOrganizationRoleRepository,
     IMapper mapper,
     IUser user
@@ -21,20 +21,20 @@ public class EditHolidayHandler(
 {
     public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(EditEventCommand request, CancellationToken cancellationToken)
     {
-        var holiday = await holidayRepository.GetByIdAsync(request.Holiday.Id);
-        if (holiday is null)
+        var @event = await eventRepository.GetByIdAsync(request.Event.Id);
+        if (@event is null)
         {
             return new NotFound();
         }
 
-        if (!await userOrganizationRoleRepository.HasPermission(holiday.OrganizationId, user.ShortId, Permissions.MANAGE_EVENTS, cancellationToken))
+        if (!await userOrganizationRoleRepository.HasPermission(@event.OrganizationId, user.ShortId, Permissions.MANAGE_EVENTS, cancellationToken))
         {
             return new AccessDenied();
         }
 
-        holiday = mapper.Map(request.Holiday, holiday);
-        holidayRepository.Update(holiday);
-        await holidayRepository.SaveAsync(cancellationToken);
+        mapper.Map(request.Event, @event);
+        eventRepository.Update(@event);
+        await eventRepository.SaveAsync(cancellationToken);
 
         return new Success();
     }

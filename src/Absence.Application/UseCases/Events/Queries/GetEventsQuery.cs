@@ -1,9 +1,9 @@
 ﻿using Absence.Application.Common.Results;
-using Absence.Application.UseCases.Holidays.DTOs;
 using MediatR;
 using OneOf.Types;
 using OneOf;
+using Absence.Application.UseCases.Events.DTOs;
 
-namespace Absence.Application.UseCases.Holidays.Queries;
+namespace Absence.Application.UseCases.Events.Queries;
 
-public record GetEventsQuery(int OrganizationId, DateTime StartDate, DateTime EndDate) : IRequest<OneOf<Success<IEnumerable<HolidayDTO>>, AccessDenied>>;
+public record GetEventsQuery(int OrganizationId, DateTime StartDate, DateTime EndDate) : IRequest<OneOf<Success<IEnumerable<EventDTO>>, AccessDenied>>;

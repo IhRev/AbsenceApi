@@ -6,16 +6,6 @@ namespace Absence.Domain.Extensions;
 
 public static class RepositoryExtensions
 {
-    public static async Task<bool> BelongsToOrganization(
-        this IRepository<DepartmentEntity> repository, 
-        int organizationId, 
-        int userId, 
-        CancellationToken cancellationToken = default
-    ) => (await repository.GetFirstOrDefaultAsync(
-            new DepartmentSpec(organizationId, userId),
-            cancellationToken
-        )) != null;
-
     public static Task<bool> HasPermission(
         this IRepository<UserOrganizationRoleEntity> userOrganizationRoleRepository,
         int organizationId,
