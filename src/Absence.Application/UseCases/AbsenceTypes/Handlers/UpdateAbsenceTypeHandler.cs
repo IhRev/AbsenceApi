@@ -21,15 +21,15 @@ public class UpdateAbsenceTypeHandler(
 {
     public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(UpdateAbsenceTypeCommand request, CancellationToken cancellationToken)
     {
-        if (!await userOrganizationRoleRepository.HasPermission(request.OrganizationId, user.ShortId, Permissions.MANAGE_ABSENCE_TYPES, cancellationToken))
-        {
-            return new AccessDenied();
-        }
-
         var absenceType = await absenceTypesRepository.GetByIdAsync(request.AbsenceType.Id, cancellationToken);
         if (absenceType is null || absenceType.IsDeleted)
         {
             return new NotFound();
+        }
+
+        if (!await userOrganizationRoleRepository.HasPermission(request.OrganizationId, user.ShortId, Permissions.MANAGE_ABSENCE_TYPES, cancellationToken))
+        {
+            return new AccessDenied();
         }
 
         mapper.Map(request.AbsenceType, absenceType);

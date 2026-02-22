@@ -3,9 +3,9 @@ using Ardalis.Specification;
 
 namespace Absence.Domain.Specifications;
 
-public class HasPermissionSpec : Specification<UserOrganizationRoleEntity>
+public class PermissionSpec : Specification<UserOrganizationRoleEntity>
 {
-    public HasPermissionSpec(string permission, int organizationId, int userId, int? departmentId = null)
+    public PermissionSpec(string permission, int organizationId, int userId, int? departmentId = null)
     {
         Query
             .Where(_ => 

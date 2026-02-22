@@ -45,7 +45,7 @@ public class CreateAbsenceTypeHandlerTests
     {
         //Arrange
         _userOrganizationRoleRepository.AnyAsync(
-            Arg.Any<HasPermissionSpec>(), 
+            Arg.Any<PermissionSpec>(), 
             Arg.Any<CancellationToken>()
         ).Returns(false);
 
@@ -62,7 +62,7 @@ public class CreateAbsenceTypeHandlerTests
     {
         //Arrange
         _userOrganizationRoleRepository.AnyAsync(
-            Arg.Any<HasPermissionSpec>(),
+            Arg.Any<PermissionSpec>(),
             Arg.Any<CancellationToken>()
         ).Returns(true);
 
