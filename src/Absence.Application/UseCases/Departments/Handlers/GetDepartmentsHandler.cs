@@ -1,15 +1,15 @@
-﻿using Absence.Application.Common.Results;
-using Absence.Application.UseCases.Departments.DTOs;
+﻿using Absence.Application.UseCases.Departments.DTOs;
 using Absence.Application.UseCases.Departments.Queries;
 using MediatR;
-using OneOf;
-using OneOf.Types;
 
 namespace Absence.Application.UseCases.Departments.Handlers;
 
-public class GetDepartmentsHandler : IRequestHandler<GetDepartmentsQuery, OneOf<Success<IEnumerable<DepartmentDTO>>, AccessDenied>>
+public class GetDepartmentsHandler : IRequestHandler<GetDepartmentsQuery, IEnumerable<DepartmentDTO>>
 {
-    public Task<OneOf<Success<IEnumerable<DepartmentDTO>>, AccessDenied>> Handle(GetDepartmentsQuery request, CancellationToken cancellationToken)
+    public Task<IEnumerable<DepartmentDTO>> Handle(
+        GetDepartmentsQuery request, 
+        CancellationToken cancellationToken = default
+    )
     {
         throw new NotImplementedException();
     }

@@ -1,8 +1,13 @@
-﻿using Absence.Application.Common.Results;
+﻿using Absence.Application.Common.Constants;
+using Absence.Application.Common.Interfaces;
 using MediatR;
 using OneOf;
 using OneOf.Types;
 
 namespace Absence.Application.UseCases.AbsenceTypes.Commands;
 
-public record DeleteAbsenceTypeCommand(int Id) : IRequest<OneOf<Success, NotFound, AccessDenied>>;
+public record DeleteAbsenceTypeCommand(int OrganizationId, int Id) 
+    : IRequest<OneOf<Success, NotFound>>, IRequirePermission
+{
+    public string Permission => Permissions.MANAGE_ABSENCE_TYPES;
+}

@@ -1,14 +1,11 @@
-﻿using Absence.Application.Common.Results;
-using Absence.Application.UseCases.Departments.Commands;
+﻿using Absence.Application.UseCases.Departments.Commands;
 using MediatR;
-using OneOf;
-using OneOf.Types;
 
 namespace Absence.Application.UseCases.Departments.Handlers;
 
-internal class AddDepartmentHandler : IRequestHandler<AddDepartmentCommand, OneOf<Success<int>, AccessDenied>>
+internal class AddDepartmentHandler : IRequestHandler<AddDepartmentCommand, int>
 {
-    public Task<OneOf<Success<int>, AccessDenied>> Handle(AddDepartmentCommand request, CancellationToken cancellationToken)
+    public Task<int> Handle(AddDepartmentCommand request, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

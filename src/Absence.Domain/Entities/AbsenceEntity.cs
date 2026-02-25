@@ -6,9 +6,9 @@ public class AbsenceEntity : IIdKeyed<int>
 {
     public int Id { get; set; }
     public required string Name { get; set; }
-    public required DateTimeOffset StartDate { get; set; }
-    public required DateTimeOffset EndDate { get; set; }
-    public required int AbsenceTypeId { get; set; }
+    public DateTimeOffset StartDate { get; set; }
+    public DateTimeOffset EndDate { get; set; }
+    public int AbsenceTypeId { get; set; }
     public int OrganizationId { get; set; }
     public int UserId { get; set; }
     public int ApprovedBy { get; set; }

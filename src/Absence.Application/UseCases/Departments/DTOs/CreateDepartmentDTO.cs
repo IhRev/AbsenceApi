@@ -3,5 +3,4 @@
 public class CreateDepartmentDTO
 {
     public required string Name { get; set; }
-    public int OrganizationId { get; set; }
 }

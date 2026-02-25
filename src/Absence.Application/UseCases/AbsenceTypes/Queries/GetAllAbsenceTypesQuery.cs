@@ -1,9 +1,12 @@
-﻿using Absence.Application.Common.Results;
+﻿using Absence.Application.Common.Constants;
+using Absence.Application.Common.Interfaces;
 using Absence.Application.UseCases.AbsenceTypes.DTOs;
 using MediatR;
-using OneOf;
-using OneOf.Types;
 
 namespace Absence.Application.UseCases.AbsenceTypes.Queries;
 
-public record GetAllAbsenceTypesQuery(int OrganizationId) : IRequest<OneOf<Success<IEnumerable<AbsenceTypeDTO>>, AccessDenied>>;
+public record GetAllAbsenceTypesQuery(int OrganizationId) 
+    : IRequest<IEnumerable<AbsenceTypeDTO>>, IRequirePermission
+{
+    public string Permission => Permissions.VIEW_BASICS;
+}

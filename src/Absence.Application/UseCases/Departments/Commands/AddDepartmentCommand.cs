@@ -1,9 +1,12 @@
-﻿using Absence.Application.Common.Results;
+﻿using Absence.Application.Common.Constants;
+using Absence.Application.Common.Interfaces;
 using Absence.Application.UseCases.Departments.DTOs;
 using MediatR;
-using OneOf;
-using OneOf.Types;
 
 namespace Absence.Application.UseCases.Departments.Commands;
 
-public record AddDepartmentCommand(CreateDepartmentDTO Department) : IRequest<OneOf<Success<int>, AccessDenied>>;
+public record AddDepartmentCommand(int OrganizationId, CreateDepartmentDTO Department)
+    : IRequest<int>, IRequirePermission
+{
+    public string Permission => Permissions.MANAGE_DEPARTMENTS;
+}

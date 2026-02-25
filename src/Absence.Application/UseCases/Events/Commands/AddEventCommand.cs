@@ -1,9 +1,12 @@
-﻿using Absence.Application.Common.Results;
-using MediatR;
-using OneOf.Types;
-using OneOf;
+﻿using MediatR;
 using Absence.Application.UseCases.Events.DTOs;
+using Absence.Application.Common.Interfaces;
+using Absence.Application.Common.Constants;
 
 namespace Absence.Application.UseCases.Events.Commands;
 
-public record AddEventCommand(CreateEventDTO Event) : IRequest<OneOf<Success<int>, AccessDenied>>;
+public record AddEventCommand(int OrganizationId, CreateEventDTO Event) 
+    : IRequest<int>, IRequirePermission
+{
+    public string Permission => Permissions.MANAGE_EVENTS;
+}

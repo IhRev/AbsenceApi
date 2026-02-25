@@ -10,6 +10,4 @@ public class CreateEventDTO
     public required DateTimeOffset Date { get; set; }
     [Required]
     public bool NonWorkingDay { get; set; }
-    [Required]
-    public required int OrganizationId { get; set; }
 }
