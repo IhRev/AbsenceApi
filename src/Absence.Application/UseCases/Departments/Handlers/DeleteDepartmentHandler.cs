@@ -1,17 +1,29 @@
 ﻿using Absence.Application.UseCases.Departments.Commands;
+using Absence.Domain.Entities;
+using Absence.Domain.Interfaces;
 using MediatR;
 using OneOf;
 using OneOf.Types;
 
 namespace Absence.Application.UseCases.Departments.Handlers;
 
-internal class DeleteDepartmentHandler : IRequestHandler<DeleteDepartmentCommand, OneOf<Success, NotFound>>
+internal class DeleteDepartmentHandler(IRepository<DepartmentEntity> departmentRepository) 
+    : IRequestHandler<DeleteDepartmentCommand, OneOf<Success, NotFound>>
 {
-    public Task<OneOf<Success, NotFound>> Handle(
+    public async Task<OneOf<Success, NotFound>> Handle(
         DeleteDepartmentCommand request, 
         CancellationToken cancellationToken = default
     )
     {
-        throw new NotImplementedException();
+        var department = await departmentRepository.GetByIdAsync(request.Id);
+        if (department is null)
+        {
+            return new NotFound();
+        }
+
+        departmentRepository.Delete(department);
+        await departmentRepository.SaveAsync(cancellationToken);
+
+        return new Success();
     }
 }

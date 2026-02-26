@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Absence.Application.UseCases.Departments.Queries;
 
-public record GetDepartmentsQuery(int OrganizationId) 
+public record GetAllDepartmentsQuery(int OrganizationId) 
     : IRequest<IEnumerable<DepartmentDTO>>, IRequirePermission
 {
     public string Permission => Permissions.VIEW_DEPARTMENTS;

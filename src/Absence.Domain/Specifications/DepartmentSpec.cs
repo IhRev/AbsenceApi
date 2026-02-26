@@ -5,10 +5,8 @@ namespace Absence.Domain.Specifications;
 
 public class DepartmentSpec : Specification<DepartmentEntity>
 {
-    public DepartmentSpec(int organizationId, int userId)
+    public DepartmentSpec(int organizationId)
     {
-        Query
-            .Include(_ => _.DepartmentUsers)
-            .Where(_ => _.OrganizationId == organizationId && _.DepartmentUsers.Any(_ => _.UserId == userId));
+        Query.Where(_ => _.OrganizationId == organizationId);
     }
 }
