@@ -6,4 +6,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Organizations.Commands;
 
-public record EditOrganizationCommand(EditOrganizationDTO Organization) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>;
+public record EditOrganizationCommand(EditOrganizationDTO Organization) : IRequest<OneOf<Success, NotFound, BadRequest>>;

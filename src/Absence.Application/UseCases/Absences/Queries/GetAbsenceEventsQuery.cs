@@ -6,4 +6,4 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Absences.Queries;
 
-public record GetAbsenceEventsQuery(int OrganizationId) : IRequest<OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest, AccessDenied>>;
+public record GetAbsenceEventsQuery(int OrganizationId) : IRequest<OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest>>;

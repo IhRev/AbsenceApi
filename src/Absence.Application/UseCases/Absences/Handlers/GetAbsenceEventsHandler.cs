@@ -12,9 +12,9 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 public class GetAbsenceEventsHandler(
     IUser user,
     IMapper mapper
-) : IRequestHandler<GetAbsenceEventsQuery, OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest, AccessDenied>>
+) : IRequestHandler<GetAbsenceEventsQuery, OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest>>
 {
-    public async Task<OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest, AccessDenied>> Handle(GetAbsenceEventsQuery request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest>> Handle(GetAbsenceEventsQuery request, CancellationToken cancellationToken)
     {
         //var organizationUser = await organizationUserRepository.GetFirstOrDefaultAsync(
         //    [

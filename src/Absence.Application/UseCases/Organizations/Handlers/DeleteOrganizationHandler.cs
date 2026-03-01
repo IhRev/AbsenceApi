@@ -14,25 +14,25 @@ public class DeleteOrganizationHandler(
     IUser user,
     IRepository<OrganizationEntity> organizationRepository,
     IUserService userService
-) : IRequestHandler<DeleteOrganizationCommand, OneOf<Success, AccessDenied, NotFound>>
+) : IRequestHandler<DeleteOrganizationCommand, OneOf<Success, NotFound>>
 {
-    public async Task<OneOf<Success, AccessDenied, NotFound>> Handle(DeleteOrganizationCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, NotFound>> Handle(DeleteOrganizationCommand request, CancellationToken cancellationToken)
     {
         var userEntity = await userService.FindByIdAsync(user.Id);
-        if (!await userService.CheckPasswordAsync(userEntity!, request.Request.Password))
-        {
-            return new AccessDenied();
-        }
+        //if (!await userService.CheckPasswordAsync(userEntity!, request.Request.Password))
+        //{
+        //    return new AccessDenied();
+        //}
 
         var organization = await organizationRepository.GetByIdAsync(request.Id, cancellationToken);
         if (organization is null)
         {
             return new NotFound();
         }
-        if (organization.OwnerId != user.ShortId)
-        {
-            return new AccessDenied();
-        }
+        //if (organization.OwnerId != user.ShortId)
+        //{
+        //    return new AccessDenied();
+        //}
 
         organizationRepository.Delete(organization);
         await organizationRepository.SaveAsync(cancellationToken);

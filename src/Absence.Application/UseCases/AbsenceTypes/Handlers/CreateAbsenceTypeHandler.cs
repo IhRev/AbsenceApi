@@ -15,7 +15,6 @@ internal class CreateAbsenceTypeHandler(IRepository<AbsenceTypeEntity> absenceTy
         absenceType.OrganizationId = request.OrganizationId;
         await absenceTypesRepository.InsertAsync(absenceType, cancellationToken);
         await absenceTypesRepository.SaveAsync(cancellationToken);
-
         return absenceType.Id;
     }
 }

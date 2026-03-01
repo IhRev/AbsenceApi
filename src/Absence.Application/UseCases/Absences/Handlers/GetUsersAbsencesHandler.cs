@@ -15,9 +15,9 @@ internal class GetUsersAbsencesHandler(
     IRepository<AbsenceEntity> absenceRepository,
     IMapper mapper,
     IUser user
-) : IRequestHandler<GetUsersAbsencesQuery, OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>>
+) : IRequestHandler<GetUsersAbsencesQuery, OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>>
 {
-    public async Task<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>> Handle(GetUsersAbsencesQuery request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>> Handle(GetUsersAbsencesQuery request, CancellationToken cancellationToken)
     {
         //var organizationUser = await organizationUserRepository.GetFirstOrDefaultAsync(
         //    [

@@ -17,9 +17,9 @@ internal class EditAbsenceHandler(
     IUser user,
     IRepository<AbsenceRequestEntity> absenceEventRepository,
     IMapper mapper
-) : IRequestHandler<EditAbsenceCommand, OneOf<Success<string>, NotFound, BadRequest, AccessDenied>>
+) : IRequestHandler<EditAbsenceCommand, OneOf<Success<string>, NotFound, BadRequest>>
 {
-    public async Task<OneOf<Success<string>, NotFound, BadRequest, AccessDenied>> Handle(EditAbsenceCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success<string>, NotFound, BadRequest>> Handle(EditAbsenceCommand request, CancellationToken cancellationToken)
     {
         //var absence = await absenceRepository.GetByIdAsync(request.Absence.Id, cancellationToken);
         //if (absence is null)

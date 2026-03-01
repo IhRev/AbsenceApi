@@ -1,5 +1,4 @@
-﻿using Absence.Application.Common.Interfaces;
-using Absence.Application.UseCases.Events.DTOs;
+﻿using Absence.Application.UseCases.Events.DTOs;
 using Absence.Application.UseCases.Events.Handlers;
 using Absence.Application.UseCases.Events.Queries;
 using Absence.Domain.Entities;
@@ -15,56 +14,38 @@ public class GetEventsHandlerTests
 {
     private GetEventsQuery _query;
     private IRepository<EventEntity> _eventRepository;
-    private IRepository<UserOrganizationRoleEntity> _userOrganizationRoleRepository;
     private IMapper _mapper;
-    private IUser _user;
     private GetEventsHandler _sut;
 
     public GetEventsHandlerTests()
     {
         _query = new(1, DateTime.Today.AddDays(-1), DateTime.Today.AddDays(1));
         _eventRepository = Substitute.For<IRepository<EventEntity>>();
-        _userOrganizationRoleRepository = Substitute.For<IRepository<UserOrganizationRoleEntity>>();
-        _user = Substitute.For<IUser>();
         _mapper = Substitute.For<IMapper>();
-        _sut = new GetEventsHandler(
-            _eventRepository,
-            _userOrganizationRoleRepository,
-            _mapper,
-            _user
-        );
+        _sut = new(_eventRepository, _mapper);
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnAccessDenied_WhenUserDoesNotHavePermission()
+    public async Task Handle_ShouldReturnEvents()
     {
         // Arrange
-        _userOrganizationRoleRepository.AnyAsync(Arg.Any<PermissionSpec>()).Returns(false);
-        
-        // Act
-        var actual = await _sut.Handle(_query, CancellationToken.None);
-        
-        // Assert
-        actual.IsT1.ShouldBeTrue();
-    }
-
-    [Fact]
-    public async Task Handle_ShouldReturnSuccess_WhenUserHasPermission()
-    {
-        // Arrange
-        _userOrganizationRoleRepository.AnyAsync(Arg.Any<PermissionSpec>()).Returns(true);
-
-        var entities = new List<EventEntity>();
+        var entities = new List<EventEntity>()
+        {
+            new() { Id = 1, Name = "name" }
+        };
         _eventRepository.GetAsync(Arg.Any<EventsSpec>()).Returns(entities);
 
-        var dtos = new List<EventDTO>();
+        var dtos = new List<EventDTO>()
+        {
+            new() { Name = "name1" },
+            new() { Name = "name2" }
+        };
         _mapper.Map<IEnumerable<EventDTO>>(entities).Returns(dtos);
 
         // Act
-        var actual = await _sut.Handle(_query, CancellationToken.None);
+        var actual = await _sut.Handle(_query);
 
         // Assert
-        actual.IsT0.ShouldBeTrue();
-        actual.AsT0.Value.ShouldBe(dtos);
+        actual.ShouldBe(dtos);
     }
 }

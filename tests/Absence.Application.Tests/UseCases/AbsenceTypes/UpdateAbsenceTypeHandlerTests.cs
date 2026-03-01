@@ -1,9 +1,7 @@
-﻿using Absence.Application.Common.Interfaces;
-using Absence.Application.UseCases.AbsenceTypes.Commands;
+﻿using Absence.Application.UseCases.AbsenceTypes.Commands;
 using Absence.Application.UseCases.AbsenceTypes.Handlers;
 using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
-using Absence.Domain.Specifications;
 using AutoMapper;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
@@ -14,9 +12,7 @@ namespace Absence.Application.Tests.UseCases.AbsenceTypes;
 public class UpdateAbsenceTypeHandlerTests
 {
     private readonly UpdateAbsenceTypeCommand _command;
-    private readonly IRepository<UserOrganizationRoleEntity> _userOrganizationRoleRepository;
     private readonly IRepository<AbsenceTypeEntity> _absenceTypesRepository;
-    private readonly IUser _user;
     private readonly IMapper _mapper;
     private readonly UpdateAbsenceTypeHandler _sut;
 
@@ -30,16 +26,9 @@ public class UpdateAbsenceTypeHandlerTests
             CountsTowardAnnualLeave = true,
             RequiresApproval = true
         });
-        _userOrganizationRoleRepository = Substitute.For<IRepository<UserOrganizationRoleEntity>>();
         _absenceTypesRepository = Substitute.For<IRepository<AbsenceTypeEntity>>();
-        _user = Substitute.For<IUser>();
         _mapper = Substitute.For<IMapper>();
-        _sut = new UpdateAbsenceTypeHandler(
-            _userOrganizationRoleRepository,
-            _absenceTypesRepository,
-            _user,
-            _mapper
-        );
+        _sut = new(_absenceTypesRepository, _mapper);
     }
 
     [Fact]
@@ -49,44 +38,40 @@ public class UpdateAbsenceTypeHandlerTests
         _absenceTypesRepository.GetByIdAsync(_command.AbsenceType.Id).ReturnsNull();
 
         //Act
-        var actual = await _sut.Handle(_command, CancellationToken.None);
+        var actual = await _sut.Handle(_command);
 
         //Assert
         actual.IsT1.ShouldBeTrue();
         _absenceTypesRepository.Received(0).Update(Arg.Any<AbsenceTypeEntity>());
         await _absenceTypesRepository.Received(0).SaveAsync();
-        await _userOrganizationRoleRepository.Received(0).AnyAsync(Arg.Any<PermissionSpec>());
     }
 
     [Fact]
-    public async Task Handle_ReturnsAccessDenied_WhenUserHasNoPermission()
+    public async Task Handle_ReturnsNotFound_WhenAbsenceTypeIsDeleted()
     {
         //Arrange
-        var absenceType = new AbsenceTypeEntity() { Code = "c", Name = "n" };
-        _absenceTypesRepository.GetByIdAsync(_command.AbsenceType.Id).Returns(absenceType);
-
-        _userOrganizationRoleRepository.AnyAsync(Arg.Any<PermissionSpec>()).Returns(false);
+        _absenceTypesRepository
+            .GetByIdAsync(_command.AbsenceType.Id)
+            .Returns(new AbsenceTypeEntity() { Code = "code", Name = "name", IsDeleted = true });
 
         //Act
-        var actual = await _sut.Handle(_command, CancellationToken.None);
+        var actual = await _sut.Handle(_command);
 
         //Assert
-        actual.IsT2.ShouldBeTrue();
-        _absenceTypesRepository.Received(0).Update(absenceType);
+        actual.IsT1.ShouldBeTrue();
+        _absenceTypesRepository.Received(0).Update(Arg.Any<AbsenceTypeEntity>());
         await _absenceTypesRepository.Received(0).SaveAsync();
     }
 
     [Fact]
-    public async Task Handle_ReturnsSuccess_WhenUserHasPermission()
+    public async Task Handle_ReturnsSuccess_WhenUpdatedSuccessfully()
     {
         //Arrange
-        var absenceType = new AbsenceTypeEntity() { Code = "c", Name = "n" };
+        var absenceType = new AbsenceTypeEntity() { Code = "code", Name = "name" };
         _absenceTypesRepository.GetByIdAsync(_command.AbsenceType.Id).Returns(absenceType);
 
-        _userOrganizationRoleRepository.AnyAsync(Arg.Any<PermissionSpec>()).Returns(true);
-
         //Act
-        var actual = await _sut.Handle(_command, CancellationToken.None);
+        var actual = await _sut.Handle(_command);
 
         //Assert
         actual.IsT0.ShouldBeTrue();

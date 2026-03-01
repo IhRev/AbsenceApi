@@ -7,4 +7,4 @@ using OneOf.Types;
 namespace Absence.Application.UseCases.Absences.Queries;
 
 public record GetUsersAbsencesQuery(DateTime StartDate, DateTime EndDate, int OrganizationId, List<int> UserIds)
-    : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>>;
+    : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>>;

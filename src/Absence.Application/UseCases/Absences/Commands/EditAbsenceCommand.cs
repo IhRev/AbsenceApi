@@ -6,4 +6,4 @@ using Absence.Application.UseCases.Absences.DTOs;
 
 namespace Absence.Application.UseCases.Absences.Commands;
 
-public record EditAbsenceCommand(EditAbsenceDTO Absence) : IRequest<OneOf<Success<string>, NotFound, BadRequest, AccessDenied>>;
+public record EditAbsenceCommand(EditAbsenceDTO Absence) : IRequest<OneOf<Success<string>, NotFound, BadRequest>>;

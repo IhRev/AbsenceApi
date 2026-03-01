@@ -12,19 +12,19 @@ namespace Absence.Application.UseCases.Organizations.Handlers;
 public class EditOrganizationHandler(
     IRepository<OrganizationEntity> organizationRepository,
     IUser user
-) : IRequestHandler<EditOrganizationCommand, OneOf<Success, NotFound, BadRequest, AccessDenied>>
+) : IRequestHandler<EditOrganizationCommand, OneOf<Success, NotFound, BadRequest>>
 {
-    public async Task<OneOf<Success, NotFound, BadRequest, AccessDenied>> Handle(EditOrganizationCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, NotFound, BadRequest>> Handle(EditOrganizationCommand request, CancellationToken cancellationToken)
     {
         var organization = await organizationRepository.GetByIdAsync(request.Organization.Id);
         if (organization is null)
         {
             return new NotFound();
         }
-        if (organization.OwnerId != user.ShortId)
-        {
-            return new AccessDenied();
-        }
+        //if (organization.OwnerId != user.ShortId)
+        //{
+        //    return new AccessDenied();
+        //}
 
         if (organization.Name == request.Organization.Name)
         {

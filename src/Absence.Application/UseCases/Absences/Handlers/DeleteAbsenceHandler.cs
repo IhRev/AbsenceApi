@@ -16,9 +16,9 @@ internal class DeleteAbsenceHandler(
     IRepository<AbsenceRequestEntity> absenceEventRepository,
     IUser user,
     IMapper mapper
-) : IRequestHandler<DeleteAbsenceCommand, OneOf<Success<string>, NotFound, AccessDenied>>
+) : IRequestHandler<DeleteAbsenceCommand, OneOf<Success<string>, NotFound>>
 {
-    public async Task<OneOf<Success<string>, NotFound, AccessDenied>> Handle(DeleteAbsenceCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success<string>, NotFound>> Handle(DeleteAbsenceCommand request, CancellationToken cancellationToken)
     {
         //var absence = await absenceRepository.GetByIdAsync(request.Id, cancellationToken);
         //if (absence is null)

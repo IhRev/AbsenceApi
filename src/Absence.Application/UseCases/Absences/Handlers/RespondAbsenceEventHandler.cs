@@ -16,9 +16,9 @@ public class RespondAbsenceEventHandler(
     IRepository<AbsenceEntity> absenceRepository,
     IUser user,
     IMapper mapper
-) : IRequestHandler<RespondAbsenceEventCommand, OneOf<Success, NotFound, AccessDenied>>
+) : IRequestHandler<RespondAbsenceEventCommand, OneOf<Success, NotFound>>
 {
-    public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(RespondAbsenceEventCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, NotFound>> Handle(RespondAbsenceEventCommand request, CancellationToken cancellationToken)
     {
         //var absenceEvent = await absenceEventRepository.GetByIdAsync(request.Id, cancellationToken);
         //if (absenceEvent is null)
