@@ -8,5 +8,5 @@ namespace Absence.Application.UseCases.Events.Commands;
 public record AddEventCommand(int OrganizationId, CreateEventDTO Event) 
     : IRequest<int>, IRequirePermission
 {
-    public string Permission => Permissions.MANAGE_EVENTS;
+    public string Permission => PermissionNames.MANAGE_EVENTS;
 }

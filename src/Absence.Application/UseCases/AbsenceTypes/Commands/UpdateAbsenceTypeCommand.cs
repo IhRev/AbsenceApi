@@ -10,5 +10,5 @@ namespace Absence.Application.UseCases.AbsenceTypes.Commands;
 public record UpdateAbsenceTypeCommand(int OrganizationId, UpdateAbsenceTypeDTO AbsenceType)
     : IRequest<OneOf<Success, NotFound>>, IRequirePermission
 {
-    public string Permission => Permissions.MANAGE_ABSENCE_TYPES;
+    public string Permission => PermissionNames.MANAGE_ABSENCE_TYPES;
 }

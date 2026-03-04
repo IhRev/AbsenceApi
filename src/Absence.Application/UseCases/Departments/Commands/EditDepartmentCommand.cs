@@ -10,5 +10,5 @@ namespace Absence.Application.UseCases.Departments.Commands;
 public record EditDepartmentCommand(int OrganizationId, EditDepartmentDTO Department)
     : IRequest<OneOf<Success, NotFound>>, IRequirePermission
 {
-    public string Permission => Permissions.MANAGE_DEPARTMENTS;
+    public string Permission => PermissionNames.MANAGE_DEPARTMENTS;
 }

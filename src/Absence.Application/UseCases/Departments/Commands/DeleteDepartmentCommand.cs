@@ -9,5 +9,5 @@ namespace Absence.Application.UseCases.Departments.Commands;
 public record DeleteDepartmentCommand(int OrganizationId, int Id) 
     : IRequest<OneOf<Success, NotFound>>, IRequirePermission
 {
-    public string Permission => Permissions.MANAGE_DEPARTMENTS;
+    public string Permission => PermissionNames.MANAGE_DEPARTMENTS;
 }

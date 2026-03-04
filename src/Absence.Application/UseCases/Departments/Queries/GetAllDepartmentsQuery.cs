@@ -8,5 +8,5 @@ namespace Absence.Application.UseCases.Departments.Queries;
 public record GetAllDepartmentsQuery(int OrganizationId) 
     : IRequest<IEnumerable<DepartmentDTO>>, IRequirePermission
 {
-    public string Permission => Permissions.VIEW_DEPARTMENTS;
+    public string Permission => PermissionNames.VIEW_DEPARTMENTS;
 }

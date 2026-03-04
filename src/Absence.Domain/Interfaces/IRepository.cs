@@ -12,6 +12,8 @@ public interface IRepository<TEntity> where TEntity : class
 
     void DeleteRangeAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default);
     
+    Task<List<TEntity>> GetAsync(CancellationToken cancellationToken = default);
+
     Task<List<TEntity>> GetAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default);
     
     Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default);

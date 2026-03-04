@@ -8,5 +8,5 @@ namespace Absence.Application.UseCases.AbsenceTypes.Commands;
 public record CreateAbsenceTypeCommand(int OrganizationId, CreateAbsenceTypeDTO AbsenceType)
     : IRequest<int>, IRequirePermission
 {
-    public string Permission => Permissions.MANAGE_ABSENCE_TYPES;
+    public string Permission => PermissionNames.MANAGE_ABSENCE_TYPES;
 }

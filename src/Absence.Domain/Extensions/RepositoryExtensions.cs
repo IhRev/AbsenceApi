@@ -12,5 +12,5 @@ public static class RepositoryExtensions
         int userId,
         string permission,
         CancellationToken cancellationToken = default
-    ) => userOrganizationRoleRepository.AnyAsync(new PermissionSpec(permission, organizationId, userId), cancellationToken);
+    ) => userOrganizationRoleRepository.AnyAsync(new UserRoleSpec(permission, organizationId, userId), cancellationToken);
 }

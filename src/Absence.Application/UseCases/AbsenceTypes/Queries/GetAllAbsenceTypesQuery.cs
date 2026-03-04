@@ -8,5 +8,5 @@ namespace Absence.Application.UseCases.AbsenceTypes.Queries;
 public record GetAllAbsenceTypesQuery(int OrganizationId) 
     : IRequest<IEnumerable<AbsenceTypeDTO>>, IRequirePermission
 {
-    public string Permission => Permissions.VIEW_BASICS;
+    public string Permission => PermissionNames.VIEW_BASICS;
 }

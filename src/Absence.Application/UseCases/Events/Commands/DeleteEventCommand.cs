@@ -9,5 +9,5 @@ namespace Absence.Application.UseCases.Events.Commands;
 public record DeleteEventCommand(int OrganizationId, int Id) 
     : IRequest<OneOf<Success, NotFound>>, IRequirePermission
 {
-    public string Permission => Permissions.MANAGE_EVENTS;
+    public string Permission => PermissionNames.MANAGE_EVENTS;
 }

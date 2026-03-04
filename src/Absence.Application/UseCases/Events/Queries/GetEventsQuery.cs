@@ -8,5 +8,5 @@ namespace Absence.Application.UseCases.Events.Queries;
 public record GetEventsQuery(int OrganizationId, DateTime StartDate, DateTime EndDate)
     : IRequest<IEnumerable<EventDTO>>, IRequirePermission
 {
-    public string Permission => Permissions.VIEW_BASICS;
+    public string Permission => PermissionNames.VIEW_BASICS;
 }
