@@ -41,23 +41,6 @@ public class EditDepartmentHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnNotFound_WhenDepartmentIsDeleted()
-    {
-        // Arrange
-        var department = new DepartmentEntity() { Name = "name", IsDeleted = true };
-        _departmentRepository.GetByIdAsync(Arg.Any<int>()).Returns(department);
-
-        // Act
-        var actual = await _sut.Handle(_command);
-
-        // Assert
-        actual.IsT1.ShouldBeTrue();
-        _mapper.Received(0).Map(_command.Department, department);
-        _departmentRepository.Received(0).Update(Arg.Any<DepartmentEntity>());
-        await _departmentRepository.Received(0).SaveAsync();
-    }
-
-    [Fact]
     public async Task Handle_ShouldReturnSuccess_WhenDepartmentUpdated()
     {
         // Arrange

@@ -38,7 +38,10 @@ public class AuthController(ISender sender) : ControllerBase
     [HttpPost("logout")]
     public async Task<ActionResult> Logout()
     {
-        await sender.Send(new LogoutUserCommand());
-        return Ok();
+        var result = await sender.Send(new LogoutUserCommand());
+        return result.Match<ActionResult>(
+            success => Ok(),
+            error => NotFound()
+        );
     }
 }

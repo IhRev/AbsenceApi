@@ -19,7 +19,7 @@ public class UpdateAbsenceTypeHandler(
     )
     {
         var absenceType = await absenceTypesRepository.GetByIdAsync(request.AbsenceType.Id, cancellationToken);
-        if (absenceType is null || absenceType.IsDeleted)
+        if (absenceType is null)
         {
             return new NotFound();
         }

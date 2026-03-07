@@ -1,9 +1,11 @@
-﻿using Absence.Application.Identity;
+﻿using Absence.Application.Common.Interfaces;
+using Absence.Application.Identity;
 using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Database.Repositories;
 using Absence.Infrastructure.Identity;
+using Absence.Infrastructure.Time;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -76,7 +78,8 @@ public static class DependencyInjection
             .AddScoped(typeof(IRepository<>), typeof(Repository<>))
             .AddScoped<IUserService, UserService>()
             .AddScoped<IJwtService, JwtService>()
-            .AddScoped<IRefreshTokenService, RefreshTokenService>();
+            .AddScoped<IRefreshTokenService, RefreshTokenService>()
+            .AddScoped<IDateTimeProvider, DateTimeProvider>();
 
         return services;
     }

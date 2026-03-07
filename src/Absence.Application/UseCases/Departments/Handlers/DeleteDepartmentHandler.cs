@@ -16,7 +16,7 @@ internal class DeleteDepartmentHandler(IRepository<DepartmentEntity> departmentR
     )
     {
         var department = await departmentRepository.GetByIdAsync(request.Id);
-        if (department is null || department.IsDeleted)
+        if (department is null)
         {
             return new NotFound();
         }

@@ -4,5 +4,5 @@ namespace Absence.Application.Identity;
 
 public interface IRefreshTokenService
 {
-    Task<string> GenerateToken(UserEntity user, CancellationToken cancellationToken);
+    Task<string> GenerateToken(UserEntity user, CancellationToken cancellationToken = default);
 }

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Absence.Infrastructure.Database.Configurations;
+namespace Absence.Infrastructure.Database.Configurations.Abstractions;
 
 public abstract class EntityConfiguration<TEntity, TId> 
     : IEntityTypeConfiguration<TEntity> where TEntity : class, IIdKeyed<TId>

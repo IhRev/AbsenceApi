@@ -36,23 +36,6 @@ public class DeleteAbsenceTypeHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ReturnsNotFound_WhenAbsenceTypeIsDeleted()
-    {
-        //Arrange
-        _absenceTypesRepository
-            .GetByIdAsync(_absenceTypeId)
-            .Returns(new AbsenceTypeEntity() { Code = "code", Name = "name", IsDeleted = true});
-
-        //Act
-        var actual = await _sut.Handle(new(_organizationId, _absenceTypeId));
-
-        //Assert
-        actual.IsT1.ShouldBeTrue();
-        _absenceTypesRepository.Received(0).Delete(Arg.Any<AbsenceTypeEntity>());
-        await _absenceTypesRepository.Received(0).SaveAsync();
-    }
-
-    [Fact]
     public async Task Handle_ReturnsSuccess_WhenAbsenceTypeDeleted()
     {
         //Arrange

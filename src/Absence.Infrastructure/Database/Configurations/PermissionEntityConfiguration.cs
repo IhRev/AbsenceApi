@@ -1,4 +1,5 @@
 ﻿using Absence.Domain.Entities;
+using Absence.Infrastructure.Database.Configurations.Abstractions;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Absence.Infrastructure.Database.Configurations;

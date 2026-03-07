@@ -1,4 +1,5 @@
-﻿using Absence.Application.Identity;
+﻿using Absence.Application.Common.Interfaces;
+using Absence.Application.Identity;
 using Absence.Application.UseCases.Users.Commands;
 using Absence.Application.UseCases.Users.DTOs;
 using MediatR;
@@ -9,10 +10,14 @@ namespace Absence.Application.UseCases.Users.Handlers;
 internal class RefreshTokenHandler(
     IUserService userService,
     IJwtService jwtService,
-    IRefreshTokenService refreshTokenService
+    IRefreshTokenService refreshTokenService,
+    IDateTimeProvider dateTimeProvider
 ) : IRequestHandler<RefreshTokenCommand, AuthResponse>
 {
-    public async Task<AuthResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<AuthResponse> Handle(
+        RefreshTokenCommand request, 
+        CancellationToken cancellationToken = default
+    )
     {
         var principal = jwtService.GetPrincipalFromExpiredToken(request.RefreshTokenRequest.AccessToken);
 
@@ -21,7 +26,7 @@ internal class RefreshTokenHandler(
 
         if (userEntity == null || 
             userEntity.RefreshToken != request.RefreshTokenRequest.RefreshToken ||
-            userEntity.RefreshTokenExpiresAt <= DateTime.UtcNow)
+            userEntity.RefreshTokenExpiresAt <= dateTimeProvider.UtcNow)
         {
             return AuthResponse.Fail("Token is invalid");
         }

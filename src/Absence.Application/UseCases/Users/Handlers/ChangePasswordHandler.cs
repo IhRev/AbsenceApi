@@ -8,19 +8,31 @@ using Absence.Application.Identity;
 
 namespace Absence.Application.UseCases.Users.Handlers;
 
-internal class ChangePasswordHandler(IUserService userService, IUser user) : IRequestHandler<ChangePasswordCommand, OneOf<Success, BadRequest>>
+internal class ChangePasswordHandler(IUserService userService, IUser user) 
+    : IRequestHandler<ChangePasswordCommand, OneOf<Success, BadRequest, NotFound>>
 {
-    public async Task<OneOf<Success, BadRequest>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, BadRequest, NotFound>> Handle(
+        ChangePasswordCommand request, 
+        CancellationToken cancellationToken = default
+    )
     {
         var userEntity = await userService.FindByIdAsync(user.Id);
+        if (userEntity == null)
+        {
+            return new NotFound();
+        }
 
-        var result = await userService.ChangePasswordAsync(userEntity!, request.Request.OldPassword, request.Request.NewPassword);
+        var result = await userService.ChangePasswordAsync(
+            userEntity, 
+            request.Request.OldPassword, 
+            request.Request.NewPassword
+        );
         if (!result.Succeeded)
         {
             return new BadRequest(result.Errors.First().Description);
         }
 
-        userEntity!.RefreshToken = null;
+        userEntity.RefreshToken = null;
         userEntity.RefreshTokenExpiresAt = DateTimeOffset.MinValue;
         await userService.UpdateAsync(userEntity);
 

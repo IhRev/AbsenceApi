@@ -14,7 +14,7 @@ internal class RefreshTokenService(
     private const int REFRESH_TOKEN_SIZE = 64;
     private readonly JwtConfiguration _jwtConfiguration = jwtConfiguration.Value;
 
-    public async Task<string> GenerateToken(UserEntity user, CancellationToken cancellationToken)
+    public async Task<string> GenerateToken(UserEntity user, CancellationToken cancellationToken = default)
     {
         var token = Convert.ToBase64String(randomGenerator.GenerateBytes(REFRESH_TOKEN_SIZE));
 

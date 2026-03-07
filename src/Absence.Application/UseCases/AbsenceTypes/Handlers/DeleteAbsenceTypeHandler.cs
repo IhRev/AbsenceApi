@@ -16,7 +16,7 @@ public class DeleteAbsenceTypeHandler(IRepository<AbsenceTypeEntity> absenceType
     )
     {
         var absenceType = await absenceTypesRepository.GetByIdAsync(request.Id, cancellationToken);
-        if (absenceType is null || absenceType.IsDeleted)
+        if (absenceType is null)
         {
             return new NotFound();
         }

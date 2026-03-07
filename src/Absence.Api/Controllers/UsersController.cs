@@ -16,15 +16,21 @@ public class UsersController(ISender sender) : ControllerBase
     [HttpGet("details")]
     public async Task<ActionResult<UserDetails>> GetUserDetails()
     {
-        var details = await sender.Send(new GetUserDetailsQuery());
-        return Ok(details);
+        var result = await sender.Send(new GetUserDetailsQuery());
+        return result.Match<ActionResult<UserDetails>>(
+            userDetails => Ok(userDetails),
+            notFound => NotFound()
+        );
     }
 
     [HttpPut("details")]
     public async Task<ActionResult> UpdateUserDetails([FromBody] UserDetails userDetails)
     {
-        await sender.Send(new UpdateUserCommand(userDetails));
-        return Ok();
+        var result = await sender.Send(new UpdateUserCommand(userDetails));
+        return result.Match<ActionResult>(
+            success => Ok(),
+            notFound => NotFound()
+        );
     }
 
     [HttpPut("change_password")]
@@ -33,7 +39,8 @@ public class UsersController(ISender sender) : ControllerBase
         var result = await sender.Send(new ChangePasswordCommand(request));
         return result.Match<ActionResult>(
             success => Ok(),
-            badRequest => BadRequest(badRequest.Message)
+            badRequest => BadRequest(badRequest.Message),
+            notFound => NotFound()
         );
     }
 
@@ -43,7 +50,8 @@ public class UsersController(ISender sender) : ControllerBase
         var result = await sender.Send(new DeleteUserCommand(request));
         return result.Match<ActionResult>(
             success => Ok(),
-            badRequest => BadRequest(badRequest.Message)
+            badRequest => BadRequest(badRequest.Message),
+            notFound => NotFound()
         );
     }
 }  

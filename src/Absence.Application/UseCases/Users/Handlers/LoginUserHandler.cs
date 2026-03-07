@@ -11,7 +11,10 @@ internal class LoginUserHandler(
     IRefreshTokenService refreshTokenService
 ) : IRequestHandler<LoginUserCommand, AuthResponse>
 {
-    public async Task<AuthResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+    public async Task<AuthResponse> Handle(
+        LoginUserCommand request, 
+        CancellationToken cancellationToken = default
+    )
     {
         var userEntity = await userService.FindByEmailAsync(request.Credentials.Email);
         if (userEntity == null || !await userService.CheckPasswordAsync(userEntity, request.Credentials.Password))

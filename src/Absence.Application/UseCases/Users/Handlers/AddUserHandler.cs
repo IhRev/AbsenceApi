@@ -7,11 +7,13 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Users.Handlers;
 
-internal class AddUserHandler(
-    IUserService userRepository
-) : IRequestHandler<AddUserCommand, OneOf<Success, Error<string>>>
+internal class AddUserHandler(IUserService userService) 
+    : IRequestHandler<AddUserCommand, OneOf<Success, Error<string>>>
 {
-    public async Task<OneOf<Success, Error<string>>> Handle(AddUserCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, Error<string>>> Handle(
+        AddUserCommand request, 
+        CancellationToken cancellationToken = default
+    )
     {
         var user = new UserEntity()
         {
@@ -21,7 +23,7 @@ internal class AddUserHandler(
             UserName = request.User.Credentials.Email,
         };
 
-        var result = await userRepository.CreateAsync(user, request.User.Credentials.Password);
+        var result = await userService.CreateAsync(user, request.User.Credentials.Password);
         if (!result.Succeeded)
         {
             return new Error<string>(result.ToString());

@@ -17,7 +17,7 @@ public class EditDepartmentHandler(IRepository<DepartmentEntity> departmentRepos
     )
     {
         var department = await departmentRepository.GetByIdAsync(request.Department.Id);
-        if (department is null || department.IsDeleted)
+        if (department is null)
         {
             return new NotFound();
         }

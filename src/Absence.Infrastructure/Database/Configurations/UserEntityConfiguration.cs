@@ -45,5 +45,8 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
             .Property(_ => _.IsDeleted)
             .HasDefaultValue(false)
             .IsRequired();
+
+        builder
+            .HasQueryFilter(u => !u.IsDeleted);
     }
 }
