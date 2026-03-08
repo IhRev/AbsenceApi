@@ -9,4 +9,4 @@ public class InviteUserToOrganizationDTO
     public required string UserEmail { get; set; }
     [Required]
     public required int OrganizationId { get; set; }
-} 
+}
