@@ -8,5 +8,5 @@ public class InviteUserToOrganizationDTO
     [EmailAddress]
     public required string UserEmail { get; set; }
     [Required]
-    public required int OrganizationId { get; set; }
+    public int OrganizationId { get; set; }
 }

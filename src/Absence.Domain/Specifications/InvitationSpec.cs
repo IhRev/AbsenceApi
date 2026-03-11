@@ -8,7 +8,9 @@ public class InvitationSpec : Specification<OrganizationUserInvitationEntity>
     public InvitationSpec(int userId)
     {
         Query
-            .Where(invitation => invitation.Invited == userId);
+            .Where(invitation => invitation.Invited == userId)
+            .Include(_ => _.InviterUser)
+            .Include(_ => _.Organization);
     }
 
     public InvitationSpec(int userId, int organizationId)
