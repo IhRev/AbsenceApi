@@ -48,7 +48,11 @@ internal class EditAbsenceHandler(
             ],
             cancellationToken
         );
-        if (organizationUser!.IsAdmin)
+        if (organizationUser is null)
+        {
+            return new AccessDenied();
+        }
+        if (organizationUser.IsAdmin)
         {
             if (absence.AbsenceTypeId != request.Absence.Type)
             {

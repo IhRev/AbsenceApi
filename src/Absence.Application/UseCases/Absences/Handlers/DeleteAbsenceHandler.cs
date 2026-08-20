@@ -46,7 +46,11 @@ internal class DeleteAbsenceHandler(
             ],
             cancellationToken
         );
-        if (organizationUser!.IsAdmin)
+        if (organizationUser is null)
+        {
+            return new AccessDenied();
+        }
+        if (organizationUser.IsAdmin)
         {
             _absenceRepository.Delete(absence);
             await _absenceRepository.SaveAsync(cancellationToken);
