@@ -15,6 +15,10 @@ public class OrganizationUserEntityConfiguration : EntityConfiguration<Organizat
             .IsRequired();
 
         builder
+            .HasIndex(_ => new { _.OrganizationId, _.UserId })
+            .IsUnique();
+
+        builder
             .HasOne(_ => _.User)
             .WithMany(_ => _.OrganizationsUsers)    
             .HasForeignKey(_ => _.UserId)

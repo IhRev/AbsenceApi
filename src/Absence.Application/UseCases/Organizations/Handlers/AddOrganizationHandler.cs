@@ -9,13 +9,11 @@ namespace Absence.Application.UseCases.Organizations.Handlers;
 
 internal class AddOrganizationHandler(
     IRepository<OrganizationEntity> organizationRepository,
-    IOrganizationUsersRepository organizationUserRepository,
     IMapper mapper,
     IUser user
 ) : IRequestHandler<AddOrganizationCommand, int>
 {
     private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
-    private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IMapper _mapper = mapper;
     private readonly IUser _user = user;
 
@@ -23,17 +21,13 @@ internal class AddOrganizationHandler(
     {
         var organization = _mapper.Map<OrganizationEntity>(request.Organization);
         organization.OwnerId = _user.ShortId;
-        await _organizationRepository.InsertAsync(organization, cancellationToken);
-        await _organizationRepository.SaveAsync(cancellationToken);
-
-        var organizationUser = new OrganizationUserEntity()
+        organization.OrganizationsUsers.Add(new OrganizationUserEntity()
         {
             IsAdmin = true,
-            OrganizationId = organization.Id,
             UserId = _user.ShortId
-        };
-        await _organizationUserRepository.InsertAsync(organizationUser);
-        await _organizationUserRepository.SaveAsync();
+        });
+        await _organizationRepository.InsertAsync(organization, cancellationToken);
+        await _organizationRepository.SaveAsync(cancellationToken);
 
         return organization.Id;
     }
