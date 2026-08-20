@@ -15,7 +15,6 @@ internal class EditAbsenceHandler(
     IRepository<AbsenceEntity> absenceRepository, 
     IRepository<AbsenceTypeEntity> absenceTypeRepository,
     IUser user,
-    IRepository<AbsenceEventTypeEntity> absenceEventTypeRepository,
     IRepository<AbsenceEventEntity> absenceEventRepository,
     IOrganizationUsersRepository organizationUserRepository,
     IMapper mapper
@@ -23,7 +22,6 @@ internal class EditAbsenceHandler(
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
     private readonly IRepository<AbsenceTypeEntity> _absenceTypeRepository = absenceTypeRepository;
-    private readonly IRepository<AbsenceEventTypeEntity> _absenceEventTypeRepository = absenceEventTypeRepository;
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IMapper _mapper = mapper;
@@ -73,13 +71,7 @@ internal class EditAbsenceHandler(
         else
         {
             var absenceEvent = _mapper.Map<AbsenceEventEntity>(request.Absence);
-            var eventType = await _absenceEventTypeRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.Name == AbsenceEventType.UPDATE)
-                ],
-                cancellationToken
-            );
-            absenceEvent.AbsenceEventTypeId = eventType!.Id;
+            absenceEvent.AbsenceEventType = AbsenceEventType.UPDATE;
             absenceEvent.OrganizationId = organizationUser.OrganizationId;
             absenceEvent.UserId = organizationUser.UserId;
             await _absenceEventRepository.InsertAsync(absenceEvent, cancellationToken);

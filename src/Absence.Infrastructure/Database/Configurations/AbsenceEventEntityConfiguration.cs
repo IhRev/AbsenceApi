@@ -32,10 +32,10 @@ public class AbsenceEventEntityConfiguration : EntityConfiguration<AbsenceEventE
            .IsRequired();
 
         builder
-            .HasOne(_ => _.AbsenceEventType)
-            .WithMany(_ => _.AbsenceEvents)
-            .HasForeignKey(_ => _.AbsenceEventTypeId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .Property(_ => _.AbsenceEventType)
+            .HasColumnName("AbsenceEventTypeId")
+            .HasConversion<int>()
+            .IsRequired();
 
         builder
             .HasOne(_ => _.Organization)

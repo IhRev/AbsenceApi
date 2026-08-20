@@ -13,7 +13,6 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 
 public class RespondAbsenceEventHandler(
     IRepository<AbsenceEventEntity> absenceEventRepository,
-    IRepository<AbsenceEventTypeEntity> absenceEventTypesRepository,
     IOrganizationUsersRepository organizationUserRepository,
     IRepository<AbsenceEntity> absenceRepository,
     IUser user,
@@ -21,7 +20,6 @@ public class RespondAbsenceEventHandler(
 ) : IRequestHandler<RespondAbsenceEventCommand, OneOf<Success, NotFound, AccessDenied>>
 {
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
-    private readonly IRepository<AbsenceEventTypeEntity> _absenceEventTypesRepository = absenceEventTypesRepository;
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
     private readonly IUser _user = user;
@@ -49,8 +47,7 @@ public class RespondAbsenceEventHandler(
 
         if (request.Accepted)
         {
-            var eventType = await _absenceEventTypesRepository.GetByIdAsync(absenceEvent.AbsenceEventTypeId, cancellationToken);
-            switch (eventType!.Name)
+            switch (absenceEvent.AbsenceEventType)
             {
                 case AbsenceEventType.CREATE:
                     await AddAbsence(absenceEvent, cancellationToken);
@@ -62,7 +59,7 @@ public class RespondAbsenceEventHandler(
                     await DeleteAbsence(absenceEvent, cancellationToken);
                     break;
                 default:
-                    throw new ArgumentException($"Incorrect event type id {absenceEvent.AbsenceEventTypeId}");
+                    throw new ArgumentException($"Incorrect event type {absenceEvent.AbsenceEventType}");
             }
             await _absenceRepository.SaveAsync(cancellationToken);
         }
