@@ -1,6 +1,7 @@
 ﻿using Absence.Application.Common.Interfaces;
 using Absence.Application.Common.Results;
 using Absence.Application.UseCases.Organizations.Commands;
+using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 using MediatR;
 using OneOf;
@@ -10,11 +11,13 @@ namespace Absence.Application.UseCases.Organizations.Handlers;
 
 internal class DeleteMemberHandler(
     IUser user, 
-    IOrganizationUsersRepository organizationUsersRepository
+    IOrganizationUsersRepository organizationUsersRepository,
+    IRepository<OrganizationEntity> organizationRepository
 ) : IRequestHandler<DeleteMemberCommand, OneOf<Success, NotFound, BadRequest, AccessDenied>>
 {
     private readonly IUser _user = user;
     private readonly IOrganizationUsersRepository _organizationUsersRepository = organizationUsersRepository;
+    private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
 
     public async Task<OneOf<Success, NotFound, BadRequest, AccessDenied>> Handle(DeleteMemberCommand request, CancellationToken cancellationToken)
     {
@@ -33,6 +36,12 @@ internal class DeleteMemberHandler(
             return new AccessDenied();
         }
 
+        var organization = await _organizationRepository.GetByIdAsync(request.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            return new NotFound();
+        }
+
         var organizationUser = await _organizationUsersRepository.GetFirstOrDefaultAsync(
             [
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == request.MemberId)
@@ -42,6 +51,10 @@ internal class DeleteMemberHandler(
         if (organizationUser is null)
         {
             return new BadRequest($"User with id {request.MemberId} doesn't belong to organization.");
+        }
+        if (organizationUser.UserId == organization.OwnerId)
+        {
+            return new BadRequest("Cannot remove the organization owner.");
         }
 
         _organizationUsersRepository.Delete(organizationUser);
