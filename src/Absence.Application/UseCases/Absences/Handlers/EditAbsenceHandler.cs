@@ -71,7 +71,7 @@ internal class EditAbsenceHandler(
             var absenceEvent = _mapper.Map<AbsenceEventEntity>(request.Absence);
             var eventType = await _absenceEventTypeRepository.GetFirstOrDefaultAsync(
                 [
-                    q => q.Where(_ => _.Name == AbsenceEventType.CREATE)
+                    q => q.Where(_ => _.Name == AbsenceEventType.UPDATE)
                 ],
                 cancellationToken
             );
