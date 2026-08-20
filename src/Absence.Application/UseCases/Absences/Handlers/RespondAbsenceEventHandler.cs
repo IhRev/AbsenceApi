@@ -80,14 +80,34 @@ public class RespondAbsenceEventHandler(
 
     private async Task UpdateAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
     {
-        var absence = await _absenceRepository.GetByIdAsync(absenceEvent.AbsenceId!, cancellationToken);
+        if (absenceEvent.AbsenceId is not int absenceId)
+        {
+            return;
+        }
+
+        var absence = await _absenceRepository.GetByIdAsync(absenceId, cancellationToken);
+        if (absence is null)
+        {
+            return;
+        }
+
         absence = _mapper.Map(absenceEvent, absence);
-        _absenceRepository.Update(absence!);
+        _absenceRepository.Update(absence);
     }
 
     private async Task DeleteAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
     {
-        var absence = await _absenceRepository.GetByIdAsync(absenceEvent.AbsenceId!, cancellationToken);
-        _absenceRepository.Delete(absence!);
+        if (absenceEvent.AbsenceId is not int absenceId)
+        {
+            return;
+        }
+
+        var absence = await _absenceRepository.GetByIdAsync(absenceId, cancellationToken);
+        if (absence is null)
+        {
+            return;
+        }
+
+        _absenceRepository.Delete(absence);
     }
 } 
