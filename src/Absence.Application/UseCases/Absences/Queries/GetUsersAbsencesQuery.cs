@@ -6,11 +6,11 @@ using OneOf.Types;
 
 namespace Absence.Application.UseCases.Absences.Queries;
 
-public class GetUsersAbsencesQuery(DateTime startDate, DateTime endDate, int organizationId, List<int> userIds)
+public class GetUsersAbsencesQuery(DateTimeOffset startDate, DateTimeOffset endDate, int organizationId, List<int> userIds)
     : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>>
 {
-    public DateTime StartDate { get; } = startDate;
-    public DateTime EndDate { get; } = endDate;
+    public DateTimeOffset StartDate { get; } = startDate;
+    public DateTimeOffset EndDate { get; } = endDate;
     public int OrganizationId { get; } = organizationId;
     public List<int> UserIds { get; } = userIds;
 }
