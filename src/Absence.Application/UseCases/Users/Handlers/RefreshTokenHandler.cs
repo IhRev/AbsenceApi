@@ -19,12 +19,16 @@ internal class RefreshTokenHandler(
     public async Task<AuthResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var principal = _jwtService.GetPrincipalFromExpiredToken(request.RefreshTokenRequest.AccessToken);
+        if (principal is null)
+        {
+            return AuthResponse.Fail("Token is invalid");
+        }
 
-        var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-        var userEntity = await _userService.FindByIdAsync(userId);
+        var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userEntity = userId is null ? null : await _userService.FindByIdAsync(userId);
 
         if (userEntity == null || 
-            userEntity.RefreshToken != request.RefreshTokenRequest.RefreshToken ||
+            !_refreshTokenService.Matches(userEntity, request.RefreshTokenRequest.RefreshToken) ||
             userEntity.RefreshTokenExpiresAt <= DateTime.UtcNow)
         {
             return AuthResponse.Fail("Token is invalid");
