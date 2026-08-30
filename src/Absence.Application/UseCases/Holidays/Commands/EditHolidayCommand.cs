@@ -6,7 +6,7 @@ using OneOf;
 
 namespace Absence.Application.UseCases.Holidays.Commands;
 
-public class EditHolidayCommand(EditHolidayDTO holiday) : IRequest<OneOf<Success, NotFound, AccessDenied>>
+public class EditHolidayCommand(EditHolidayDTO holiday) : IRequest<OneOf<Success, NotFound, AccessDenied, BadRequest>>
 {
     public EditHolidayDTO Holiday { get; } = holiday;
 }

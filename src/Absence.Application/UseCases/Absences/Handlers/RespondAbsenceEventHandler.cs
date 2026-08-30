@@ -15,17 +15,19 @@ public class RespondAbsenceEventHandler(
     IRepository<AbsenceEventEntity> absenceEventRepository,
     IOrganizationUsersRepository organizationUserRepository,
     IRepository<AbsenceEntity> absenceRepository,
+    IAbsenceHolidayOverlapChecker overlapChecker,
     IUser user,
     IMapper mapper
-) : IRequestHandler<RespondAbsenceEventCommand, OneOf<Success, NotFound, AccessDenied>>
+) : IRequestHandler<RespondAbsenceEventCommand, OneOf<Success, NotFound, AccessDenied, BadRequest>>
 {
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
+    private readonly IAbsenceHolidayOverlapChecker _overlapChecker = overlapChecker;
     private readonly IUser _user = user;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(RespondAbsenceEventCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, NotFound, AccessDenied, BadRequest>> Handle(RespondAbsenceEventCommand request, CancellationToken cancellationToken)
     {
         var absenceEvent = await _absenceEventRepository.GetByIdAsync(request.Id, cancellationToken);
         if (absenceEvent is null)
@@ -47,6 +49,23 @@ public class RespondAbsenceEventHandler(
 
         if (request.Accepted)
         {
+            if (absenceEvent.AbsenceEventType is AbsenceEventType.CREATE or AbsenceEventType.UPDATE)
+            {
+                if (absenceEvent.StartDate > absenceEvent.EndDate)
+                {
+                    return new BadRequest("Start date must be before end date.");
+                }
+
+                if (await _overlapChecker.AbsenceOverlapsHolidayAsync(
+                    absenceEvent.OrganizationId,
+                    absenceEvent.StartDate,
+                    absenceEvent.EndDate,
+                    cancellationToken))
+                {
+                    return new BadRequest("Absence overlaps a holiday.");
+                }
+            }
+
             switch (absenceEvent.AbsenceEventType)
             {
                 case AbsenceEventType.CREATE:
@@ -107,4 +126,4 @@ public class RespondAbsenceEventHandler(
 
         _absenceRepository.Delete(absence);
     }
-} 
+}

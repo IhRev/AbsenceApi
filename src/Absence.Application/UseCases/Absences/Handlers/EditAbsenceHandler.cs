@@ -17,6 +17,7 @@ internal class EditAbsenceHandler(
     IUser user,
     IRepository<AbsenceEventEntity> absenceEventRepository,
     IOrganizationUsersRepository organizationUserRepository,
+    IAbsenceHolidayOverlapChecker overlapChecker,
     IMapper mapper
 ) : IRequestHandler<EditAbsenceCommand, OneOf<Success<string>, NotFound, BadRequest, AccessDenied>>
 {
@@ -24,6 +25,7 @@ internal class EditAbsenceHandler(
     private readonly IRepository<AbsenceTypeEntity> _absenceTypeRepository = absenceTypeRepository;
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
+    private readonly IAbsenceHolidayOverlapChecker _overlapChecker = overlapChecker;
     private readonly IMapper _mapper = mapper;
     private readonly IUser _user = user;
 
@@ -50,6 +52,21 @@ internal class EditAbsenceHandler(
         {
             return new AccessDenied();
         }
+
+        if (request.Absence.StartDate > request.Absence.EndDate)
+        {
+            return new BadRequest("Start date must be before end date.");
+        }
+
+        if (await _overlapChecker.AbsenceOverlapsHolidayAsync(
+            absence.OrganizationId,
+            request.Absence.StartDate,
+            request.Absence.EndDate,
+            cancellationToken))
+        {
+            return new BadRequest("Absence overlaps a holiday.");
+        }
+
         if (organizationUser.IsAdmin)
         {
             if (absence.AbsenceTypeId != request.Absence.Type)

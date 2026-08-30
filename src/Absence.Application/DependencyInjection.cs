@@ -1,6 +1,6 @@
 ﻿using Absence.Application.Common.Adapters;
 using Absence.Application.Common.Interfaces;
-using Absence.Domain.Interfaces;
+using Absence.Application.Common.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -17,7 +17,8 @@ public static class DependencyInjection
             .AddAutoMapper(Assembly.GetExecutingAssembly());
 
         services
-            .AddScoped<IRandomGenerator, RandomGenerator>();
+            .AddScoped<IRandomGenerator, RandomGenerator>()
+            .AddScoped<IAbsenceHolidayOverlapChecker, AbsenceHolidayOverlapChecker>();
 
         return services;
     }

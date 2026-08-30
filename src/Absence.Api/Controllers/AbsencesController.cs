@@ -87,7 +87,8 @@ public class AbsencesController(ISender sender) : ControllerBase
         return response.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
-            accessDenied => Forbid()
+            accessDenied => Forbid(),
+            badRequest => BadRequest(badRequest.Message)
         );
     }
 } 

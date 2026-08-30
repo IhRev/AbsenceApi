@@ -42,7 +42,8 @@ public class HolidaysController(ISender sender) : ControllerBase
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
-            accessDenied => Forbid()
+            accessDenied => Forbid(),
+            badRequest => BadRequest(badRequest.Message)
         );
     }
 
