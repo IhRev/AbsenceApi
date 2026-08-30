@@ -14,18 +14,18 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 internal class AddAbsenceHandler(
     IRepository<AbsenceEntity> absenceRepository, 
     IRepository<AbsenceTypeEntity> absenceTypesRepository, 
-    IRepository<AbsenceEventTypeEntity> absenceEventTypeRepository,
     IRepository<AbsenceEventEntity> absenceEventRepository,
     IOrganizationUsersRepository organizationUserRepository,
+    IAbsenceHolidayOverlapChecker overlapChecker,
     IMapper mapper,
     IUser user
 ) : IRequestHandler<AddAbsenceCommand, OneOf<Success<int>, Success<string>, BadRequest>>
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
     private readonly IRepository<AbsenceTypeEntity> _absenceTypesRepository = absenceTypesRepository;
-    private readonly IRepository<AbsenceEventTypeEntity> _absenceEventTypeRepository = absenceEventTypeRepository;
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
+    private readonly IAbsenceHolidayOverlapChecker _overlapChecker = overlapChecker;
     private readonly IMapper _mapper = mapper;
     private readonly IUser _user = user;
 
@@ -49,6 +49,20 @@ internal class AddAbsenceHandler(
             return new BadRequest($"No absence type with id {request.Absence.Type} found.");
         }
 
+        if (request.Absence.StartDate > request.Absence.EndDate)
+        {
+            return new BadRequest("Start date must be before end date.");
+        }
+
+        if (await _overlapChecker.AbsenceOverlapsHolidayAsync(
+            request.Absence.Organization,
+            request.Absence.StartDate,
+            request.Absence.EndDate,
+            cancellationToken))
+        {
+            return new BadRequest("Absence overlaps a holiday.");
+        }
+
         if (organizationUser.IsAdmin)
         {
             var absence = _mapper.Map<AbsenceEntity>(request.Absence);
@@ -61,13 +75,7 @@ internal class AddAbsenceHandler(
         {
             var absenceEvent = _mapper.Map<AbsenceEventEntity>(request.Absence);
             absenceEvent.UserId = _user.ShortId;
-            var eventType = await _absenceEventTypeRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.Name == AbsenceEventType.CREATE)
-                ],
-                cancellationToken
-            );
-            absenceEvent.AbsenceEventTypeId = eventType!.Id;
+            absenceEvent.AbsenceEventType = AbsenceEventType.CREATE;
             await _absenceEventRepository.InsertAsync(absenceEvent, cancellationToken);
             await _absenceEventRepository.SaveAsync(cancellationToken);
             return new Success<string>("Absence create requested.");

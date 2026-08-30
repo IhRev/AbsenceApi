@@ -14,13 +14,15 @@ internal class AddHolidayHandler(
     IRepository<HolidayEntity> holidayRepository,
     IMapper mapper,
     IUser user,
-    IRepository<OrganizationUserEntity> organizationUserRepository
+    IRepository<OrganizationUserEntity> organizationUserRepository,
+    IAbsenceHolidayOverlapChecker overlapChecker
 ) : IRequestHandler<AddHolidayCommand, OneOf<Success<int>, BadRequest, AccessDenied>>
 {
     private readonly IRepository<HolidayEntity> _holidayRepository = holidayRepository;
     private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
     private readonly IMapper _mapper = mapper;
     private readonly IUser _user = user;
+    private readonly IAbsenceHolidayOverlapChecker _overlapChecker = overlapChecker;
 
     public async Task<OneOf<Success<int>, BadRequest, AccessDenied>> Handle(AddHolidayCommand request, CancellationToken cancellationToken)
     {
@@ -38,6 +40,14 @@ internal class AddHolidayHandler(
         if (!organizationUser.IsAdmin)
         {
             return new AccessDenied();
+        }
+
+        if (await _overlapChecker.HolidayOverlapsAbsenceAsync(
+            request.Holiday.OrganizationId,
+            request.Holiday.Date,
+            cancellationToken))
+        {
+            return new BadRequest("Holiday overlaps an existing absence.");
         }
 
         var holiday = _mapper.Map<HolidayEntity>(request.Holiday);

@@ -36,26 +36,39 @@ internal class JwtService(IOptions<JwtConfiguration> jwtConfiguration) : IJwtSer
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
         var tokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience = false,
-            ValidateIssuer = false,
+            ValidateAudience = true,
+            ValidateIssuer = true,
             ValidateLifetime = false,
             ValidateIssuerSigningKey = true,
+            ValidIssuer = _jwtConfiguration.Issuer,
+            ValidAudience = _jwtConfiguration.Audience,
             IssuerSigningKey = GetSigningKey()
         };
 
-        var principal = new JwtSecurityTokenHandler().ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-
-        if (securityToken is not JwtSecurityToken jwtSecurityToken ||
-           !jwtSecurityToken.Header.Alg.Equals(ALGORITHM, StringComparison.InvariantCultureIgnoreCase))
+        try
         {
-            throw new SecurityTokenException("Invalid token");
-        }
+            var principal = new JwtSecurityTokenHandler().ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
 
-        return principal;
+            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
+               !jwtSecurityToken.Header.Alg.Equals(ALGORITHM, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return null;
+            }
+
+            return principal;
+        }
+        catch (SecurityTokenException)
+        {
+            return null;
+        }
+        catch (ArgumentException)
+        {
+            return null;
+        }
     }
 
     private SymmetricSecurityKey GetSigningKey() => 

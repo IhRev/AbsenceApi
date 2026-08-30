@@ -14,7 +14,6 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 internal class DeleteAbsenceHandler(
     IRepository<AbsenceEntity> absenceRepository,
     IOrganizationUsersRepository organizationUserRepository,
-    IRepository<AbsenceEventTypeEntity> absenceEventTypeRepository,
     IRepository<AbsenceEventEntity> absenceEventRepository,
     IUser user,
     IMapper mapper
@@ -22,7 +21,6 @@ internal class DeleteAbsenceHandler(
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-    private readonly IRepository<AbsenceEventTypeEntity> _absenceEventTypeRepository = absenceEventTypeRepository;
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
     private readonly IUser _user = user;
     private readonly IMapper _mapper = mapper;
@@ -46,7 +44,11 @@ internal class DeleteAbsenceHandler(
             ],
             cancellationToken
         );
-        if (organizationUser!.IsAdmin)
+        if (organizationUser is null)
+        {
+            return new AccessDenied();
+        }
+        if (organizationUser.IsAdmin)
         {
             _absenceRepository.Delete(absence);
             await _absenceRepository.SaveAsync(cancellationToken);
@@ -55,13 +57,7 @@ internal class DeleteAbsenceHandler(
         else
         {
             var absenceEvent = _mapper.Map<AbsenceEventEntity>(absence);
-            var eventType = await _absenceEventTypeRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.Name == AbsenceEventType.DELETE)
-                ],
-                cancellationToken
-            );
-            absenceEvent.AbsenceEventTypeId = eventType!.Id;
+            absenceEvent.AbsenceEventType = AbsenceEventType.DELETE;
             await _absenceEventRepository.InsertAsync(absenceEvent, cancellationToken);
             await _absenceEventRepository.SaveAsync(cancellationToken);
             return new Success<string>("Absence delete requested.");

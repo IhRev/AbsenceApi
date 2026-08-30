@@ -13,21 +13,21 @@ namespace Absence.Application.UseCases.Absences.Handlers;
 
 public class RespondAbsenceEventHandler(
     IRepository<AbsenceEventEntity> absenceEventRepository,
-    IRepository<AbsenceEventTypeEntity> absenceEventTypesRepository,
     IOrganizationUsersRepository organizationUserRepository,
     IRepository<AbsenceEntity> absenceRepository,
+    IAbsenceHolidayOverlapChecker overlapChecker,
     IUser user,
     IMapper mapper
-) : IRequestHandler<RespondAbsenceEventCommand, OneOf<Success, NotFound, AccessDenied>>
+) : IRequestHandler<RespondAbsenceEventCommand, OneOf<Success, NotFound, AccessDenied, BadRequest>>
 {
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
-    private readonly IRepository<AbsenceEventTypeEntity> _absenceEventTypesRepository = absenceEventTypesRepository;
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
+    private readonly IAbsenceHolidayOverlapChecker _overlapChecker = overlapChecker;
     private readonly IUser _user = user;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(RespondAbsenceEventCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, NotFound, AccessDenied, BadRequest>> Handle(RespondAbsenceEventCommand request, CancellationToken cancellationToken)
     {
         var absenceEvent = await _absenceEventRepository.GetByIdAsync(request.Id, cancellationToken);
         if (absenceEvent is null)
@@ -49,8 +49,24 @@ public class RespondAbsenceEventHandler(
 
         if (request.Accepted)
         {
-            var eventType = await _absenceEventTypesRepository.GetByIdAsync(absenceEvent.AbsenceEventTypeId, cancellationToken);
-            switch (eventType!.Name)
+            if (absenceEvent.AbsenceEventType is AbsenceEventType.CREATE or AbsenceEventType.UPDATE)
+            {
+                if (absenceEvent.StartDate > absenceEvent.EndDate)
+                {
+                    return new BadRequest("Start date must be before end date.");
+                }
+
+                if (await _overlapChecker.AbsenceOverlapsHolidayAsync(
+                    absenceEvent.OrganizationId,
+                    absenceEvent.StartDate,
+                    absenceEvent.EndDate,
+                    cancellationToken))
+                {
+                    return new BadRequest("Absence overlaps a holiday.");
+                }
+            }
+
+            switch (absenceEvent.AbsenceEventType)
             {
                 case AbsenceEventType.CREATE:
                     await AddAbsence(absenceEvent, cancellationToken);
@@ -62,7 +78,7 @@ public class RespondAbsenceEventHandler(
                     await DeleteAbsence(absenceEvent, cancellationToken);
                     break;
                 default:
-                    throw new ArgumentException($"Incorrect event type id {absenceEvent.AbsenceEventTypeId}");
+                    throw new ArgumentException($"Incorrect event type {absenceEvent.AbsenceEventType}");
             }
             await _absenceRepository.SaveAsync(cancellationToken);
         }
@@ -80,14 +96,34 @@ public class RespondAbsenceEventHandler(
 
     private async Task UpdateAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
     {
-        var absence = await _absenceRepository.GetByIdAsync(absenceEvent.AbsenceId!, cancellationToken);
+        if (absenceEvent.AbsenceId is not int absenceId)
+        {
+            return;
+        }
+
+        var absence = await _absenceRepository.GetByIdAsync(absenceId, cancellationToken);
+        if (absence is null)
+        {
+            return;
+        }
+
         absence = _mapper.Map(absenceEvent, absence);
-        _absenceRepository.Update(absence!);
+        _absenceRepository.Update(absence);
     }
 
     private async Task DeleteAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
     {
-        var absence = await _absenceRepository.GetByIdAsync(absenceEvent.AbsenceId!, cancellationToken);
-        _absenceRepository.Delete(absence!);
+        if (absenceEvent.AbsenceId is not int absenceId)
+        {
+            return;
+        }
+
+        var absence = await _absenceRepository.GetByIdAsync(absenceId, cancellationToken);
+        if (absence is null)
+        {
+            return;
+        }
+
+        _absenceRepository.Delete(absence);
     }
-} 
+}

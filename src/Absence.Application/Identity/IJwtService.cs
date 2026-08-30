@@ -7,5 +7,5 @@ public interface IJwtService
 {
     string GenerateToken(UserEntity user);
 
-    ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
 }

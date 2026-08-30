@@ -15,17 +15,17 @@ internal class EditAbsenceHandler(
     IRepository<AbsenceEntity> absenceRepository, 
     IRepository<AbsenceTypeEntity> absenceTypeRepository,
     IUser user,
-    IRepository<AbsenceEventTypeEntity> absenceEventTypeRepository,
     IRepository<AbsenceEventEntity> absenceEventRepository,
     IOrganizationUsersRepository organizationUserRepository,
+    IAbsenceHolidayOverlapChecker overlapChecker,
     IMapper mapper
 ) : IRequestHandler<EditAbsenceCommand, OneOf<Success<string>, NotFound, BadRequest, AccessDenied>>
 {
     private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
     private readonly IRepository<AbsenceTypeEntity> _absenceTypeRepository = absenceTypeRepository;
-    private readonly IRepository<AbsenceEventTypeEntity> _absenceEventTypeRepository = absenceEventTypeRepository;
     private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
     private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
+    private readonly IAbsenceHolidayOverlapChecker _overlapChecker = overlapChecker;
     private readonly IMapper _mapper = mapper;
     private readonly IUser _user = user;
 
@@ -48,7 +48,26 @@ internal class EditAbsenceHandler(
             ],
             cancellationToken
         );
-        if (organizationUser!.IsAdmin)
+        if (organizationUser is null)
+        {
+            return new AccessDenied();
+        }
+
+        if (request.Absence.StartDate > request.Absence.EndDate)
+        {
+            return new BadRequest("Start date must be before end date.");
+        }
+
+        if (await _overlapChecker.AbsenceOverlapsHolidayAsync(
+            absence.OrganizationId,
+            request.Absence.StartDate,
+            request.Absence.EndDate,
+            cancellationToken))
+        {
+            return new BadRequest("Absence overlaps a holiday.");
+        }
+
+        if (organizationUser.IsAdmin)
         {
             if (absence.AbsenceTypeId != request.Absence.Type)
             {
@@ -69,13 +88,7 @@ internal class EditAbsenceHandler(
         else
         {
             var absenceEvent = _mapper.Map<AbsenceEventEntity>(request.Absence);
-            var eventType = await _absenceEventTypeRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.Name == AbsenceEventType.CREATE)
-                ],
-                cancellationToken
-            );
-            absenceEvent.AbsenceEventTypeId = eventType!.Id;
+            absenceEvent.AbsenceEventType = AbsenceEventType.UPDATE;
             absenceEvent.OrganizationId = organizationUser.OrganizationId;
             absenceEvent.UserId = organizationUser.UserId;
             await _absenceEventRepository.InsertAsync(absenceEvent, cancellationToken);

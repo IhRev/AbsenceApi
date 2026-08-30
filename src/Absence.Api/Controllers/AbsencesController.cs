@@ -15,7 +15,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     private readonly ISender _sender = sender;
 
     [HttpGet("/organizations/{organizationId}/absences")]
-    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
     {
         var response = await _sender.Send(new GetUserAbsencesQuery(startDate, endDate, organizationId));
         return response.Match<ActionResult>(
@@ -25,7 +25,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     }
 
     [HttpPost("/organizations/{organizationId}/absences")]
-    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> GetByUserIds([FromRoute] int organizationId, [FromBody] List<int> userIds, [FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> GetByUserIds([FromRoute] int organizationId, [FromBody] List<int> userIds, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
     {
         var response = await _sender.Send(new GetUsersAbsencesQuery(startDate, endDate, organizationId, userIds));
         return response.Match<ActionResult>(
@@ -87,7 +87,8 @@ public class AbsencesController(ISender sender) : ControllerBase
         return response.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
-            accessDenied => Forbid()
+            accessDenied => Forbid(),
+            badRequest => BadRequest(badRequest.Message)
         );
     }
 } 

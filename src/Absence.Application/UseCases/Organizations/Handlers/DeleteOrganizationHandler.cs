@@ -14,13 +14,13 @@ public class DeleteOrganizationHandler(
     IUser user,
     IRepository<OrganizationEntity> organizationRepository,
     IUserService userService
-) : IRequestHandler<DeleteOrganizationCommand, OneOf<Success, AccessDenied, NotFound>>
+) : IRequestHandler<DeleteOrganizationCommand, OneOf<Success, NotFound, AccessDenied>>
 {
     private readonly IUser _user = user;
     private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
     private readonly IUserService _userService = userService;
 
-    public async Task<OneOf<Success, AccessDenied, NotFound>> Handle(DeleteOrganizationCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(DeleteOrganizationCommand request, CancellationToken cancellationToken)
     {
         var user = await _userService.FindByIdAsync(_user.Id);
         if (!await _userService.CheckPasswordAsync(user!, request.Request.Password))

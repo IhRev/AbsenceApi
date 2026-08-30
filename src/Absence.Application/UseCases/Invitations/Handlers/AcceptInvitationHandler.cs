@@ -37,9 +37,17 @@ internal class AcceptInvitationHandler(
 
         if (request.Accespted)
         {
-            var organizationUser = _mapper.Map<OrganizationUserEntity>(invitation);
-            await _organizationUserRepository.InsertAsync(organizationUser, cancellationToken);
-            await _organizationUserRepository.SaveAsync(cancellationToken);
+            var existingMembership = await _organizationUserRepository.GetFirstOrDefaultAsync(
+                [
+                    q => q.Where(_ => _.OrganizationId == invitation.OrganizationId && _.UserId == _user.ShortId)
+                ],
+                cancellationToken
+            );
+            if (existingMembership is null)
+            {
+                var organizationUser = _mapper.Map<OrganizationUserEntity>(invitation);
+                await _organizationUserRepository.InsertAsync(organizationUser, cancellationToken);
+            }
         }
 
         _organizationUserInvitationRepository.Delete(invitation);

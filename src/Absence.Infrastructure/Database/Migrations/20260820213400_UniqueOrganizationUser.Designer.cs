@@ -4,6 +4,7 @@ using Absence.Infrastructure.Database.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Absence.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(AbsenceContext))]
-    partial class AbsenceContextModelSnapshot : ModelSnapshot
+    [Migration("20260820213400_UniqueOrganizationUser")]
+    partial class UniqueOrganizationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,9 +72,8 @@ namespace Absence.Infrastructure.Database.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AbsenceEventType")
-                        .HasColumnType("int")
-                        .HasColumnName("AbsenceEventTypeId");
+                    b.Property<int>("AbsenceEventTypeId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("AbsenceId")
                         .HasColumnType("int");
@@ -98,11 +100,30 @@ namespace Absence.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AbsenceEventTypeId");
+
                     b.HasIndex("OrganizationId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("AbsenceEvents");
+                });
+
+            modelBuilder.Entity("Absence.Domain.Entities.AbsenceEventTypeEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AbsenceEventTypes");
                 });
 
             modelBuilder.Entity("Absence.Domain.Entities.AbsenceTypeEntity", b =>
@@ -482,6 +503,12 @@ namespace Absence.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Absence.Domain.Entities.AbsenceEventEntity", b =>
                 {
+                    b.HasOne("Absence.Domain.Entities.AbsenceEventTypeEntity", "AbsenceEventType")
+                        .WithMany("AbsenceEvents")
+                        .HasForeignKey("AbsenceEventTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Absence.Domain.Entities.OrganizationEntity", "Organization")
                         .WithMany("AbsenceEvents")
                         .HasForeignKey("OrganizationId")
@@ -494,6 +521,8 @@ namespace Absence.Infrastructure.Database.Migrations
                         .HasPrincipalKey("ShortId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AbsenceEventType");
 
                     b.Navigation("Organization");
 
@@ -621,6 +650,11 @@ namespace Absence.Infrastructure.Database.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Absence.Domain.Entities.AbsenceEventTypeEntity", b =>
+                {
+                    b.Navigation("AbsenceEvents");
                 });
 
             modelBuilder.Entity("Absence.Domain.Entities.AbsenceTypeEntity", b =>

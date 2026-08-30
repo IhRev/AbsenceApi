@@ -4,17 +4,20 @@ using MediatR;
 using OneOf.Types;
 using OneOf;
 using Absence.Application.Common.Interfaces;
+using Absence.Domain.Entities;
 using Absence.Domain.Interfaces;
 
 namespace Absence.Application.UseCases.Organizations.Handlers;
 
 public class ChangeMemberAccessHandler(
     IUser user,
-    IOrganizationUsersRepository organizationUsersRepository
+    IOrganizationUsersRepository organizationUsersRepository,
+    IRepository<OrganizationEntity> organizationRepository
 ) : IRequestHandler<ChangeMemberAccessCommand, OneOf<Success, NotFound, AccessDenied, BadRequest>>
 {
     private readonly IUser _user = user;
     private readonly IOrganizationUsersRepository _organizationUsersRepository = organizationUsersRepository;
+    private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
 
     public async Task<OneOf<Success, NotFound, AccessDenied, BadRequest>> Handle(ChangeMemberAccessCommand request, CancellationToken cancellationToken)
     {
@@ -33,6 +36,12 @@ public class ChangeMemberAccessHandler(
             return new AccessDenied();
         }
 
+        var organization = await _organizationRepository.GetByIdAsync(request.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            return new NotFound();
+        }
+
         var organizationUser = await _organizationUsersRepository.GetFirstOrDefaultAsync(
             [
                 q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == request.UserId)
@@ -42,6 +51,10 @@ public class ChangeMemberAccessHandler(
         if (organizationUser is null)
         {
             return new BadRequest($"User with id {request.UserId} doesn't belong to organization.");
+        }
+        if (organizationUser.UserId == organization.OwnerId)
+        {
+            return new BadRequest("Cannot change the organization owner's access.");
         }
 
         if (organizationUser.IsAdmin == request.IsAdmin)
