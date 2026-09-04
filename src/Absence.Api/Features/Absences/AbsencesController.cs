@@ -17,7 +17,7 @@ public class AbsencesController(ISender sender) : ControllerBase
         var response = await _sender.Send(new GetUserAbsences.Query(startDate, endDate, organizationId));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message)
+            notFound => NotFound()
         );
     }
 
@@ -27,7 +27,7 @@ public class AbsencesController(ISender sender) : ControllerBase
         var response = await _sender.Send(new GetUsersAbsences.Query(startDate, endDate, organizationId, userIds));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message),
+            notFound => NotFound(),
             accessDenied => Forbid()
         );
     }
@@ -39,6 +39,7 @@ public class AbsencesController(ISender sender) : ControllerBase
         return response.Match<ActionResult>(
             successCreated => Ok(successCreated.Value),
             successRequested => Ok(new { Message = successRequested.Value }),
+            notFound => NotFound(),
             badRequest => BadRequest(badRequest.Message)
         );
     }
@@ -72,7 +73,7 @@ public class AbsencesController(ISender sender) : ControllerBase
         var response = await _sender.Send(new GetAbsenceEvents.Query(organizationId));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(),
+            notFound => NotFound(),
             accessDenied => Forbid()
         );
     }

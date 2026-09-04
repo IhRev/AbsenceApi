@@ -21,7 +21,7 @@ public static class RespondAbsenceEvent
     internal sealed class Handler(
         AbsenceContext db,
         IAbsenceHolidayOverlapChecker overlapChecker,
-        IUser user
+        IOrganizationAccess organizationAccess
     ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied, BadRequest>>
     {
         public async Task<OneOf<Success, NotFound, AccessDenied, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
@@ -32,12 +32,12 @@ public static class RespondAbsenceEvent
                 return new NotFound();
             }
 
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == absenceEvent.OrganizationId,
-                cancellationToken);
-            if (organizationUser is null || !organizationUser.IsAdmin)
+            var access = await organizationAccess.RequireAdminAsync(absenceEvent.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out var denied))
             {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success, NotFound, AccessDenied, BadRequest>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
             if (request.Accepted)

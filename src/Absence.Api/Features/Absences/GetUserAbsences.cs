@@ -1,5 +1,4 @@
 using Absence.Api.Common.Interfaces;
-using Absence.Api.Common.Results;
 using Absence.Infrastructure.Database.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +10,7 @@ namespace Absence.Api.Features.Absences;
 public static class GetUserAbsences
 {
     public sealed class Query(DateTimeOffset startDate, DateTimeOffset endDate, int organizationId)
-        : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>>
+        : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound>>
     {
         public DateTimeOffset StartDate { get; } = startDate;
         public DateTimeOffset EndDate { get; } = endDate;
@@ -20,17 +19,16 @@ public static class GetUserAbsences
 
     internal sealed class Handler(
         AbsenceContext db,
+        IOrganizationAccess organizationAccess,
         IUser user
-    ) : IRequestHandler<Query, OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>>
+    ) : IRequestHandler<Query, OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound>>
     {
-        public async Task<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == request.OrganizationId,
-                cancellationToken);
-            if (organizationUser is null)
+            var access = await organizationAccess.RequireMemberAsync(request.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out _))
             {
-                return new BadRequest($"No organization with id {request.OrganizationId} found.");
+                return new NotFound();
             }
 
             var absences = await db.Absences

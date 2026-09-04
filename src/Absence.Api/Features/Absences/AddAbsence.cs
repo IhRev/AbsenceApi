@@ -27,7 +27,7 @@ public class CreateAbsenceDTO
 
 public static class AddAbsence
 {
-    public sealed class Command(CreateAbsenceDTO absence) : IRequest<OneOf<Success<int>, Success<string>, BadRequest>>
+    public sealed class Command(CreateAbsenceDTO absence) : IRequest<OneOf<Success<int>, Success<string>, NotFound, BadRequest>>
     {
         public CreateAbsenceDTO Absence { get; } = absence;
     }
@@ -35,17 +35,16 @@ public static class AddAbsence
     internal sealed class Handler(
         AbsenceContext db,
         IAbsenceHolidayOverlapChecker overlapChecker,
+        IOrganizationAccess organizationAccess,
         IUser user
-    ) : IRequestHandler<Command, OneOf<Success<int>, Success<string>, BadRequest>>
+    ) : IRequestHandler<Command, OneOf<Success<int>, Success<string>, NotFound, BadRequest>>
     {
-        public async Task<OneOf<Success<int>, Success<string>, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<int>, Success<string>, NotFound, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == request.Absence.Organization,
-                cancellationToken);
-            if (organizationUser is null)
+            var access = await organizationAccess.RequireMemberAsync(request.Absence.Organization, cancellationToken);
+            if (!access.TryPickT0(out var organizationUser, out _))
             {
-                return new BadRequest($"No organization with id {request.Absence.Organization} found.");
+                return new NotFound();
             }
 
             var absenceType = await db.AbsenceTypes.FirstOrDefaultAsync(

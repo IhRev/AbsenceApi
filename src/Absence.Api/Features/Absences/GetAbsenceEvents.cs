@@ -10,28 +10,24 @@ namespace Absence.Api.Features.Absences;
 
 public static class GetAbsenceEvents
 {
-    public sealed class Query(int organizationId) : IRequest<OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest, AccessDenied>>
+    public sealed class Query(int organizationId) : IRequest<OneOf<Success<IEnumerable<AbsenceEventDTO>>, NotFound, AccessDenied>>
     {
         public int OrganizationId { get; } = organizationId;
     }
 
     internal sealed class Handler(
         AbsenceContext db,
-        IUser user
-    ) : IRequestHandler<Query, OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest, AccessDenied>>
+        IOrganizationAccess organizationAccess
+    ) : IRequestHandler<Query, OneOf<Success<IEnumerable<AbsenceEventDTO>>, NotFound, AccessDenied>>
     {
-        public async Task<OneOf<Success<IEnumerable<AbsenceEventDTO>>, BadRequest, AccessDenied>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<IEnumerable<AbsenceEventDTO>>, NotFound, AccessDenied>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == request.OrganizationId,
-                cancellationToken);
-            if (organizationUser is null)
+            var access = await organizationAccess.RequireAdminAsync(request.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out var denied))
             {
-                return new BadRequest($"No organization with id {request.OrganizationId} found.");
-            }
-            if (!organizationUser.IsAdmin)
-            {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success<IEnumerable<AbsenceEventDTO>>, NotFound, AccessDenied>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
             var events = await db.AbsenceEvents

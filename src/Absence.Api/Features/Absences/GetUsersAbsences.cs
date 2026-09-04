@@ -11,7 +11,7 @@ namespace Absence.Api.Features.Absences;
 public static class GetUsersAbsences
 {
     public sealed class Query(DateTimeOffset startDate, DateTimeOffset endDate, int organizationId, List<int> userIds)
-        : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>>
+        : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound, AccessDenied>>
     {
         public DateTimeOffset StartDate { get; } = startDate;
         public DateTimeOffset EndDate { get; } = endDate;
@@ -21,21 +21,17 @@ public static class GetUsersAbsences
 
     internal sealed class Handler(
         AbsenceContext db,
-        IUser user
-    ) : IRequestHandler<Query, OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>>
+        IOrganizationAccess organizationAccess
+    ) : IRequestHandler<Query, OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound, AccessDenied>>
     {
-        public async Task<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound, AccessDenied>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == request.OrganizationId,
-                cancellationToken);
-            if (organizationUser is null)
+            var access = await organizationAccess.RequireAdminAsync(request.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out var denied))
             {
-                return new BadRequest($"No organization with id {request.OrganizationId} found.");
-            }
-            if (!organizationUser.IsAdmin)
-            {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound, AccessDenied>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
             var absences = await db.Absences

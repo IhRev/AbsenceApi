@@ -12,11 +12,11 @@ namespace Absence.Api.Common.Interfaces;
 /// </summary>
 public interface IOrganizationAccess
 {
-    Task<OneOf<Success<OrganizationUserEntity>, NotFound>> RequireMemberAsync(
+    Task<OneOf<OrganizationUserEntity, NotFound>> RequireMemberAsync(
         int organizationId,
         CancellationToken cancellationToken = default);
 
-    Task<OneOf<Success<OrganizationUserEntity>, NotFound, AccessDenied>> RequireAdminAsync(
+    Task<OneOf<OrganizationUserEntity, NotFound, AccessDenied>> RequireAdminAsync(
         int organizationId,
         CancellationToken cancellationToken = default);
 }

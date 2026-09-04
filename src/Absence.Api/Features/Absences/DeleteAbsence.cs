@@ -19,6 +19,7 @@ public static class DeleteAbsence
 
     internal sealed class Handler(
         AbsenceContext db,
+        IOrganizationAccess organizationAccess,
         IUser user
     ) : IRequestHandler<Command, OneOf<Success<string>, NotFound, AccessDenied>>
     {
@@ -34,12 +35,10 @@ public static class DeleteAbsence
                 return new AccessDenied();
             }
 
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == absence.OrganizationId,
-                cancellationToken);
-            if (organizationUser is null)
+            var access = await organizationAccess.RequireMemberAsync(absence.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out var organizationUser, out _))
             {
-                return new AccessDenied();
+                return new NotFound();
             }
             if (organizationUser.IsAdmin)
             {

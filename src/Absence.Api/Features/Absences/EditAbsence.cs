@@ -35,6 +35,7 @@ public static class EditAbsence
     internal sealed class Handler(
         AbsenceContext db,
         IUser user,
+        IOrganizationAccess organizationAccess,
         IAbsenceHolidayOverlapChecker overlapChecker
     ) : IRequestHandler<Command, OneOf<Success<string>, NotFound, BadRequest, AccessDenied>>
     {
@@ -50,12 +51,10 @@ public static class EditAbsence
                 return new AccessDenied();
             }
 
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == absence.OrganizationId,
-                cancellationToken);
-            if (organizationUser is null)
+            var access = await organizationAccess.RequireMemberAsync(absence.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out var organizationUser, out _))
             {
-                return new AccessDenied();
+                return new NotFound();
             }
 
             if (request.Absence.StartDate > request.Absence.EndDate)
