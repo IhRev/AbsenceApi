@@ -22,7 +22,7 @@ public class InviteUserToOrganizationDTO
 
 public static class InviteUser
 {
-    public sealed class Command(InviteUserToOrganizationDTO invite) : IRequest<OneOf<Success, BadRequest, AccessDenied>>
+    public sealed class Command(InviteUserToOrganizationDTO invite) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>
     {
         public InviteUserToOrganizationDTO Invite { get; } = invite;
     }
@@ -30,25 +30,18 @@ public static class InviteUser
     internal sealed class Handler(
         AbsenceContext db,
         IUserService userService,
+        IOrganizationAccess organizationAccess,
         IUser user
-    ) : IRequestHandler<Command, OneOf<Success, BadRequest, AccessDenied>>
+    ) : IRequestHandler<Command, OneOf<Success, NotFound, BadRequest, AccessDenied>>
     {
-        public async Task<OneOf<Success, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success, NotFound, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var organization = await db.Organizations.FirstOrDefaultAsync(
-                _ => _.Id == request.Invite.OrganizationId,
-                cancellationToken);
-            if (organization is null)
+            var access = await organizationAccess.RequireAdminAsync(request.Invite.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out var denied))
             {
-                return new BadRequest($"Organization with id {request.Invite.OrganizationId} doesn't exist.");
-            }
-
-            var inviterOrganization = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.OrganizationId == request.Invite.OrganizationId && _.UserId == user.ShortId,
-                cancellationToken);
-            if (inviterOrganization is null || !inviterOrganization.IsAdmin)
-            {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success, NotFound, BadRequest, AccessDenied>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
             var invitedUser = await userService.FindByEmailAsync(request.Invite.UserEmail);

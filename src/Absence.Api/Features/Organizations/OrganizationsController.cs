@@ -24,7 +24,7 @@ public class OrganizationsController(ISender sender) : ControllerBase
         var result = await _sender.Send(new GetOrganizationMembers.Query(organizationId));
         return result.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message)
+            notFound => NotFound()
         );
     }
 

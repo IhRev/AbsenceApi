@@ -18,22 +18,18 @@ public static class ChangeMemberAccess
     }
 
     internal sealed class Handler(
-        IUser user,
+        IOrganizationAccess organizationAccess,
         AbsenceContext db
     ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied, BadRequest>>
     {
         public async Task<OneOf<Success, NotFound, AccessDenied, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var organizationOwner = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.OrganizationId == request.OrganizationId && _.UserId == user.ShortId,
-                cancellationToken);
-            if (organizationOwner is null)
+            var access = await organizationAccess.RequireAdminAsync(request.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out var denied))
             {
-                return new NotFound();
-            }
-            if (!organizationOwner.IsAdmin)
-            {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success, NotFound, AccessDenied, BadRequest>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
             var organization = await db.Organizations.FirstOrDefaultAsync(

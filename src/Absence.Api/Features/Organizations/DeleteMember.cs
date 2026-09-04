@@ -17,22 +17,18 @@ public static class DeleteMember
     }
 
     internal sealed class Handler(
-        IUser user,
+        IOrganizationAccess organizationAccess,
         AbsenceContext db
     ) : IRequestHandler<Command, OneOf<Success, NotFound, BadRequest, AccessDenied>>
     {
         public async Task<OneOf<Success, NotFound, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var organizationOwner = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.OrganizationId == request.OrganizationId && _.UserId == user.ShortId,
-                cancellationToken);
-            if (organizationOwner is null)
+            var access = await organizationAccess.RequireAdminAsync(request.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out var denied))
             {
-                return new NotFound();
-            }
-            if (!organizationOwner.IsAdmin)
-            {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success, NotFound, BadRequest, AccessDenied>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
             var organization = await db.Organizations.FirstOrDefaultAsync(

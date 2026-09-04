@@ -24,6 +24,7 @@ public class InvitationsController(ISender sender) : ControllerBase
         var response = await _sender.Send(new InviteUser.Command(ivitation));
         return response.Match<ActionResult>(
             success => Ok(),
+            notFound => NotFound(),
             badRequest => BadRequest(badRequest.Message),
             accessDenied => Forbid()
         );
@@ -35,7 +36,7 @@ public class InvitationsController(ISender sender) : ControllerBase
         var response = await _sender.Send(new AcceptInvitation.Command(initationId, accepted));
         return response.Match<ActionResult>(
             success => Ok(),
-            badRequest => NotFound(),
+            notFound => NotFound(),
             accessDenied => Forbid()
         );
     }

@@ -1,5 +1,4 @@
 using Absence.Api.Common.Interfaces;
-using Absence.Api.Common.Results;
 using Absence.Infrastructure.Database.Contexts;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,24 +9,22 @@ namespace Absence.Api.Features.Organizations;
 
 public static class GetOrganizationMembers
 {
-    public sealed class Query(int organizationId) : IRequest<OneOf<Success<IEnumerable<MemberDTO>>, BadRequest>>
+    public sealed class Query(int organizationId) : IRequest<OneOf<Success<IEnumerable<MemberDTO>>, NotFound>>
     {
         public int OrganizationId { get; } = organizationId;
     }
 
     internal sealed class Handler(
         AbsenceContext db,
-        IUser user
-    ) : IRequestHandler<Query, OneOf<Success<IEnumerable<MemberDTO>>, BadRequest>>
+        IOrganizationAccess organizationAccess
+    ) : IRequestHandler<Query, OneOf<Success<IEnumerable<MemberDTO>>, NotFound>>
     {
-        public async Task<OneOf<Success<IEnumerable<MemberDTO>>, BadRequest>> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<IEnumerable<MemberDTO>>, NotFound>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == request.OrganizationId,
-                cancellationToken);
-            if (organizationUser is null)
+            var access = await organizationAccess.RequireMemberAsync(request.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out _))
             {
-                return new BadRequest($"No organization with id {request.OrganizationId} found.");
+                return new NotFound();
             }
 
             var organizationUsers = await db.OrganizationUsers
