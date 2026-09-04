@@ -17,7 +17,7 @@ public static class DeleteHoliday
 
     internal sealed class Handler(
         AbsenceContext db,
-        IUser user
+        IOrganizationAccess organizationAccess
     ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied>>
     {
         public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
@@ -28,16 +28,12 @@ public static class DeleteHoliday
                 return new NotFound();
             }
 
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == holiday.OrganizationId,
-                cancellationToken);
-            if (organizationUser is null)
+            var access = await organizationAccess.RequireAdminAsync(holiday.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out var denied))
             {
-                return new NotFound();
-            }
-            if (!organizationUser.IsAdmin)
-            {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success, NotFound, AccessDenied>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
             db.Holidays.Remove(holiday);

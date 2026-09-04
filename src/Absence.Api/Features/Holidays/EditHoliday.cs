@@ -28,7 +28,7 @@ public static class EditHoliday
 
     internal sealed class Handler(
         AbsenceContext db,
-        IUser user,
+        IOrganizationAccess organizationAccess,
         IAbsenceHolidayOverlapChecker overlapChecker
     ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied, BadRequest>>
     {
@@ -40,16 +40,12 @@ public static class EditHoliday
                 return new NotFound();
             }
 
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == holiday.OrganizationId,
-                cancellationToken);
-            if (organizationUser is null)
+            var access = await organizationAccess.RequireAdminAsync(holiday.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out var denied))
             {
-                return new NotFound();
-            }
-            if (!organizationUser.IsAdmin)
-            {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success, NotFound, AccessDenied, BadRequest>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
             if (await overlapChecker.HolidayOverlapsAbsenceAsync(

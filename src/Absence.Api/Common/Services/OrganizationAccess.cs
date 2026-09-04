@@ -10,7 +10,7 @@ namespace Absence.Api.Common.Services;
 
 internal class OrganizationAccess(AbsenceContext db, IUser user) : IOrganizationAccess
 {
-    public async Task<OneOf<Success<OrganizationUserEntity>, NotFound, AccessDenied>> RequireMemberAsync(
+    public async Task<OneOf<Success<OrganizationUserEntity>, NotFound>> RequireMemberAsync(
         int organizationId,
         CancellationToken cancellationToken = default)
     {

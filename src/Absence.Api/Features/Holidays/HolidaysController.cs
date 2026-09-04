@@ -17,7 +17,7 @@ public class HolidaysController(ISender sender) : ControllerBase
         var response = await _sender.Send(new GetHolidays.Query(organizationId, startDate, endDate));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
-            badRequest => BadRequest(badRequest.Message)
+            notFound => NotFound()
         );
     }
 
@@ -27,6 +27,7 @@ public class HolidaysController(ISender sender) : ControllerBase
         var response = await _sender.Send(new AddHoliday.Command(holiday));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
+            notFound => NotFound(),
             badRequest => BadRequest(badRequest.Message),
             accessDenied => Forbid()
         );

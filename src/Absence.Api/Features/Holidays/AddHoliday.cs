@@ -22,29 +22,25 @@ public class CreateHolidayDTO
 
 public static class AddHoliday
 {
-    public sealed class Command(CreateHolidayDTO holiday) : IRequest<OneOf<Success<int>, BadRequest, AccessDenied>>
+    public sealed class Command(CreateHolidayDTO holiday) : IRequest<OneOf<Success<int>, NotFound, BadRequest, AccessDenied>>
     {
         public CreateHolidayDTO Holiday { get; } = holiday;
     }
 
     internal sealed class Handler(
         AbsenceContext db,
-        IUser user,
+        IOrganizationAccess organizationAccess,
         IAbsenceHolidayOverlapChecker overlapChecker
-    ) : IRequestHandler<Command, OneOf<Success<int>, BadRequest, AccessDenied>>
+    ) : IRequestHandler<Command, OneOf<Success<int>, NotFound, BadRequest, AccessDenied>>
     {
-        public async Task<OneOf<Success<int>, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<int>, NotFound, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == user.ShortId && _.OrganizationId == request.Holiday.OrganizationId,
-                cancellationToken);
-            if (organizationUser is null)
+            var access = await organizationAccess.RequireAdminAsync(request.Holiday.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out var denied))
             {
-                return new BadRequest($"No organization with id {request.Holiday.OrganizationId} found.");
-            }
-            if (!organizationUser.IsAdmin)
-            {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success<int>, NotFound, BadRequest, AccessDenied>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
             if (await overlapChecker.HolidayOverlapsAbsenceAsync(
