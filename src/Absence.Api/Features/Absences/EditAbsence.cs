@@ -51,7 +51,7 @@ public static class EditAbsence
             }
 
             var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
-                _ => _.UserId == absence.UserId && _.OrganizationId == absence.OrganizationId,
+                _ => _.UserId == user.ShortId && _.OrganizationId == absence.OrganizationId,
                 cancellationToken);
             if (organizationUser is null)
             {
@@ -72,16 +72,17 @@ public static class EditAbsence
                 return new BadRequest("Absence overlaps a holiday.");
             }
 
+            if (absence.AbsenceTypeId != request.Absence.Type)
+            {
+                var typeExists = await db.AbsenceTypes.AnyAsync(_ => _.Id == request.Absence.Type, cancellationToken);
+                if (!typeExists)
+                {
+                    return new BadRequest($"Type with id {request.Absence.Type} doesn't exist");
+                }
+            }
+
             if (organizationUser.IsAdmin)
             {
-                if (absence.AbsenceTypeId != request.Absence.Type)
-                {
-                    var typeExists = await db.AbsenceTypes.AnyAsync(_ => _.Id == request.Absence.Type, cancellationToken);
-                    if (!typeExists)
-                    {
-                        return new BadRequest($"Type with id {request.Absence.Type} doesn't exist");
-                    }
-                }
                 absence.Name = request.Absence.Name;
                 absence.AbsenceTypeId = request.Absence.Type;
                 absence.StartDate = request.Absence.StartDate;
@@ -99,8 +100,8 @@ public static class EditAbsence
                 StartDate = request.Absence.StartDate,
                 EndDate = request.Absence.EndDate,
                 AbsenceEventType = AbsenceEventType.UPDATE,
-                OrganizationId = organizationUser.OrganizationId,
-                UserId = organizationUser.UserId
+                OrganizationId = absence.OrganizationId,
+                UserId = absence.UserId
             };
             db.AbsenceEvents.Add(absenceEvent);
             await db.SaveChangesAsync(cancellationToken);

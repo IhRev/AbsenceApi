@@ -57,23 +57,36 @@ public static class RespondAbsenceEvent
                     {
                         return new BadRequest("Absence overlaps a holiday.");
                     }
+
+                    var typeExists = await db.AbsenceTypes.AnyAsync(
+                        _ => _.Id == absenceEvent.AbsenceTypeId,
+                        cancellationToken);
+                    if (!typeExists)
+                    {
+                        return new BadRequest($"Type with id {absenceEvent.AbsenceTypeId} doesn't exist");
+                    }
                 }
 
                 switch (absenceEvent.AbsenceEventType)
                 {
                     case AbsenceEventType.CREATE:
-                        await AddAbsence(absenceEvent, cancellationToken);
+                        AddAbsence(absenceEvent);
                         break;
                     case AbsenceEventType.UPDATE:
-                        await UpdateAbsence(absenceEvent, cancellationToken);
+                        if (!await UpdateAbsence(absenceEvent, cancellationToken))
+                        {
+                            return new BadRequest("The absence this event refers to no longer exists.");
+                        }
                         break;
                     case AbsenceEventType.DELETE:
-                        await DeleteAbsence(absenceEvent, cancellationToken);
+                        if (!await DeleteAbsence(absenceEvent, cancellationToken))
+                        {
+                            return new BadRequest("The absence this event refers to no longer exists.");
+                        }
                         break;
                     default:
-                        throw new ArgumentException($"Incorrect event type {absenceEvent.AbsenceEventType}");
+                        return new BadRequest($"Unsupported event type {absenceEvent.AbsenceEventType}.");
                 }
-                await db.SaveChangesAsync(cancellationToken);
             }
 
             db.AbsenceEvents.Remove(absenceEvent);
@@ -81,8 +94,7 @@ public static class RespondAbsenceEvent
             return new Success();
         }
 
-        private Task AddAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
-        {
+        private void AddAbsence(AbsenceEventEntity absenceEvent) =>
             db.Absences.Add(new AbsenceEntity
             {
                 Name = absenceEvent.Name,
@@ -92,20 +104,18 @@ public static class RespondAbsenceEvent
                 UserId = absenceEvent.UserId,
                 OrganizationId = absenceEvent.OrganizationId
             });
-            return Task.CompletedTask;
-        }
 
-        private async Task UpdateAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
+        private async Task<bool> UpdateAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
         {
             if (absenceEvent.AbsenceId is not int absenceId)
             {
-                return;
+                return false;
             }
 
             var absence = await db.Absences.FirstOrDefaultAsync(_ => _.Id == absenceId, cancellationToken);
             if (absence is null)
             {
-                return;
+                return false;
             }
 
             absence.Name = absenceEvent.Name;
@@ -114,22 +124,24 @@ public static class RespondAbsenceEvent
             absence.AbsenceTypeId = absenceEvent.AbsenceTypeId;
             absence.UserId = absenceEvent.UserId;
             absence.OrganizationId = absenceEvent.OrganizationId;
+            return true;
         }
 
-        private async Task DeleteAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
+        private async Task<bool> DeleteAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
         {
             if (absenceEvent.AbsenceId is not int absenceId)
             {
-                return;
+                return false;
             }
 
             var absence = await db.Absences.FirstOrDefaultAsync(_ => _.Id == absenceId, cancellationToken);
             if (absence is null)
             {
-                return;
+                return false;
             }
 
             db.Absences.Remove(absence);
+            return true;
         }
     }
 }
