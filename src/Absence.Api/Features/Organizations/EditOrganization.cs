@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
-using Absence.Infrastructure.Database.Repositories;
-using Absence.Infrastructure.Entities;
+using Absence.Infrastructure.Database.Contexts;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -25,21 +25,18 @@ public static class EditOrganization
     }
 
     internal sealed class Handler(
-        IRepository<OrganizationEntity> organizationRepository,
+        AbsenceContext db,
         IUser user
     ) : IRequestHandler<Command, OneOf<Success, NotFound, BadRequest, AccessDenied>>
     {
-        private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
-        private readonly IUser _user = user;
-
         public async Task<OneOf<Success, NotFound, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var organization = await _organizationRepository.GetByIdAsync(request.Organization.Id);
+            var organization = await db.Organizations.FirstOrDefaultAsync(_ => _.Id == request.Organization.Id, cancellationToken);
             if (organization is null)
             {
                 return new NotFound();
             }
-            if (organization.OwnerId != _user.ShortId)
+            if (organization.OwnerId != user.ShortId)
             {
                 return new AccessDenied();
             }
@@ -50,8 +47,7 @@ public static class EditOrganization
             }
 
             organization.Name = request.Organization.Name;
-            _organizationRepository.Update(organization);
-            await _organizationRepository.SaveAsync(cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
 
             return new Success();
         }

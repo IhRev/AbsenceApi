@@ -4,7 +4,6 @@ using Absence.Api.Common.Results;
 using Absence.Infrastructure.Common;
 using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Entities;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
@@ -36,7 +35,6 @@ public static class AddAbsence
     internal sealed class Handler(
         AbsenceContext db,
         IAbsenceHolidayOverlapChecker overlapChecker,
-        IMapper mapper,
         IUser user
     ) : IRequestHandler<Command, OneOf<Success<int>, Success<string>, BadRequest>>
     {
@@ -74,16 +72,30 @@ public static class AddAbsence
 
             if (organizationUser.IsAdmin)
             {
-                var absence = mapper.Map<AbsenceEntity>(request.Absence);
-                absence.UserId = user.ShortId;
+                var absence = new AbsenceEntity
+                {
+                    Name = request.Absence.Name,
+                    AbsenceTypeId = request.Absence.Type,
+                    OrganizationId = request.Absence.Organization,
+                    StartDate = request.Absence.StartDate,
+                    EndDate = request.Absence.EndDate,
+                    UserId = user.ShortId
+                };
                 db.Absences.Add(absence);
                 await db.SaveChangesAsync(cancellationToken);
                 return new Success<int>(absence.Id);
             }
 
-            var absenceEvent = mapper.Map<AbsenceEventEntity>(request.Absence);
-            absenceEvent.UserId = user.ShortId;
-            absenceEvent.AbsenceEventType = AbsenceEventType.CREATE;
+            var absenceEvent = new AbsenceEventEntity
+            {
+                Name = request.Absence.Name,
+                AbsenceTypeId = request.Absence.Type,
+                OrganizationId = request.Absence.Organization,
+                StartDate = request.Absence.StartDate,
+                EndDate = request.Absence.EndDate,
+                UserId = user.ShortId,
+                AbsenceEventType = AbsenceEventType.CREATE
+            };
             db.AbsenceEvents.Add(absenceEvent);
             await db.SaveChangesAsync(cancellationToken);
             return new Success<string>("Absence create requested.");

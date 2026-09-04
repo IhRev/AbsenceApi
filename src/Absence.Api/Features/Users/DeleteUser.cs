@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
-using Absence.Infrastructure.Database.Repositories;
-using Absence.Infrastructure.Entities;
+using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Identity;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -26,34 +26,27 @@ public static class DeleteUser
     internal sealed class Handler(
         IUserService userService,
         IUser user,
-        IRepository<OrganizationEntity> organizationRepository
+        AbsenceContext db
     ) : IRequestHandler<Command, OneOf<Success, BadRequest>>
     {
-        private readonly IUserService _userService = userService;
-        private readonly IUser _user = user;
-        private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
-
         public async Task<OneOf<Success, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var user = await _userService.FindByIdAsync(_user.Id);
+            var identityUser = await userService.FindByIdAsync(user.Id);
 
-            if (!await _userService.CheckPasswordAsync(user!, request.Request.Password))
+            if (!await userService.CheckPasswordAsync(identityUser!, request.Request.Password))
             {
                 return new BadRequest("Password is invalid.");
             }
 
-            var ownedOrganization = await _organizationRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.OwnerId == _user.ShortId)
-                ],
-                cancellationToken
-            );
+            var ownedOrganization = await db.Organizations.FirstOrDefaultAsync(
+                _ => _.OwnerId == user.ShortId,
+                cancellationToken);
             if (ownedOrganization is not null)
             {
                 return new BadRequest("Transfer or delete owned organizations first.");
             }
 
-            await _userService.DeleteAsync(user!);
+            await userService.DeleteAsync(identityUser!);
 
             return new Success();
         }

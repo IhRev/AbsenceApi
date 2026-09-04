@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
-using Absence.Infrastructure.Database.Repositories;
+using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Entities;
-using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -28,28 +28,16 @@ public static class AddHoliday
     }
 
     internal sealed class Handler(
-        IRepository<HolidayEntity> holidayRepository,
-        IMapper mapper,
+        AbsenceContext db,
         IUser user,
-        IRepository<OrganizationUserEntity> organizationUserRepository,
         IAbsenceHolidayOverlapChecker overlapChecker
     ) : IRequestHandler<Command, OneOf<Success<int>, BadRequest, AccessDenied>>
     {
-        private readonly IRepository<HolidayEntity> _holidayRepository = holidayRepository;
-        private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
-        private readonly IMapper _mapper = mapper;
-        private readonly IUser _user = user;
-        private readonly IAbsenceHolidayOverlapChecker _overlapChecker = overlapChecker;
-
         public async Task<OneOf<Success<int>, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
-               [
-                   q => q.Where(_ => _.UserId == _user.ShortId),
-                    q => q.Where(_ => _.OrganizationId == request.Holiday.OrganizationId)
-               ],
-               cancellationToken
-            );
+            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
+                _ => _.UserId == user.ShortId && _.OrganizationId == request.Holiday.OrganizationId,
+                cancellationToken);
             if (organizationUser is null)
             {
                 return new BadRequest($"No organization with id {request.Holiday.OrganizationId} found.");
@@ -59,7 +47,7 @@ public static class AddHoliday
                 return new AccessDenied();
             }
 
-            if (await _overlapChecker.HolidayOverlapsAbsenceAsync(
+            if (await overlapChecker.HolidayOverlapsAbsenceAsync(
                 request.Holiday.OrganizationId,
                 request.Holiday.Date,
                 cancellationToken))
@@ -67,9 +55,14 @@ public static class AddHoliday
                 return new BadRequest("Holiday overlaps an existing absence.");
             }
 
-            var holiday = _mapper.Map<HolidayEntity>(request.Holiday);
-            await _holidayRepository.InsertAsync(holiday, cancellationToken);
-            await _holidayRepository.SaveAsync(cancellationToken);
+            var holiday = new HolidayEntity
+            {
+                Name = request.Holiday.Name,
+                Date = request.Holiday.Date,
+                OrganizationId = request.Holiday.OrganizationId
+            };
+            db.Holidays.Add(holiday);
+            await db.SaveChangesAsync(cancellationToken);
             return new Success<int>(holiday.Id);
         }
     }

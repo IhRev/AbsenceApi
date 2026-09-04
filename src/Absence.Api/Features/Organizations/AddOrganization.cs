@@ -1,8 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Absence.Api.Common.Interfaces;
-using Absence.Infrastructure.Database.Repositories;
+using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Entities;
-using AutoMapper;
 using MediatR;
 
 namespace Absence.Api.Features.Organizations;
@@ -21,26 +20,24 @@ public static class AddOrganization
     }
 
     internal sealed class Handler(
-        IRepository<OrganizationEntity> organizationRepository,
-        IMapper mapper,
+        AbsenceContext db,
         IUser user
     ) : IRequestHandler<Command, int>
     {
-        private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
-        private readonly IMapper _mapper = mapper;
-        private readonly IUser _user = user;
-
         public async Task<int> Handle(Command request, CancellationToken cancellationToken)
         {
-            var organization = _mapper.Map<OrganizationEntity>(request.Organization);
-            organization.OwnerId = _user.ShortId;
+            var organization = new OrganizationEntity
+            {
+                Name = request.Organization.Name,
+                OwnerId = user.ShortId
+            };
             organization.OrganizationsUsers.Add(new OrganizationUserEntity()
             {
                 IsAdmin = true,
-                UserId = _user.ShortId
+                UserId = user.ShortId
             });
-            await _organizationRepository.InsertAsync(organization, cancellationToken);
-            await _organizationRepository.SaveAsync(cancellationToken);
+            db.Organizations.Add(organization);
+            await db.SaveChangesAsync(cancellationToken);
 
             return organization.Id;
         }

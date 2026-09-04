@@ -1,7 +1,6 @@
-using Absence.Infrastructure.Database.Repositories;
-using Absence.Infrastructure.Entities;
-using AutoMapper;
+using Absence.Infrastructure.Database.Contexts;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Absence.Api.Features.AbsenceTypes;
 
@@ -15,16 +14,18 @@ public static class GetAbsenceTypes
 {
     public sealed class Query : IRequest<IEnumerable<AbsenceTypeDTO>>;
 
-    internal sealed class Handler(IRepository<AbsenceTypeEntity> absenceTypeRepository, IMapper mapper)
+    internal sealed class Handler(AbsenceContext db)
         : IRequestHandler<Query, IEnumerable<AbsenceTypeDTO>>
     {
-        private readonly IRepository<AbsenceTypeEntity> _absenceTypeRepository = absenceTypeRepository;
-        private readonly IMapper _mapper = mapper;
-
         public async Task<IEnumerable<AbsenceTypeDTO>> Handle(Query request, CancellationToken cancellationToken = default)
         {
-            var absenceTypes = await _absenceTypeRepository.GetAsync(cancellationToken: cancellationToken);
-            return _mapper.Map<IEnumerable<AbsenceTypeDTO>>(absenceTypes);
+            return await db.AbsenceTypes
+                .Select(_ => new AbsenceTypeDTO
+                {
+                    Id = _.Id,
+                    Name = _.Name
+                })
+                .ToListAsync(cancellationToken);
         }
     }
 }

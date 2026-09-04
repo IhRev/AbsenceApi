@@ -4,7 +4,6 @@ using Absence.Api.Common.Results;
 using Absence.Infrastructure.Common;
 using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Entities;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
@@ -36,8 +35,7 @@ public static class EditAbsence
     internal sealed class Handler(
         AbsenceContext db,
         IUser user,
-        IAbsenceHolidayOverlapChecker overlapChecker,
-        IMapper mapper
+        IAbsenceHolidayOverlapChecker overlapChecker
     ) : IRequestHandler<Command, OneOf<Success<string>, NotFound, BadRequest, AccessDenied>>
     {
         public async Task<OneOf<Success<string>, NotFound, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
@@ -84,16 +82,26 @@ public static class EditAbsence
                         return new BadRequest($"Type with id {request.Absence.Type} doesn't exist");
                     }
                 }
-                mapper.Map(request.Absence, absence);
+                absence.Name = request.Absence.Name;
+                absence.AbsenceTypeId = request.Absence.Type;
+                absence.StartDate = request.Absence.StartDate;
+                absence.EndDate = request.Absence.EndDate;
                 await db.SaveChangesAsync(cancellationToken);
 
                 return new Success<string>("Absence updated.");
             }
 
-            var absenceEvent = mapper.Map<AbsenceEventEntity>(request.Absence);
-            absenceEvent.AbsenceEventType = AbsenceEventType.UPDATE;
-            absenceEvent.OrganizationId = organizationUser.OrganizationId;
-            absenceEvent.UserId = organizationUser.UserId;
+            var absenceEvent = new AbsenceEventEntity
+            {
+                Name = request.Absence.Name,
+                AbsenceId = request.Absence.Id,
+                AbsenceTypeId = request.Absence.Type,
+                StartDate = request.Absence.StartDate,
+                EndDate = request.Absence.EndDate,
+                AbsenceEventType = AbsenceEventType.UPDATE,
+                OrganizationId = organizationUser.OrganizationId,
+                UserId = organizationUser.UserId
+            };
             db.AbsenceEvents.Add(absenceEvent);
             await db.SaveChangesAsync(cancellationToken);
             return new Success<string>("Absence update requested.");

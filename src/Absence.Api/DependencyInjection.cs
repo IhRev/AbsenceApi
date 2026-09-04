@@ -24,9 +24,6 @@ public static class DependencyInjection
             .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
 
         services
-            .AddAutoMapper(assembly);
-
-        services
             .AddEndpointsApiExplorer();
 
         services

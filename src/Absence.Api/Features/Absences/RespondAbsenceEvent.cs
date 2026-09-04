@@ -3,7 +3,6 @@ using Absence.Api.Common.Results;
 using Absence.Infrastructure.Common;
 using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Entities;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
@@ -22,8 +21,7 @@ public static class RespondAbsenceEvent
     internal sealed class Handler(
         AbsenceContext db,
         IAbsenceHolidayOverlapChecker overlapChecker,
-        IUser user,
-        IMapper mapper
+        IUser user
     ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied, BadRequest>>
     {
         public async Task<OneOf<Success, NotFound, AccessDenied, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
@@ -85,8 +83,15 @@ public static class RespondAbsenceEvent
 
         private Task AddAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
         {
-            var absence = mapper.Map<AbsenceEntity>(absenceEvent);
-            db.Absences.Add(absence);
+            db.Absences.Add(new AbsenceEntity
+            {
+                Name = absenceEvent.Name,
+                StartDate = absenceEvent.StartDate,
+                EndDate = absenceEvent.EndDate,
+                AbsenceTypeId = absenceEvent.AbsenceTypeId,
+                UserId = absenceEvent.UserId,
+                OrganizationId = absenceEvent.OrganizationId
+            });
             return Task.CompletedTask;
         }
 
@@ -103,7 +108,12 @@ public static class RespondAbsenceEvent
                 return;
             }
 
-            mapper.Map(absenceEvent, absence);
+            absence.Name = absenceEvent.Name;
+            absence.StartDate = absenceEvent.StartDate;
+            absence.EndDate = absenceEvent.EndDate;
+            absence.AbsenceTypeId = absenceEvent.AbsenceTypeId;
+            absence.UserId = absenceEvent.UserId;
+            absence.OrganizationId = absenceEvent.OrganizationId;
         }
 
         private async Task DeleteAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)

@@ -1,8 +1,8 @@
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
-using Absence.Infrastructure.Database.Repositories;
-using Absence.Infrastructure.Entities;
+using Absence.Infrastructure.Database.Contexts;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -16,30 +16,21 @@ public static class DeleteHoliday
     }
 
     internal sealed class Handler(
-        IRepository<HolidayEntity> holidayRepository,
-        IRepository<OrganizationUserEntity> organizationUserRepository,
+        AbsenceContext db,
         IUser user
     ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied>>
     {
-        private readonly IRepository<HolidayEntity> _holidayRepository = holidayRepository;
-        private readonly IRepository<OrganizationUserEntity> _organizationUserRepository = organizationUserRepository;
-        private readonly IUser _user = user;
-
         public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var holiday = await _holidayRepository.GetByIdAsync(request.Id);
+            var holiday = await db.Holidays.FirstOrDefaultAsync(_ => _.Id == request.Id, cancellationToken);
             if (holiday is null)
             {
                 return new NotFound();
             }
 
-            var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.UserId == _user.ShortId),
-                    q => q.Where(_ => _.OrganizationId == holiday.OrganizationId)
-                ],
-                cancellationToken
-            );
+            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
+                _ => _.UserId == user.ShortId && _.OrganizationId == holiday.OrganizationId,
+                cancellationToken);
             if (organizationUser is null)
             {
                 return new NotFound();
@@ -49,8 +40,8 @@ public static class DeleteHoliday
                 return new AccessDenied();
             }
 
-            _holidayRepository.Delete(holiday);
-            await _holidayRepository.SaveAsync(cancellationToken);
+            db.Holidays.Remove(holiday);
+            await db.SaveChangesAsync(cancellationToken);
 
             return new Success();
         }

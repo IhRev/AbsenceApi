@@ -1,7 +1,6 @@
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
 using Absence.Infrastructure.Database.Contexts;
-using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OneOf;
@@ -21,7 +20,6 @@ public static class GetUserAbsences
 
     internal sealed class Handler(
         AbsenceContext db,
-        IMapper mapper,
         IUser user
     ) : IRequestHandler<Query, OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest>>
     {
@@ -39,8 +37,17 @@ public static class GetUserAbsences
                 .Where(_ => _.UserId == user.ShortId)
                 .Where(_ => _.StartDate < request.EndDate && _.EndDate > request.StartDate)
                 .Where(_ => _.OrganizationId == request.OrganizationId)
+                .Select(_ => new AbsenceDTO
+                {
+                    Id = _.Id,
+                    Name = _.Name,
+                    Type = _.AbsenceTypeId,
+                    UserId = _.UserId,
+                    StartDate = _.StartDate,
+                    EndDate = _.EndDate
+                })
                 .ToListAsync(cancellationToken);
-            return new Success<IEnumerable<AbsenceDTO>>(mapper.Map<IEnumerable<AbsenceDTO>>(absences));
+            return new Success<IEnumerable<AbsenceDTO>>(absences);
         }
     }
 }

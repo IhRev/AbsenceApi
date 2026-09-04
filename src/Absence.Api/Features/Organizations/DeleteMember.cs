@@ -1,8 +1,8 @@
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
-using Absence.Infrastructure.Database.Repositories;
-using Absence.Infrastructure.Entities;
+using Absence.Infrastructure.Database.Contexts;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -17,23 +17,15 @@ public static class DeleteMember
     }
 
     internal sealed class Handler(
-        IUser user, 
-        IOrganizationUsersRepository organizationUsersRepository,
-        IRepository<OrganizationEntity> organizationRepository
+        IUser user,
+        AbsenceContext db
     ) : IRequestHandler<Command, OneOf<Success, NotFound, BadRequest, AccessDenied>>
     {
-        private readonly IUser _user = user;
-        private readonly IOrganizationUsersRepository _organizationUsersRepository = organizationUsersRepository;
-        private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
-
         public async Task<OneOf<Success, NotFound, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var organizationOwner = await _organizationUsersRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == _user.ShortId)
-                ],
-                cancellationToken
-            );
+            var organizationOwner = await db.OrganizationUsers.FirstOrDefaultAsync(
+                _ => _.OrganizationId == request.OrganizationId && _.UserId == user.ShortId,
+                cancellationToken);
             if (organizationOwner is null)
             {
                 return new NotFound();
@@ -43,18 +35,17 @@ public static class DeleteMember
                 return new AccessDenied();
             }
 
-            var organization = await _organizationRepository.GetByIdAsync(request.OrganizationId, cancellationToken);
+            var organization = await db.Organizations.FirstOrDefaultAsync(
+                _ => _.Id == request.OrganizationId,
+                cancellationToken);
             if (organization is null)
             {
                 return new NotFound();
             }
 
-            var organizationUser = await _organizationUsersRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.OrganizationId == request.OrganizationId && _.UserId == request.MemberId)
-                ],
-                cancellationToken
-            );
+            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
+                _ => _.OrganizationId == request.OrganizationId && _.UserId == request.MemberId,
+                cancellationToken);
             if (organizationUser is null)
             {
                 return new BadRequest($"User with id {request.MemberId} doesn't belong to organization.");
@@ -64,8 +55,8 @@ public static class DeleteMember
                 return new BadRequest("Cannot remove the organization owner.");
             }
 
-            _organizationUsersRepository.Delete(organizationUser);
-            await _organizationUsersRepository.SaveAsync(cancellationToken);
+            db.OrganizationUsers.Remove(organizationUser);
+            await db.SaveChangesAsync(cancellationToken);
 
             return new Success();
         }

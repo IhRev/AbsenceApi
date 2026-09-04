@@ -9,7 +9,7 @@ This file applies to the whole repo. There are no nested `AGENTS.md` files.
 | Project | Role |
 |---|---|
 | `src/Absence.Api` | Host, feature slices (controller + one file per use case), shared results, `IUser` (`CurrentUser`), overlap checker, exception handler |
-| `src/Absence.Infrastructure` | EF Core (`AbsenceContext`), entities, SQL Server, Identity, JWT, repository implementations |
+| `src/Absence.Infrastructure` | EF Core (`AbsenceContext`), entities, SQL Server, Identity, JWT |
 
 Solution: `AbsenceApi.sln`. The `tests` solution folder has **no test projects**.
 
@@ -54,20 +54,19 @@ src/Absence.Api/Features/<Feature>/
   AddX.cs              // request DTO + static class AddX { Command, Handler }
   GetX.cs              // static class GetX { Query, Handler }
   SharedDto.cs         // only when several slices share a response type
-  FeatureMapping.cs    // AutoMapper profile for this feature
 ```
 
 Do not add Commands/, Queries/, Handlers/, DTOs/, or Mappings/ subfolders. Controllers stay in the feature folder, not in `Controllers/`.
 
 Existing features: `Users`, `Organizations`, `Invitations`, `Absences`, `AbsenceTypes`, `Holidays`.
 
-New handlers may inject `AbsenceContext` directly. Existing handlers still use `IRepository<T>` / specialized repos; do not add new generic repository abstractions.
+Handlers inject `AbsenceContext` directly. Do not add generic repository abstractions.
 
 ### Adding an endpoint
 
 1. Add `Features/<Feature>/<UseCase>.cs` with the request DTO (if any) and `public static class <UseCase>` containing `Command` or `Query` plus `internal Handler`.
 2. Put shared response DTOs next to slices in the feature folder (not a DTOs/ subfolder).
-3. Update or add the feature AutoMapper `Profile` in the same folder when mapping entities.
+3. Map entities to DTOs in the handler (`Select` for reads, object initializers / property assignment for writes). Do not add a mapper library.
 4. Add a thin action on the feature controller: `Send(new <UseCase>.Command(...))` then map the result to HTTP.
 
 Controllers: `[ApiController]`, primary constructor with `ISender`, `[Authorize]` except `auth/login`, `auth/register`, `auth/refresh_token`. Routes are lowercase; multi-word segments use snake_case (`refresh_token`, `change_password`, `event_types`). Some absence/holiday GETs use absolute routes like `/organizations/{organizationId}/absences`. Do not rewrite endpoints as Minimal APIs.
@@ -87,7 +86,8 @@ Do not throw for expected business failures. Unexpected exceptions go through `G
 
 - Entities implement `IIdKeyed<TId>` and live in `Absence.Infrastructure/Entities`.
 - `UserEntity` extends `IdentityUser`. Identity `Id` is `string`; org/absence FKs use `int ShortId`. JWT puts ShortId in claim `shortid`. Inject `IUser` in handlers (`Id` vs `ShortId`).
-- Existing code uses generic `IRepository<T>` plus specialized repos (`IOrganizationUsersRepository`, `IAbsenceEventRepository`, `IOrganizationUserInvitationsRepository`). Queries are composed as `Func<IQueryable<T>, IQueryable<T>>[]`. Shared holiday overlap uses `AbsenceContext` via `IAbsenceHolidayOverlapChecker`.
+- Handlers query `AbsenceContext` `DbSet`s with LINQ. Shared holiday/absence overlap uses `AbsenceContext` via `IAbsenceHolidayOverlapChecker`.
+- Do not add generic `IRepository<T>` or specialized repository wrappers.
 - EF configs inherit `EntityConfiguration<TEntity, TId>` and live in `Infrastructure/Database/Configurations`. Migrations in `Infrastructure/Database/Migrations`. After model changes, add a migration; do not edit the snapshot by hand unless fixing a broken migration.
 
 ### Absence approval
@@ -97,10 +97,10 @@ Org **admins** persist absences immediately. Non-admins create `AbsenceEventEnti
 ## Code style
 
 - `net9.0`, nullable enabled, implicit usings, file-scoped namespaces.
-- Primary constructors; handlers still assign to `private readonly` fields.
+- Primary constructors; handlers use constructor parameters directly.
 - LINQ/EF lambdas commonly use `_` as the entity parameter (`_ => _.Name`).
-- Slice `Handler` types and AutoMapper profiles are `internal`.
-- MediatR, AutoMapper, and OneOf sit on **Api**. EF, Identity, and JWT sit on **Infrastructure**.
+- Slice `Handler` types are `internal`.
+- MediatR and OneOf sit on **Api**. EF, Identity, and JWT sit on **Infrastructure**.
 
 ## Do not
 

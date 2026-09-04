@@ -1,7 +1,7 @@
 using Absence.Api.Common.Interfaces;
-using Absence.Infrastructure.Database.Repositories;
-using AutoMapper;
+using Absence.Infrastructure.Database.Contexts;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Absence.Api.Features.Organizations;
 
@@ -10,25 +10,22 @@ public static class GetUserOrganizations
     public sealed class Query : IRequest<IEnumerable<OrganizationDTO>>;
 
     internal sealed class Handler(
-        IOrganizationUsersRepository organizationUserRepository,
-        IMapper mapper,
+        AbsenceContext db,
         IUser user
     ) : IRequestHandler<Query, IEnumerable<OrganizationDTO>>
     {
-        private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-        private readonly IMapper _mapper = mapper;
-        private readonly IUser _user = user;
-
         public async Task<IEnumerable<OrganizationDTO>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var organizationUserEntities = await _organizationUserRepository.GetAsync(
-                [
-                    q => q.Where(_ => _.UserId == _user.ShortId)
-                ],
-                cancellationToken
-            );
-
-            return _mapper.Map<IEnumerable<OrganizationDTO>>(organizationUserEntities, opts => opts.Items["UserId"] = _user.ShortId);
+            return await db.OrganizationUsers
+                .Where(_ => _.UserId == user.ShortId)
+                .Select(_ => new OrganizationDTO
+                {
+                    Id = _.OrganizationId,
+                    Name = _.Organization.Name,
+                    IsAdmin = _.IsAdmin,
+                    IsOwner = user.ShortId == _.Organization.OwnerId
+                })
+                .ToListAsync(cancellationToken);
         }
     }
 }

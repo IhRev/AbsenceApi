@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
-using Absence.Infrastructure.Database.Repositories;
-using Absence.Infrastructure.Entities;
+using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Identity;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -26,34 +26,30 @@ public static class DeleteOrganization
 
     internal sealed class Handler(
         IUser user,
-        IRepository<OrganizationEntity> organizationRepository,
+        AbsenceContext db,
         IUserService userService
     ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied>>
     {
-        private readonly IUser _user = user;
-        private readonly IRepository<OrganizationEntity> _organizationRepository = organizationRepository;
-        private readonly IUserService _userService = userService;
-
         public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var user = await _userService.FindByIdAsync(_user.Id);
-            if (!await _userService.CheckPasswordAsync(user!, request.Request.Password))
+            var identityUser = await userService.FindByIdAsync(user.Id);
+            if (!await userService.CheckPasswordAsync(identityUser!, request.Request.Password))
             {
                 return new AccessDenied();
             }
 
-            var organization = await _organizationRepository.GetByIdAsync(request.Id, cancellationToken);
+            var organization = await db.Organizations.FirstOrDefaultAsync(_ => _.Id == request.Id, cancellationToken);
             if (organization is null)
             {
                 return new NotFound();
             }
-            if (organization.OwnerId != _user.ShortId)
+            if (organization.OwnerId != user.ShortId)
             {
                 return new AccessDenied();
             }
 
-            _organizationRepository.Delete(organization);
-            await _organizationRepository.SaveAsync(cancellationToken);
+            db.Organizations.Remove(organization);
+            await db.SaveChangesAsync(cancellationToken);
 
             return new Success();
         }

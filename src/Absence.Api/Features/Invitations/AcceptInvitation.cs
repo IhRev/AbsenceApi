@@ -1,9 +1,9 @@
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
-using Absence.Infrastructure.Database.Repositories;
+using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Entities;
-using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -18,47 +18,43 @@ public static class AcceptInvitation
     }
 
     internal sealed class Handler(
-        IRepository<OrganizationUserInvitationEntity> organizationUserInvitationRepository,
-        IOrganizationUsersRepository organizationUserRepository,
-        IUser user,
-        IMapper mapper
+        AbsenceContext db,
+        IUser user
     ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied>>
     {
-        private readonly IRepository<OrganizationUserInvitationEntity> _organizationUserInvitationRepository = organizationUserInvitationRepository;
-        private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-        private readonly IUser _user = user;
-        private readonly IMapper _mapper = mapper;
-
         public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var invitation = await _organizationUserInvitationRepository.GetByIdAsync(request.Id, cancellationToken);
+            var invitation = await db.OrganizationUserInvitations.FirstOrDefaultAsync(
+                _ => _.Id == request.Id,
+                cancellationToken);
             if (invitation is null)
             {
                 return new NotFound();
             }
 
-            if (invitation.Invited != _user.ShortId)
+            if (invitation.Invited != user.ShortId)
             {
                 return new AccessDenied();
             }
 
             if (request.Accespted)
             {
-                var existingMembership = await _organizationUserRepository.GetFirstOrDefaultAsync(
-                    [
-                        q => q.Where(_ => _.OrganizationId == invitation.OrganizationId && _.UserId == _user.ShortId)
-                    ],
-                    cancellationToken
-                );
+                var existingMembership = await db.OrganizationUsers.FirstOrDefaultAsync(
+                    _ => _.OrganizationId == invitation.OrganizationId && _.UserId == user.ShortId,
+                    cancellationToken);
                 if (existingMembership is null)
                 {
-                    var organizationUser = _mapper.Map<OrganizationUserEntity>(invitation);
-                    await _organizationUserRepository.InsertAsync(organizationUser, cancellationToken);
+                    db.OrganizationUsers.Add(new OrganizationUserEntity
+                    {
+                        OrganizationId = invitation.OrganizationId,
+                        UserId = invitation.Invited,
+                        IsAdmin = false
+                    });
                 }
             }
 
-            _organizationUserInvitationRepository.Delete(invitation);
-            await _organizationUserInvitationRepository.SaveAsync(cancellationToken);
+            db.OrganizationUserInvitations.Remove(invitation);
+            await db.SaveChangesAsync(cancellationToken);
 
             return new Success();
         }
