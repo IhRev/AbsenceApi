@@ -1,6 +1,4 @@
-﻿using Absence.Application.Common.Interfaces;
-using Absence.Application.Identity;
-using Absence.Domain.Entities;
+using Absence.Infrastructure.Entities;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using System.Text;

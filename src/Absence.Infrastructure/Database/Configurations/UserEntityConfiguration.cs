@@ -1,4 +1,4 @@
-﻿using Absence.Domain.Entities;
+using Absence.Infrastructure.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

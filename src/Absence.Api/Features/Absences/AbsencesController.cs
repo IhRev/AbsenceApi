@@ -1,0 +1,91 @@
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Absence.Api.Features.Absences;
+
+[Authorize]
+[ApiController]
+[Route("absences")]
+public class AbsencesController(ISender sender) : ControllerBase
+{
+    private readonly ISender _sender = sender;
+
+    [HttpGet("/organizations/{organizationId}/absences")]
+    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
+    {
+        var response = await _sender.Send(new GetUserAbsences.Query(startDate, endDate, organizationId));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            badRequest => BadRequest(badRequest.Message)
+        );
+    }
+
+    [HttpPost("/organizations/{organizationId}/absences")]
+    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> GetByUserIds([FromRoute] int organizationId, [FromBody] List<int> userIds, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
+    {
+        var response = await _sender.Send(new GetUsersAbsences.Query(startDate, endDate, organizationId, userIds));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            badRequest => BadRequest(badRequest.Message),
+            accessDenied => Forbid()
+        );
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<int>> Add([FromBody] CreateAbsenceDTO absence)
+    {
+        var response = await _sender.Send(new AddAbsence.Command(absence));
+        return response.Match<ActionResult>(
+            successCreated => Ok(successCreated.Value),
+            successRequested => Ok(new { Message = successRequested.Value }),
+            badRequest => BadRequest(badRequest.Message)
+        );
+    }
+
+    [HttpPut]
+    public async Task<ActionResult<string>> Edit([FromBody] EditAbsenceDTO absence)
+    {
+        var result = await _sender.Send(new EditAbsence.Command(absence));
+        return result.Match<ActionResult>(
+            success => Ok(new { Message = success.Value }),
+            notFound => NotFound(),
+            badRequest => BadRequest(badRequest.Message),
+            accessDenied => Forbid()
+        );
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<string>> Delete([FromRoute] int id)
+    {
+        var result = await _sender.Send(new DeleteAbsence.Command(id));
+        return result.Match<ActionResult>(
+            success => Ok(new { Message = success.Value }),
+            notFound => NotFound(),
+            accessDenied => Forbid()
+        );
+    }
+
+    [HttpGet("/organizations/{organizationId}/absences/events")]
+    public async Task<ActionResult<IEnumerable<AbsenceEventDTO>>> GetEvents([FromRoute] int organizationId)
+    {
+        var response = await _sender.Send(new GetAbsenceEvents.Query(organizationId));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            badRequest => BadRequest(),
+            accessDenied => Forbid()
+        );
+    }
+
+    [HttpPost("events/{eventId}")]
+    public async Task<ActionResult> Respond([FromRoute] int eventId, [FromQuery] bool accepted)
+    {
+        var response = await _sender.Send(new RespondAbsenceEvent.Command(eventId, accepted));
+        return response.Match<ActionResult>(
+            success => Ok(),
+            notFound => NotFound(),
+            accessDenied => Forbid(),
+            badRequest => BadRequest(badRequest.Message)
+        );
+    }
+}

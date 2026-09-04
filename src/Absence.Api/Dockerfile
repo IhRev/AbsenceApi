@@ -9,8 +9,6 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Absence.Api/Absence.Api.csproj", "src/Absence.Api/"]
 COPY ["src/Absence.Infrastructure/Absence.Infrastructure.csproj", "src/Absence.Infrastructure/"]
-COPY ["src/Absence.Application/Absence.Application.csproj", "src/Absence.Application/"]
-COPY ["src/Absence.Domain/Absence.Domain.csproj", "src/Absence.Domain/"]
 RUN dotnet restore "./src/Absence.Api/Absence.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Absence.Api"

@@ -1,6 +1,4 @@
-﻿using Absence.Application.Common.Constants;
-using Absence.Application.Identity;
-using Absence.Domain.Entities;
+using Absence.Infrastructure.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

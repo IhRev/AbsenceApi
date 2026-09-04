@@ -1,4 +1,4 @@
-﻿using Absence.Domain.Entities;
+using Absence.Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

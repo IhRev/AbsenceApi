@@ -1,5 +1,5 @@
-﻿using Absence.Domain.Entities;
-using Absence.Domain.Interfaces;
+using Absence.Infrastructure.Entities;
+using Absence.Infrastructure.Database.Repositories;
 using Absence.Infrastructure.Database.Contexts;
 using Microsoft.EntityFrameworkCore;
 

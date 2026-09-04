@@ -1,0 +1,66 @@
+using Absence.Api.Common.Interfaces;
+using Absence.Api.Common.Results;
+using Absence.Infrastructure.Database.Repositories;
+using Absence.Infrastructure.Entities;
+using AutoMapper;
+using MediatR;
+using OneOf;
+using OneOf.Types;
+
+namespace Absence.Api.Features.Invitations;
+
+public static class AcceptInvitation
+{
+    public sealed class Command(int id, bool accespted) : IRequest<OneOf<Success, NotFound, AccessDenied>>
+    {
+        public int Id { get; } = id;
+        public bool Accespted { get; } = accespted;
+    }
+
+    internal sealed class Handler(
+        IRepository<OrganizationUserInvitationEntity> organizationUserInvitationRepository,
+        IOrganizationUsersRepository organizationUserRepository,
+        IUser user,
+        IMapper mapper
+    ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied>>
+    {
+        private readonly IRepository<OrganizationUserInvitationEntity> _organizationUserInvitationRepository = organizationUserInvitationRepository;
+        private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
+        private readonly IUser _user = user;
+        private readonly IMapper _mapper = mapper;
+
+        public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
+        {
+            var invitation = await _organizationUserInvitationRepository.GetByIdAsync(request.Id, cancellationToken);
+            if (invitation is null)
+            {
+                return new NotFound();
+            }
+
+            if (invitation.Invited != _user.ShortId)
+            {
+                return new AccessDenied();
+            }
+
+            if (request.Accespted)
+            {
+                var existingMembership = await _organizationUserRepository.GetFirstOrDefaultAsync(
+                    [
+                        q => q.Where(_ => _.OrganizationId == invitation.OrganizationId && _.UserId == _user.ShortId)
+                    ],
+                    cancellationToken
+                );
+                if (existingMembership is null)
+                {
+                    var organizationUser = _mapper.Map<OrganizationUserEntity>(invitation);
+                    await _organizationUserRepository.InsertAsync(organizationUser, cancellationToken);
+                }
+            }
+
+            _organizationUserInvitationRepository.Delete(invitation);
+            await _organizationUserInvitationRepository.SaveAsync(cancellationToken);
+
+            return new Success();
+        }
+    }
+}
