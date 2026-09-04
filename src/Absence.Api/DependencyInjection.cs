@@ -64,7 +64,8 @@ public static class DependencyInjection
 
         services
             .AddScoped<IUser, CurrentUser>()
-            .AddScoped<IAbsenceHolidayOverlapChecker, AbsenceHolidayOverlapChecker>();
+            .AddScoped<IAbsenceHolidayOverlapChecker, AbsenceHolidayOverlapChecker>()
+            .AddScoped<IOrganizationAccess, OrganizationAccess>();
 
         return services;
     }
