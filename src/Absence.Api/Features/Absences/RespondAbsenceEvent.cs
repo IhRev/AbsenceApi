@@ -1,10 +1,11 @@
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
 using Absence.Infrastructure.Common;
-using Absence.Infrastructure.Database.Repositories;
+using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Entities;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -19,36 +20,23 @@ public static class RespondAbsenceEvent
     }
 
     internal sealed class Handler(
-        IRepository<AbsenceEventEntity> absenceEventRepository,
-        IOrganizationUsersRepository organizationUserRepository,
-        IRepository<AbsenceEntity> absenceRepository,
+        AbsenceContext db,
         IAbsenceHolidayOverlapChecker overlapChecker,
         IUser user,
         IMapper mapper
     ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied, BadRequest>>
     {
-        private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
-        private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-        private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
-        private readonly IAbsenceHolidayOverlapChecker _overlapChecker = overlapChecker;
-        private readonly IUser _user = user;
-        private readonly IMapper _mapper = mapper;
-
         public async Task<OneOf<Success, NotFound, AccessDenied, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var absenceEvent = await _absenceEventRepository.GetByIdAsync(request.Id, cancellationToken);
+            var absenceEvent = await db.AbsenceEvents.FirstOrDefaultAsync(_ => _.Id == request.Id, cancellationToken);
             if (absenceEvent is null)
             {
                 return new NotFound();
             }
 
-            var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.UserId == _user.ShortId),
-                    q => q.Where(_ => _.OrganizationId == absenceEvent.OrganizationId)
-                ],
-                cancellationToken
-            );
+            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
+                _ => _.UserId == user.ShortId && _.OrganizationId == absenceEvent.OrganizationId,
+                cancellationToken);
             if (organizationUser is null || !organizationUser.IsAdmin)
             {
                 return new AccessDenied();
@@ -63,7 +51,7 @@ public static class RespondAbsenceEvent
                         return new BadRequest("Start date must be before end date.");
                     }
 
-                    if (await _overlapChecker.AbsenceOverlapsHolidayAsync(
+                    if (await overlapChecker.AbsenceOverlapsHolidayAsync(
                         absenceEvent.OrganizationId,
                         absenceEvent.StartDate,
                         absenceEvent.EndDate,
@@ -87,18 +75,19 @@ public static class RespondAbsenceEvent
                     default:
                         throw new ArgumentException($"Incorrect event type {absenceEvent.AbsenceEventType}");
                 }
-                await _absenceRepository.SaveAsync(cancellationToken);
+                await db.SaveChangesAsync(cancellationToken);
             }
 
-            _absenceEventRepository.Delete(absenceEvent);
-            await _absenceEventRepository.SaveAsync(cancellationToken);
+            db.AbsenceEvents.Remove(absenceEvent);
+            await db.SaveChangesAsync(cancellationToken);
             return new Success();
         }
 
         private Task AddAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
         {
-            var absence = _mapper.Map<AbsenceEntity>(absenceEvent);
-            return _absenceRepository.InsertAsync(absence, cancellationToken);
+            var absence = mapper.Map<AbsenceEntity>(absenceEvent);
+            db.Absences.Add(absence);
+            return Task.CompletedTask;
         }
 
         private async Task UpdateAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
@@ -108,14 +97,13 @@ public static class RespondAbsenceEvent
                 return;
             }
 
-            var absence = await _absenceRepository.GetByIdAsync(absenceId, cancellationToken);
+            var absence = await db.Absences.FirstOrDefaultAsync(_ => _.Id == absenceId, cancellationToken);
             if (absence is null)
             {
                 return;
             }
 
-            absence = _mapper.Map(absenceEvent, absence);
-            _absenceRepository.Update(absence);
+            mapper.Map(absenceEvent, absence);
         }
 
         private async Task DeleteAbsence(AbsenceEventEntity absenceEvent, CancellationToken cancellationToken = default)
@@ -125,13 +113,13 @@ public static class RespondAbsenceEvent
                 return;
             }
 
-            var absence = await _absenceRepository.GetByIdAsync(absenceId, cancellationToken);
+            var absence = await db.Absences.FirstOrDefaultAsync(_ => _.Id == absenceId, cancellationToken);
             if (absence is null)
             {
                 return;
             }
 
-            _absenceRepository.Delete(absence);
+            db.Absences.Remove(absence);
         }
     }
 }

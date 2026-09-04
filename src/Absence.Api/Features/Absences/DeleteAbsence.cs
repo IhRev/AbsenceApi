@@ -1,10 +1,11 @@
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
 using Absence.Infrastructure.Common;
-using Absence.Infrastructure.Database.Repositories;
+using Absence.Infrastructure.Database.Contexts;
 using Absence.Infrastructure.Entities;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -18,53 +19,41 @@ public static class DeleteAbsence
     }
 
     internal sealed class Handler(
-        IRepository<AbsenceEntity> absenceRepository,
-        IOrganizationUsersRepository organizationUserRepository,
-        IRepository<AbsenceEventEntity> absenceEventRepository,
+        AbsenceContext db,
         IUser user,
         IMapper mapper
     ) : IRequestHandler<Command, OneOf<Success<string>, NotFound, AccessDenied>>
     {
-        private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
-        private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-        private readonly IRepository<AbsenceEventEntity> _absenceEventRepository = absenceEventRepository;
-        private readonly IUser _user = user;
-        private readonly IMapper _mapper = mapper;
-
         public async Task<OneOf<Success<string>, NotFound, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var absence = await _absenceRepository.GetByIdAsync(request.Id, cancellationToken);
+            var absence = await db.Absences.FirstOrDefaultAsync(_ => _.Id == request.Id, cancellationToken);
             if (absence is null)
             {
                 return new NotFound();
             }
-            if (absence.UserId != _user.ShortId)
+            if (absence.UserId != user.ShortId)
             {
                 return new AccessDenied();
             }
 
-            var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.UserId == _user.ShortId),
-                    q => q.Where(_ => _.OrganizationId == absence.OrganizationId)
-                ],
-                cancellationToken
-            );
+            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
+                _ => _.UserId == user.ShortId && _.OrganizationId == absence.OrganizationId,
+                cancellationToken);
             if (organizationUser is null)
             {
                 return new AccessDenied();
             }
             if (organizationUser.IsAdmin)
             {
-                _absenceRepository.Delete(absence);
-                await _absenceRepository.SaveAsync(cancellationToken);
+                db.Absences.Remove(absence);
+                await db.SaveChangesAsync(cancellationToken);
                 return new Success<string>("Absence deleted.");
             }
 
-            var absenceEvent = _mapper.Map<AbsenceEventEntity>(absence);
+            var absenceEvent = mapper.Map<AbsenceEventEntity>(absence);
             absenceEvent.AbsenceEventType = AbsenceEventType.DELETE;
-            await _absenceEventRepository.InsertAsync(absenceEvent, cancellationToken);
-            await _absenceEventRepository.SaveAsync(cancellationToken);
+            db.AbsenceEvents.Add(absenceEvent);
+            await db.SaveChangesAsync(cancellationToken);
             return new Success<string>("Absence delete requested.");
         }
     }

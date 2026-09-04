@@ -1,9 +1,9 @@
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
-using Absence.Infrastructure.Database.Repositories;
-using Absence.Infrastructure.Entities;
+using Absence.Infrastructure.Database.Contexts;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OneOf.Types;
 
@@ -21,26 +21,16 @@ public static class GetUsersAbsences
     }
 
     internal sealed class Handler(
-        IRepository<AbsenceEntity> absenceRepository,
-        IOrganizationUsersRepository organizationUserRepository,
+        AbsenceContext db,
         IMapper mapper,
         IUser user
     ) : IRequestHandler<Query, OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>>
     {
-        private readonly IRepository<AbsenceEntity> _absenceRepository = absenceRepository;
-        private readonly IOrganizationUsersRepository _organizationUserRepository = organizationUserRepository;
-        private readonly IMapper _mapper = mapper;
-        private readonly IUser _user = user;
-
         public async Task<OneOf<Success<IEnumerable<AbsenceDTO>>, BadRequest, AccessDenied>> Handle(Query request, CancellationToken cancellationToken)
         {
-            var organizationUser = await _organizationUserRepository.GetFirstOrDefaultAsync(
-                [
-                    q => q.Where(_ => _.UserId == _user.ShortId),
-                    q => q.Where(_ => _.OrganizationId == request.OrganizationId)
-                ],
-                cancellationToken
-            );
+            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
+                _ => _.UserId == user.ShortId && _.OrganizationId == request.OrganizationId,
+                cancellationToken);
             if (organizationUser is null)
             {
                 return new BadRequest($"No organization with id {request.OrganizationId} found.");
@@ -50,15 +40,12 @@ public static class GetUsersAbsences
                 return new AccessDenied();
             }
 
-            var absences = await _absenceRepository.GetAsync(
-                [
-                    q => q.Where(_ => request.UserIds.Contains(_.UserId)),
-                    q => q.Where(_ => _.StartDate < request.EndDate && _.EndDate > request.StartDate),
-                    q => q.Where(_ => _.OrganizationId == request.OrganizationId),
-                ],
-                cancellationToken
-            );
-            return new Success<IEnumerable<AbsenceDTO>>(_mapper.Map<IEnumerable<AbsenceDTO>>(absences));
+            var absences = await db.Absences
+                .Where(_ => request.UserIds.Contains(_.UserId))
+                .Where(_ => _.StartDate < request.EndDate && _.EndDate > request.StartDate)
+                .Where(_ => _.OrganizationId == request.OrganizationId)
+                .ToListAsync(cancellationToken);
+            return new Success<IEnumerable<AbsenceDTO>>(mapper.Map<IEnumerable<AbsenceDTO>>(absences));
         }
     }
 }
