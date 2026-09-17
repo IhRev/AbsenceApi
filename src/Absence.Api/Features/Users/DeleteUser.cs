@@ -18,7 +18,7 @@ public class DeleteUserRequest
 
 public static class DeleteUser
 {
-    public sealed class Command(DeleteUserRequest request) : IRequest<OneOf<Success, BadRequest>>
+    public sealed class Command(DeleteUserRequest request) : IRequest<OneOf<Success, BadRequest, Unauthorized>>
     {
         public DeleteUserRequest Request { get; } = request;
     }
@@ -27,13 +27,17 @@ public static class DeleteUser
         IUserService userService,
         IUser user,
         AbsenceContext db
-    ) : IRequestHandler<Command, OneOf<Success, BadRequest>>
+    ) : IRequestHandler<Command, OneOf<Success, BadRequest, Unauthorized>>
     {
-        public async Task<OneOf<Success, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success, BadRequest, Unauthorized>> Handle(Command request, CancellationToken cancellationToken)
         {
             var identityUser = await userService.FindByIdAsync(user.Id);
+            if (identityUser is null)
+            {
+                return new Unauthorized();
+            }
 
-            if (!await userService.CheckPasswordAsync(identityUser!, request.Request.Password))
+            if (!await userService.CheckPasswordAsync(identityUser, request.Request.Password))
             {
                 return new BadRequest("Password is invalid.");
             }
@@ -46,7 +50,7 @@ public static class DeleteUser
                 return new BadRequest("Transfer or delete owned organizations first.");
             }
 
-            await userService.DeleteAsync(identityUser!);
+            await userService.DeleteAsync(identityUser);
 
             return new Success();
         }

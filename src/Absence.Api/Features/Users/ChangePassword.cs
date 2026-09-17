@@ -18,29 +18,30 @@ public class ChangePasswordRequest
 
 public static class ChangePassword
 {
-    public sealed class Command(ChangePasswordRequest request) : IRequest<OneOf<Success, BadRequest>>
+    public sealed class Command(ChangePasswordRequest request) : IRequest<OneOf<Success, BadRequest, Unauthorized>>
     {
         public ChangePasswordRequest Request { get; } = request;
     }
 
-    internal sealed class Handler(IUserService userService, IUser user) : IRequestHandler<Command, OneOf<Success, BadRequest>>
+    internal sealed class Handler(IUserService userService, IUser currentUser) : IRequestHandler<Command, OneOf<Success, BadRequest, Unauthorized>>
     {
-        private readonly IUserService _userService = userService;
-        private readonly IUser _user = user;
-
-        public async Task<OneOf<Success, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success, BadRequest, Unauthorized>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var user = await _userService.FindByIdAsync(_user.Id);
+            var user = await userService.FindByIdAsync(currentUser.Id);
+            if (user is null)
+            {
+                return new Unauthorized();
+            }
 
-            var result = await _userService.ChangePasswordAsync(user!, request.Request.OldPassword, request.Request.NewPassword);
+            var result = await userService.ChangePasswordAsync(user, request.Request.OldPassword, request.Request.NewPassword);
             if (!result.Succeeded)
             {
                 return new BadRequest(result.Errors.First().Description);
             }
 
-            user!.RefreshToken = null;
+            user.RefreshToken = null;
             user.RefreshTokenExpiresAt = DateTimeOffset.MinValue;
-            await _userService.UpdateAsync(user);
+            await userService.UpdateAsync(user);
 
             return new Success();
         }

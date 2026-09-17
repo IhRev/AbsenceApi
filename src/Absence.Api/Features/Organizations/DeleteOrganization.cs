@@ -18,7 +18,7 @@ public class DeleteOrganizationRequest
 
 public static class DeleteOrganization
 {
-    public sealed class Command(int id, DeleteOrganizationRequest request) : IRequest<OneOf<Success, NotFound, AccessDenied>>
+    public sealed class Command(int id, DeleteOrganizationRequest request) : IRequest<OneOf<Success, NotFound, AccessDenied, Unauthorized>>
     {
         public int Id { get; } = id;
         public DeleteOrganizationRequest Request { get; } = request;
@@ -29,20 +29,24 @@ public static class DeleteOrganization
         AbsenceContext db,
         IOrganizationAccess organizationAccess,
         IUserService userService
-    ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied>>
+    ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied, Unauthorized>>
     {
-        public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success, NotFound, AccessDenied, Unauthorized>> Handle(Command request, CancellationToken cancellationToken)
         {
             var access = await organizationAccess.RequireOwnerAsync(request.Id, cancellationToken);
             if (!access.TryPickT0(out var organization, out var denied))
             {
-                return denied.Match<OneOf<Success, NotFound, AccessDenied>>(
+                return denied.Match<OneOf<Success, NotFound, AccessDenied, Unauthorized>>(
                     notFound => notFound,
                     accessDenied => accessDenied);
             }
 
             var identityUser = await userService.FindByIdAsync(user.Id);
-            if (!await userService.CheckPasswordAsync(identityUser!, request.Request.Password))
+            if (identityUser is null)
+            {
+                return new Unauthorized();
+            }
+            if (!await userService.CheckPasswordAsync(identityUser, request.Request.Password))
             {
                 return new AccessDenied();
             }

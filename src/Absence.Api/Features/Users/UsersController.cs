@@ -9,39 +9,45 @@ namespace Absence.Api.Features.Users;
 [Route("users")]
 public class UsersController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender = sender;
-
     [HttpGet("details")]
     public async Task<ActionResult<UserDetails>> GetUserDetails()
     {
-        var details = await _sender.Send(new GetUserDetails.Query());
-        return Ok(details);
+        var result = await sender.Send(new GetUserDetails.Query());
+        return result.Match<ActionResult>(
+            success => Ok(success.Value),
+            unauthorized => Unauthorized()
+        );
     }
 
     [HttpPut("details")]
-    public async Task<ActionResult> UpdateUserDetails([FromBody] UserDetails userDetails)
+    public async Task<ActionResult> UpdateUserDetails([FromBody] UpdateUserRequest userDetails)
     {
-        await _sender.Send(new UpdateUser.Command(userDetails));
-        return Ok();
+        var result = await sender.Send(new UpdateUser.Command(userDetails));
+        return result.Match<ActionResult>(
+            success => Ok(),
+            unauthorized => Unauthorized()
+        );
     }
 
     [HttpPut("change_password")]
     public async Task<ActionResult> UpdateUserPassword([FromBody] ChangePasswordRequest request)
     {
-        var result = await _sender.Send(new ChangePassword.Command(request));
+        var result = await sender.Send(new ChangePassword.Command(request));
         return result.Match<ActionResult>(
             success => Ok(),
-            badRequest => BadRequest(badRequest.Message)
+            badRequest => BadRequest(badRequest.Message),
+            unauthorized => Unauthorized()
         );
     }
 
     [HttpDelete]
     public async Task<ActionResult> DeleteUser([FromBody] DeleteUserRequest request)
     {
-        var result = await _sender.Send(new DeleteUser.Command(request));
+        var result = await sender.Send(new DeleteUser.Command(request));
         return result.Match<ActionResult>(
             success => Ok(),
-            badRequest => BadRequest(badRequest.Message)
+            badRequest => BadRequest(badRequest.Message),
+            unauthorized => Unauthorized()
         );
     }
 }

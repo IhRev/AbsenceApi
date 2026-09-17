@@ -42,7 +42,8 @@ public class OrganizationsController(ISender sender) : ControllerBase
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
-            accessDenied => Forbid()
+            accessDenied => Forbid(),
+            unauthorized => Unauthorized()
         );
     }
 

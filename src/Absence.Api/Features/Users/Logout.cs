@@ -1,24 +1,31 @@
 using Absence.Api.Common.Interfaces;
+using Absence.Api.Common.Results;
 using Absence.Infrastructure.Identity;
 using MediatR;
+using OneOf;
+using OneOf.Types;
 
 namespace Absence.Api.Features.Users;
 
 public static class Logout
 {
-    public sealed class Command : IRequest;
+    public sealed class Command : IRequest<OneOf<Success, Unauthorized>>;
 
-    internal sealed class Handler(IUserService userService, IUser user) : IRequestHandler<Command>
+    internal sealed class Handler(IUserService userService, IUser currentUser) : IRequestHandler<Command, OneOf<Success, Unauthorized>>
     {
-        private readonly IUserService _userService = userService;
-        private readonly IUser _user = user;
-
-        public async Task Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success, Unauthorized>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var user = await _userService.FindByIdAsync(_user.Id);
-            user!.RefreshToken = null;
+            var user = await userService.FindByIdAsync(currentUser.Id);
+            if (user is null)
+            {
+                return new Unauthorized();
+            }
+
+            user.RefreshToken = null;
             user.RefreshTokenExpiresAt = DateTimeOffset.MinValue;
-            await _userService.UpdateAsync(user);
+            await userService.UpdateAsync(user);
+
+            return new Success();
         }
     }
 }
