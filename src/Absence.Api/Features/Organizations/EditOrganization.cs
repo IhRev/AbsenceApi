@@ -26,19 +26,17 @@ public static class EditOrganization
 
     internal sealed class Handler(
         AbsenceContext db,
-        IUser user
+        IOrganizationAccess organizationAccess
     ) : IRequestHandler<Command, OneOf<Success, NotFound, BadRequest, AccessDenied>>
     {
         public async Task<OneOf<Success, NotFound, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var organization = await db.Organizations.FirstOrDefaultAsync(_ => _.Id == request.Organization.Id, cancellationToken);
-            if (organization is null)
+            var access = await organizationAccess.RequireOwnerAsync(request.Organization.Id, cancellationToken);
+            if (!access.TryPickT0(out var organization, out var denied))
             {
-                return new NotFound();
-            }
-            if (organization.OwnerId != user.ShortId)
-            {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success, NotFound, BadRequest, AccessDenied>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
             if (organization.Name == request.Organization.Name)

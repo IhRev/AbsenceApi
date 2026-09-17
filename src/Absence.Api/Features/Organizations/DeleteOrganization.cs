@@ -27,23 +27,22 @@ public static class DeleteOrganization
     internal sealed class Handler(
         IUser user,
         AbsenceContext db,
+        IOrganizationAccess organizationAccess,
         IUserService userService
     ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied>>
     {
         public async Task<OneOf<Success, NotFound, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var identityUser = await userService.FindByIdAsync(user.Id);
-            if (!await userService.CheckPasswordAsync(identityUser!, request.Request.Password))
+            var access = await organizationAccess.RequireOwnerAsync(request.Id, cancellationToken);
+            if (!access.TryPickT0(out var organization, out var denied))
             {
-                return new AccessDenied();
+                return denied.Match<OneOf<Success, NotFound, AccessDenied>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
             }
 
-            var organization = await db.Organizations.FirstOrDefaultAsync(_ => _.Id == request.Id, cancellationToken);
-            if (organization is null)
-            {
-                return new NotFound();
-            }
-            if (organization.OwnerId != user.ShortId)
+            var identityUser = await userService.FindByIdAsync(user.Id);
+            if (!await userService.CheckPasswordAsync(identityUser!, request.Request.Password))
             {
                 return new AccessDenied();
             }
