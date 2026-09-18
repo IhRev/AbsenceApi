@@ -48,6 +48,8 @@ internal class RefreshTokenService(
     {
         user.RefreshToken = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
         user.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(_jwtConfiguration.RefreshTokenExpireTimeInDays);
-        await _userService.UpdateAsync(user);
+
+        // Issuing a token we failed to store would hand the caller a refresh token that can never work.
+        (await _userService.UpdateAsync(user)).EnsureSucceeded("Storing the refresh token");
     }
 }

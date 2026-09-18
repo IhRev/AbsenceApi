@@ -41,7 +41,7 @@ public static class ChangePassword
 
             user.RefreshToken = null;
             user.RefreshTokenExpiresAt = DateTimeOffset.MinValue;
-            await userService.UpdateAsync(user);
+            (await userService.UpdateAsync(user)).EnsureSucceeded("Clearing the refresh token");
 
             return new Success();
         }

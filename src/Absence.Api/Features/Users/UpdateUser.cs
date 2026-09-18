@@ -35,7 +35,7 @@ public static class UpdateUser
 
             user.FirstName = request.UserDetails.FirstName;
             user.LastName = request.UserDetails.LastName;
-            await userService.UpdateAsync(user);
+            (await userService.UpdateAsync(user)).EnsureSucceeded("Updating the user profile");
 
             return new Success();
         }

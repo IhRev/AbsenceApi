@@ -19,9 +19,9 @@ public interface IUserService
 
     Task<UserEntity?> FindByIdAsync(string id);
 
-    Task UpdateAsync(UserEntity user);
+    Task<IdentityResult> UpdateAsync(UserEntity user);
 
-    Task DeleteAsync(UserEntity user);
+    Task<IdentityResult> DeleteAsync(UserEntity user);
 
     Task<IdentityResult> ChangePasswordAsync(UserEntity user, string oldPassword, string newPassword);
 }

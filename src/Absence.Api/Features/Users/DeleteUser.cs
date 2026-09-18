@@ -50,7 +50,21 @@ public static class DeleteUser
                 return new BadRequest("Transfer or delete owned organizations first.");
             }
 
-            await userService.DeleteAsync(identityUser);
+            // Invitations this user received cascade, but the ones they sent are NoAction to avoid
+            // two cascade paths into the same table, so they have to go before the user does.
+            await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+
+            await db.OrganizationUserInvitations
+                .Where(_ => _.Inviter == user.ShortId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            var deletion = await userService.DeleteAsync(identityUser);
+            if (!deletion.Succeeded)
+            {
+                return new BadRequest(deletion.Errors.First().Description);
+            }
+
+            await transaction.CommitAsync(cancellationToken);
 
             return new Success();
         }
