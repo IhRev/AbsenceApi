@@ -41,9 +41,12 @@ public static class RefreshToken
             var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userEntity = userId is null ? null : await _userService.FindByIdAsync(userId);
 
-            if (userEntity == null ||
+            // A missing expiry must read as invalid: comparing null with <= yields false,
+            // which would otherwise make such a token valid forever.
+            if (userEntity is null ||
                 !_refreshTokenService.Matches(userEntity, request.RefreshTokenRequest.RefreshToken) ||
-                userEntity.RefreshTokenExpiresAt <= DateTime.UtcNow)
+                userEntity.RefreshTokenExpiresAt is not { } expiresAt ||
+                expiresAt <= DateTimeOffset.UtcNow)
             {
                 return AuthResponse.Fail("Token is invalid");
             }

@@ -59,8 +59,17 @@ public static class DependencyInjection
                 });
             });
 
+        // Validated at startup: an unset secret or a zero lifetime otherwise surfaces much later
+        // as tokens that are rejected the moment they are issued.
         services
-            .Configure<JwtConfiguration>(configuration.GetSection("JwtConfiguration"));
+            .AddOptions<JwtConfiguration>()
+            .Bind(configuration.GetSection("JwtConfiguration"))
+            .Validate(_ => !string.IsNullOrWhiteSpace(_.Secret), "JwtConfiguration:Secret must be configured.")
+            .Validate(_ => !string.IsNullOrWhiteSpace(_.Issuer), "JwtConfiguration:Issuer must be configured.")
+            .Validate(_ => !string.IsNullOrWhiteSpace(_.Audience), "JwtConfiguration:Audience must be configured.")
+            .Validate(_ => _.JwtTokenExpireTimeInMinutes > 0, "JwtConfiguration:JwtTokenExpireTimeInMinutes must be greater than zero.")
+            .Validate(_ => _.RefreshTokenExpireTimeInDays > 0, "JwtConfiguration:RefreshTokenExpireTimeInDays must be greater than zero.")
+            .ValidateOnStart();
 
         services
             .AddScoped<IUser, CurrentUser>()
