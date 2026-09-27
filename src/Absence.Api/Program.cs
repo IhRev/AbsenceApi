@@ -14,3 +14,6 @@ builder.Services
 var app = builder.Build();
 app.AddMiddlewares();
 await app.RunAsync();
+
+// Top-level statements produce an internal Program; WebApplicationFactory<Program> needs it public.
+public partial class Program;
