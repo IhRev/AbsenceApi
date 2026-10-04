@@ -59,7 +59,7 @@ public static class RespondAbsenceEvent
                     }
 
                     var typeExists = await db.AbsenceTypes.AnyAsync(
-                        _ => _.Id == absenceEvent.AbsenceTypeId,
+                        _ => _.Id == absenceEvent.AbsenceTypeId && _.OrganizationId == absenceEvent.OrganizationId,
                         cancellationToken);
                     if (!typeExists)
                     {

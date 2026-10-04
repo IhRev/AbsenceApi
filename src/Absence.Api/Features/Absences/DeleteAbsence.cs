@@ -30,16 +30,19 @@ public static class DeleteAbsence
             {
                 return new NotFound();
             }
-            if (absence.UserId != user.ShortId)
-            {
-                return new AccessDenied();
-            }
-
+            // Membership is checked before ownership so a non-member cannot tell an existing
+            // absence from a missing one.
             var access = await organizationAccess.RequireMemberAsync(absence.OrganizationId, cancellationToken);
             if (!access.TryPickT0(out var organizationUser, out _))
             {
                 return new NotFound();
             }
+
+            if (absence.UserId != user.ShortId)
+            {
+                return new AccessDenied();
+            }
+
             if (organizationUser.IsAdmin)
             {
                 db.Absences.Remove(absence);

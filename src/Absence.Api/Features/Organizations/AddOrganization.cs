@@ -36,6 +36,11 @@ public static class AddOrganization
                 IsAdmin = true,
                 UserId = user.ShortId
             });
+
+            // Every organization starts with a usable set of absence types; more can be added later.
+            organization.AbsenceTypes.Add(new AbsenceTypeEntity { Name = "Vacation" });
+            organization.AbsenceTypes.Add(new AbsenceTypeEntity { Name = "Sick leave" });
+
             db.Organizations.Add(organization);
             await db.SaveChangesAsync(cancellationToken);
 

@@ -118,19 +118,43 @@ public static class TestApi
     }
 
     /// <summary>
-    /// Absence types are a reference table with no seed data and no write endpoint, so tests have to
-    /// insert them directly. This becomes organization-scoped once Phase 2 lands.
+    /// Inserts an absence type directly. Creating an organization already seeds Vacation and Sick leave,
+    /// so this is only for types beyond that starter set.
     /// </summary>
-    public static async Task<int> CreateAbsenceTypeAsync(this AbsenceApiFactory factory, string name = "Vacation")
+    public static async Task<int> CreateAbsenceTypeAsync(this AbsenceApiFactory factory, int organizationId, string name)
     {
         using var scope = factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AbsenceContext>();
 
-        var type = new AbsenceTypeEntity { Name = name };
+        var type = new AbsenceTypeEntity { Name = name, OrganizationId = organizationId };
         db.AbsenceTypes.Add(type);
         await db.SaveChangesAsync();
 
         return type.Id;
+    }
+
+    /// <summary>
+    /// Creates an absence that is persisted straight away, which only happens for an organization
+    /// admin; a plain member would get an <c>AbsenceEventEntity</c> and no id back.
+    /// </summary>
+    public static async Task<int> CreateAbsenceAsync(
+        this TestUser admin,
+        int organizationId,
+        int absenceTypeId,
+        DateTimeOffset startDate,
+        DateTimeOffset endDate)
+    {
+        var response = await admin.Client.PostAsJsonAsync("/absences", new
+        {
+            name = "Trip",
+            type = absenceTypeId,
+            startDate,
+            endDate,
+            organization = organizationId
+        });
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<int>();
     }
 
     public static string Encode(this DateTimeOffset moment) => Uri.EscapeDataString(moment.ToString("o"));

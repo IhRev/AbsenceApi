@@ -48,7 +48,7 @@ public static class AddAbsence
             }
 
             var absenceType = await db.AbsenceTypes.FirstOrDefaultAsync(
-                _ => _.Id == request.Absence.Type,
+                _ => _.Id == request.Absence.Type && _.OrganizationId == request.Absence.Organization,
                 cancellationToken);
             if (absenceType is null)
             {
