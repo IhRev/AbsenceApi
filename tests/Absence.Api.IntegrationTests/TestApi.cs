@@ -9,7 +9,7 @@ namespace Absence.Api.IntegrationTests;
 
 public sealed record TestUser(HttpClient Client, string Email, int ShortId);
 
-public sealed record AuthPayload(bool IsSuccess, string? Message, string? AccessToken, string? RefreshToken);
+public sealed record AuthPayload(string AccessToken, string RefreshToken);
 
 public sealed record UserDetailsPayload(int Id, string FirstName, string LastName, string Email);
 

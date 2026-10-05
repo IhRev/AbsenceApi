@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Absence.Api.Common.Results;
 using Absence.Infrastructure.Identity;
 using MediatR;
-using System.Security.Claims;
+using OneOf;
 
 namespace Absence.Api.Features.Users;
 
@@ -15,7 +17,7 @@ public class RefreshTokenRequest
 
 public static class RefreshToken
 {
-    public sealed class Command(RefreshTokenRequest refreshTokenRequest) : IRequest<AuthResponse>
+    public sealed class Command(RefreshTokenRequest refreshTokenRequest) : IRequest<OneOf<AuthTokens, BadRequest>>
     {
         public RefreshTokenRequest RefreshTokenRequest { get; } = refreshTokenRequest;
     }
@@ -24,37 +26,34 @@ public static class RefreshToken
         IUserService userService,
         IJwtService jwtService,
         IRefreshTokenService refreshTokenService
-    ) : IRequestHandler<Command, AuthResponse>
+    ) : IRequestHandler<Command, OneOf<AuthTokens, BadRequest>>
     {
-        private readonly IUserService _userService = userService;
-        private readonly IJwtService _jwtService = jwtService;
-        private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
-
-        public async Task<AuthResponse> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<AuthTokens, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var principal = _jwtService.GetPrincipalFromExpiredToken(request.RefreshTokenRequest.AccessToken);
+            var principal = jwtService.GetPrincipalFromExpiredToken(request.RefreshTokenRequest.AccessToken);
             if (principal is null)
             {
-                return AuthResponse.Fail("Token is invalid");
+                return new BadRequest("Token is invalid");
             }
 
             var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userEntity = userId is null ? null : await _userService.FindByIdAsync(userId);
+            var userEntity = userId is null ? null : await userService.FindByIdAsync(userId);
 
             // A missing expiry must read as invalid: comparing null with <= yields false,
             // which would otherwise make such a token valid forever.
             if (userEntity is null ||
-                !_refreshTokenService.Matches(userEntity, request.RefreshTokenRequest.RefreshToken) ||
+                !refreshTokenService.Matches(userEntity, request.RefreshTokenRequest.RefreshToken) ||
                 userEntity.RefreshTokenExpiresAt is not { } expiresAt ||
                 expiresAt <= DateTimeOffset.UtcNow)
             {
-                return AuthResponse.Fail("Token is invalid");
+                return new BadRequest("Token is invalid");
             }
 
-            var newAccessToken = _jwtService.GenerateToken(userEntity);
-            var newRefreshToken = await _refreshTokenService.GenerateToken(userEntity, cancellationToken);
-
-            return AuthResponse.Success(newAccessToken, newRefreshToken);
+            return new AuthTokens
+            {
+                AccessToken = jwtService.GenerateToken(userEntity),
+                RefreshToken = await refreshTokenService.GenerateToken(userEntity, cancellationToken)
+            };
         }
     }
 }

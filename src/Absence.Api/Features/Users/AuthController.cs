@@ -11,17 +11,24 @@ public class AuthController(ISender sender) : ControllerBase
     private readonly ISender _sender = sender;
 
     [HttpPost("login")]
-    public async Task<ActionResult<AuthResponse>> Login([FromBody] UserCredentials credentials)
+    public async Task<ActionResult<AuthTokens>> Login([FromBody] UserCredentials credentials)
     {
-        var response = await _sender.Send(new Login.Command(credentials));
-        return response.IsSuccess ? Ok(response) : BadRequest(response);
+        var result = await _sender.Send(new Login.Command(credentials));
+        return result.Match<ActionResult>(
+            tokens => Ok(tokens),
+            badRequest => BadRequest(badRequest.Message)
+        );
     }
 
     [HttpPost("refresh_token")]
-    public async Task<ActionResult<AuthResponse>> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
+    public async Task<ActionResult<AuthTokens>> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
-        var response = await _sender.Send(new RefreshToken.Command(refreshTokenRequest));
-        return response.IsSuccess ? Ok(response) : Unauthorized(response);
+        var result = await _sender.Send(new RefreshToken.Command(refreshTokenRequest));
+        return result.Match<ActionResult>(
+            tokens => Ok(tokens),
+            // The handler's failure is an authentication failure on an anonymous endpoint.
+            badRequest => Unauthorized(badRequest.Message)
+        );
     }
 
     [HttpPost("register")]

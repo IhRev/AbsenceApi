@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using Absence.Api.Common.Results;
 using Absence.Infrastructure.Identity;
 using MediatR;
+using OneOf;
 
 namespace Absence.Api.Features.Users;
 
@@ -15,7 +17,7 @@ public class UserCredentials
 
 public static class Login
 {
-    public sealed class Command(UserCredentials credentials) : IRequest<AuthResponse>
+    public sealed class Command(UserCredentials credentials) : IRequest<OneOf<AuthTokens, BadRequest>>
     {
         public UserCredentials Credentials { get; } = credentials;
     }
@@ -24,42 +26,39 @@ public static class Login
         IUserService userService,
         IJwtService jwtService,
         IRefreshTokenService refreshTokenService
-    ) : IRequestHandler<Command, AuthResponse>
+    ) : IRequestHandler<Command, OneOf<AuthTokens, BadRequest>>
     {
-        private readonly IUserService _userService = userService;
-        private readonly IJwtService _jwtService = jwtService;
-        private readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
-
-        public async Task<AuthResponse> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<AuthTokens, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
         {
-            var user = await _userService.FindByEmailAsync(request.Credentials.Email);
+            var user = await userService.FindByEmailAsync(request.Credentials.Email);
             if (user == null)
             {
-                return AuthResponse.Fail("Incorrect email or password");
+                return new BadRequest("Incorrect email or password");
             }
 
-            if (await _userService.IsLockedOutAsync(user))
+            if (await userService.IsLockedOutAsync(user))
             {
-                return AuthResponse.Fail("Account is locked. Try again later.");
+                return new BadRequest("Account is locked. Try again later.");
             }
 
-            if (!await _userService.CheckPasswordAsync(user, request.Credentials.Password))
+            if (!await userService.CheckPasswordAsync(user, request.Credentials.Password))
             {
-                await _userService.AccessFailedAsync(user);
-                if (await _userService.IsLockedOutAsync(user))
+                await userService.AccessFailedAsync(user);
+                if (await userService.IsLockedOutAsync(user))
                 {
-                    return AuthResponse.Fail("Account is locked. Try again later.");
+                    return new BadRequest("Account is locked. Try again later.");
                 }
 
-                return AuthResponse.Fail("Incorrect email or password");
+                return new BadRequest("Incorrect email or password");
             }
 
-            await _userService.ResetAccessFailedCountAsync(user);
+            await userService.ResetAccessFailedCountAsync(user);
 
-            var accessToken = _jwtService.GenerateToken(user);
-            var refreshToken = await _refreshTokenService.GenerateToken(user, cancellationToken);
-
-            return AuthResponse.Success(accessToken, refreshToken);
+            return new AuthTokens
+            {
+                AccessToken = jwtService.GenerateToken(user),
+                RefreshToken = await refreshTokenService.GenerateToken(user, cancellationToken)
+            };
         }
     }
 }
