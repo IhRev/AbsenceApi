@@ -27,7 +27,7 @@ public class CreateAbsenceDTO
 
 public static class AddAbsence
 {
-    public sealed class Command(CreateAbsenceDTO absence) : IRequest<OneOf<Success<int>, Success<string>, NotFound, BadRequest>>
+    public sealed class Command(CreateAbsenceDTO absence) : IRequest<OneOf<Persisted, Queued, NotFound, BadRequest>>
     {
         public CreateAbsenceDTO Absence { get; } = absence;
     }
@@ -37,9 +37,9 @@ public static class AddAbsence
         IAbsenceHolidayOverlapChecker overlapChecker,
         IOrganizationAccess organizationAccess,
         IUser user
-    ) : IRequestHandler<Command, OneOf<Success<int>, Success<string>, NotFound, BadRequest>>
+    ) : IRequestHandler<Command, OneOf<Persisted, Queued, NotFound, BadRequest>>
     {
-        public async Task<OneOf<Success<int>, Success<string>, NotFound, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<Persisted, Queued, NotFound, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
         {
             var access = await organizationAccess.RequireMemberAsync(request.Absence.Organization, cancellationToken);
             if (!access.TryPickT0(out var organizationUser, out _))
@@ -82,7 +82,7 @@ public static class AddAbsence
                 };
                 db.Absences.Add(absence);
                 await db.SaveChangesAsync(cancellationToken);
-                return new Success<int>(absence.Id);
+                return new Persisted(absence.Id);
             }
 
             var absenceEvent = new AbsenceEventEntity
@@ -97,7 +97,7 @@ public static class AddAbsence
             };
             db.AbsenceEvents.Add(absenceEvent);
             await db.SaveChangesAsync(cancellationToken);
-            return new Success<string>("Absence create requested.");
+            return new Queued();
         }
     }
 }

@@ -27,7 +27,7 @@ public class EditAbsenceDTO
 
 public static class EditAbsence
 {
-    public sealed class Command(EditAbsenceDTO absence) : IRequest<OneOf<Success<string>, NotFound, BadRequest, AccessDenied>>
+    public sealed class Command(EditAbsenceDTO absence) : IRequest<OneOf<Persisted, Queued, NotFound, BadRequest, AccessDenied>>
     {
         public EditAbsenceDTO Absence { get; } = absence;
     }
@@ -37,9 +37,9 @@ public static class EditAbsence
         IUser user,
         IOrganizationAccess organizationAccess,
         IAbsenceHolidayOverlapChecker overlapChecker
-    ) : IRequestHandler<Command, OneOf<Success<string>, NotFound, BadRequest, AccessDenied>>
+    ) : IRequestHandler<Command, OneOf<Persisted, Queued, NotFound, BadRequest, AccessDenied>>
     {
-        public async Task<OneOf<Success<string>, NotFound, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<Persisted, Queued, NotFound, BadRequest, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
             var absence = await db.Absences.FirstOrDefaultAsync(_ => _.Id == request.Absence.Id, cancellationToken);
             if (absence is null)
@@ -92,7 +92,7 @@ public static class EditAbsence
                 absence.EndDate = request.Absence.EndDate;
                 await db.SaveChangesAsync(cancellationToken);
 
-                return new Success<string>("Absence updated.");
+                return new Persisted(absence.Id);
             }
 
             var absenceEvent = new AbsenceEventEntity
@@ -108,7 +108,7 @@ public static class EditAbsence
             };
             db.AbsenceEvents.Add(absenceEvent);
             await db.SaveChangesAsync(cancellationToken);
-            return new Success<string>("Absence update requested.");
+            return new Queued();
         }
     }
 }

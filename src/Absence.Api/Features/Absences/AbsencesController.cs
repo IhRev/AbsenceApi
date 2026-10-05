@@ -37,19 +37,20 @@ public class AbsencesController(ISender sender) : ControllerBase
     {
         var response = await _sender.Send(new AddAbsence.Command(absence));
         return response.Match<ActionResult>(
-            successCreated => Ok(successCreated.Value),
-            successRequested => Ok(new { Message = successRequested.Value }),
+            persisted => Created($"/absences/{persisted.AbsenceId}", persisted.AbsenceId),
+            queued => Accepted(),
             notFound => NotFound(),
             badRequest => BadRequest(badRequest.Message)
         );
     }
 
     [HttpPut]
-    public async Task<ActionResult<string>> Edit([FromBody] EditAbsenceDTO absence)
+    public async Task<ActionResult> Edit([FromBody] EditAbsenceDTO absence)
     {
         var result = await _sender.Send(new EditAbsence.Command(absence));
         return result.Match<ActionResult>(
-            success => Ok(new { Message = success.Value }),
+            persisted => Ok(),
+            queued => Accepted(),
             notFound => NotFound(),
             badRequest => BadRequest(badRequest.Message),
             accessDenied => Forbid()
@@ -57,11 +58,12 @@ public class AbsencesController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<string>> Delete([FromRoute] int id)
+    public async Task<ActionResult> Delete([FromRoute] int id)
     {
         var result = await _sender.Send(new DeleteAbsence.Command(id));
         return result.Match<ActionResult>(
-            success => Ok(new { Message = success.Value }),
+            persisted => NoContent(),
+            queued => Accepted(),
             notFound => NotFound(),
             accessDenied => Forbid()
         );

@@ -135,7 +135,7 @@ public static class TestApi
 
     /// <summary>
     /// Creates an absence that is persisted straight away, which only happens for an organization
-    /// admin; a plain member would get an <c>AbsenceEventEntity</c> and no id back.
+    /// admin. The response is 201 with the new id as the body.
     /// </summary>
     public static async Task<int> CreateAbsenceAsync(
         this TestUser admin,

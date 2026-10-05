@@ -12,7 +12,7 @@ namespace Absence.Api.Features.Absences;
 
 public static class DeleteAbsence
 {
-    public sealed class Command(int id) : IRequest<OneOf<Success<string>, NotFound, AccessDenied>>
+    public sealed class Command(int id) : IRequest<OneOf<Persisted, Queued, NotFound, AccessDenied>>
     {
         public int Id { get; } = id;
     }
@@ -21,9 +21,9 @@ public static class DeleteAbsence
         AbsenceContext db,
         IOrganizationAccess organizationAccess,
         IUser user
-    ) : IRequestHandler<Command, OneOf<Success<string>, NotFound, AccessDenied>>
+    ) : IRequestHandler<Command, OneOf<Persisted, Queued, NotFound, AccessDenied>>
     {
-        public async Task<OneOf<Success<string>, NotFound, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<OneOf<Persisted, Queued, NotFound, AccessDenied>> Handle(Command request, CancellationToken cancellationToken)
         {
             var absence = await db.Absences.FirstOrDefaultAsync(_ => _.Id == request.Id, cancellationToken);
             if (absence is null)
@@ -47,7 +47,7 @@ public static class DeleteAbsence
             {
                 db.Absences.Remove(absence);
                 await db.SaveChangesAsync(cancellationToken);
-                return new Success<string>("Absence deleted.");
+                return new Persisted(absence.Id);
             }
 
             db.AbsenceEvents.Add(new AbsenceEventEntity
@@ -62,7 +62,7 @@ public static class DeleteAbsence
                 AbsenceEventType = AbsenceEventType.DELETE
             });
             await db.SaveChangesAsync(cancellationToken);
-            return new Success<string>("Absence delete requested.");
+            return new Queued();
         }
     }
 }
