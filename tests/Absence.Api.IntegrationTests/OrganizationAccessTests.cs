@@ -21,7 +21,8 @@ public class OrganizationAccessTests(AbsenceApiFactory factory)
     {
         { "GET", "/organizations/{org}/holidays?startDate={from}&endDate={to}", null },
         { "GET", "/organizations/{org}/members", null },
-        { "GET", "/organizations/{org}/absences?startDate={from}&endDate={to}", null }
+        { "GET", "/organizations/{org}/absences?startDate={from}&endDate={to}", null },
+        { "GET", "/organizations/{org}/absences/types", null }
     };
 
     public static TheoryData<string, string, string?> AdminOnlyEndpoints => new()
@@ -33,7 +34,10 @@ public class OrganizationAccessTests(AbsenceApiFactory factory)
         { "PUT", "/organizations", """{"id":{org},"name":"Renamed"}""" },
         { "DELETE", "/organizations/{org}", """{"password":"Passw0rd!"}""" },
         { "PUT", "/organizations/{org}/members/{member}?isAdmin=true", null },
-        { "DELETE", "/organizations/{org}/members/{member}", null }
+        { "DELETE", "/organizations/{org}/members/{member}", null },
+        { "POST", "/organizations/{org}/absences/types", """{"name":"Unpaid"}""" },
+        { "PUT", "/organizations/{org}/absences/types/1", """{"name":"Renamed"}""" },
+        { "DELETE", "/organizations/{org}/absences/types/1", null }
     };
 
     public static TheoryData<string, string, string?> AllGatedEndpoints
