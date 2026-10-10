@@ -11,10 +11,10 @@ namespace Absence.Api.Features.Invitations;
 
 public static class AcceptInvitation
 {
-    public sealed class Command(int id, bool accespted) : IRequest<OneOf<Success, NotFound, AccessDenied>>
+    public sealed class Command(int id, bool accepted) : IRequest<OneOf<Success, NotFound, AccessDenied>>
     {
         public int Id { get; } = id;
-        public bool Accespted { get; } = accespted;
+        public bool Accepted { get; } = accepted;
     }
 
     internal sealed class Handler(
@@ -37,7 +37,7 @@ public static class AcceptInvitation
                 return new AccessDenied();
             }
 
-            if (request.Accespted)
+            if (request.Accepted)
             {
                 var existingMembership = await db.OrganizationUsers.FirstOrDefaultAsync(
                     _ => _.OrganizationId == invitation.OrganizationId && _.UserId == user.ShortId,

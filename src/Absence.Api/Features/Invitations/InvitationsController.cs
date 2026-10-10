@@ -19,9 +19,9 @@ public class InvitationsController(ISender sender) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> SendInvitation([FromBody] InviteUserToOrganizationDTO ivitation)
+    public async Task<ActionResult> SendInvitation([FromBody] InviteUserToOrganizationDTO invitation)
     {
-        var response = await _sender.Send(new InviteUser.Command(ivitation));
+        var response = await _sender.Send(new InviteUser.Command(invitation));
         return response.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
@@ -30,10 +30,10 @@ public class InvitationsController(ISender sender) : ControllerBase
         );
     }
 
-    [HttpPost("{initationId}")]
-    public async Task<ActionResult> AcceptInvitation([FromRoute] int initationId, [FromQuery] bool accepted)
+    [HttpPost("{invitationId}")]
+    public async Task<ActionResult> AcceptInvitation([FromRoute] int invitationId, [FromQuery] bool accepted)
     {
-        var response = await _sender.Send(new AcceptInvitation.Command(initationId, accepted));
+        var response = await _sender.Send(new AcceptInvitation.Command(invitationId, accepted));
         return response.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
