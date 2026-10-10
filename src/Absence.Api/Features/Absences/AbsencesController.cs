@@ -9,8 +9,6 @@ namespace Absence.Api.Features.Absences;
 [Route("absences")]
 public class AbsencesController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender = sender;
-
     [HttpGet("/organizations/{organizationId}/absences")]
     public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get(
         [FromRoute] int organizationId,
@@ -20,7 +18,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     {
         if (userIds is { Count: > 0 })
         {
-            var filtered = await _sender.Send(new GetUsersAbsences.Query(startDate, endDate, organizationId, userIds));
+            var filtered = await sender.Send(new GetUsersAbsences.Query(startDate, endDate, organizationId, userIds));
             return filtered.Match<ActionResult>(
                 success => Ok(success.Value),
                 notFound => NotFound(),
@@ -28,7 +26,7 @@ public class AbsencesController(ISender sender) : ControllerBase
             );
         }
 
-        var response = await _sender.Send(new GetUserAbsences.Query(startDate, endDate, organizationId));
+        var response = await sender.Send(new GetUserAbsences.Query(startDate, endDate, organizationId));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
             notFound => NotFound()
@@ -38,7 +36,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<int>> Add([FromBody] CreateAbsenceDTO absence)
     {
-        var response = await _sender.Send(new AddAbsence.Command(absence));
+        var response = await sender.Send(new AddAbsence.Command(absence));
         return response.Match<ActionResult>(
             persisted => Created($"/absences/{persisted.AbsenceId}", persisted.AbsenceId),
             queued => Accepted(),
@@ -50,7 +48,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpPut]
     public async Task<ActionResult> Edit([FromBody] EditAbsenceDTO absence)
     {
-        var result = await _sender.Send(new EditAbsence.Command(absence));
+        var result = await sender.Send(new EditAbsence.Command(absence));
         return result.Match<ActionResult>(
             persisted => Ok(),
             queued => Accepted(),
@@ -63,7 +61,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete([FromRoute] int id)
     {
-        var result = await _sender.Send(new DeleteAbsence.Command(id));
+        var result = await sender.Send(new DeleteAbsence.Command(id));
         return result.Match<ActionResult>(
             persisted => NoContent(),
             queued => Accepted(),
@@ -75,7 +73,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpGet("/organizations/{organizationId}/absences/events")]
     public async Task<ActionResult<IEnumerable<AbsenceEventDTO>>> GetEvents([FromRoute] int organizationId)
     {
-        var response = await _sender.Send(new GetAbsenceEvents.Query(organizationId));
+        var response = await sender.Send(new GetAbsenceEvents.Query(organizationId));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
             notFound => NotFound(),
@@ -86,7 +84,7 @@ public class AbsencesController(ISender sender) : ControllerBase
     [HttpPost("events/{eventId}")]
     public async Task<ActionResult> Respond([FromRoute] int eventId, [FromQuery] bool accepted)
     {
-        var response = await _sender.Send(new RespondAbsenceEvent.Command(eventId, accepted));
+        var response = await sender.Send(new RespondAbsenceEvent.Command(eventId, accepted));
         return response.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),

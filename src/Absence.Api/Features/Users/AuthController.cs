@@ -8,12 +8,10 @@ namespace Absence.Api.Features.Users;
 [Route("auth")]
 public class AuthController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender = sender;
-
     [HttpPost("login")]
     public async Task<ActionResult<AuthTokens>> Login([FromBody] UserCredentials credentials)
     {
-        var result = await _sender.Send(new Login.Command(credentials));
+        var result = await sender.Send(new Login.Command(credentials));
         return result.Match<ActionResult>(
             tokens => Ok(tokens),
             badRequest => BadRequest(badRequest.Message)
@@ -23,7 +21,7 @@ public class AuthController(ISender sender) : ControllerBase
     [HttpPost("refresh_token")]
     public async Task<ActionResult<AuthTokens>> Refresh([FromBody] RefreshTokenRequest refreshTokenRequest)
     {
-        var result = await _sender.Send(new RefreshToken.Command(refreshTokenRequest));
+        var result = await sender.Send(new RefreshToken.Command(refreshTokenRequest));
         return result.Match<ActionResult>(
             tokens => Ok(tokens),
             // The handler's failure is an authentication failure on an anonymous endpoint.
@@ -34,7 +32,7 @@ public class AuthController(ISender sender) : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult> Register([FromBody] RegisterDTO user)
     {
-        var response = await _sender.Send(new Register.Command(user));
+        var response = await sender.Send(new Register.Command(user));
         return response.Match<ActionResult>(
             success => Ok(),
             error => BadRequest(error.Value)
@@ -45,7 +43,7 @@ public class AuthController(ISender sender) : ControllerBase
     [HttpPost("logout")]
     public async Task<ActionResult> Logout()
     {
-        var result = await _sender.Send(new Logout.Command());
+        var result = await sender.Send(new Logout.Command());
         return result.Match<ActionResult>(
             success => Ok(),
             unauthorized => Unauthorized()

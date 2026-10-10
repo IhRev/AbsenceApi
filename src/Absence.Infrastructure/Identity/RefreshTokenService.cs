@@ -13,12 +13,10 @@ internal class RefreshTokenService(
 {
     private const int REFRESH_TOKEN_SIZE = 64;
     private readonly JwtConfiguration _jwtConfiguration = jwtConfiguration.Value;
-    private readonly IRandomGenerator _randomGenerator = randomGenerator;
-    private readonly IUserService _userService = userService;
 
     public async Task<string> GenerateToken(UserEntity user, CancellationToken cancellationToken)
     {
-        var token = Convert.ToBase64String(_randomGenerator.GenerateBytes(REFRESH_TOKEN_SIZE));
+        var token = Convert.ToBase64String(randomGenerator.GenerateBytes(REFRESH_TOKEN_SIZE));
 
         await SaveToken(user, token, cancellationToken);
 
@@ -50,6 +48,6 @@ internal class RefreshTokenService(
         user.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(_jwtConfiguration.RefreshTokenExpireTimeInDays);
 
         // Issuing a token we failed to store would hand the caller a refresh token that can never work.
-        (await _userService.UpdateAsync(user)).EnsureSucceeded("Storing the refresh token");
+        (await userService.UpdateAsync(user)).EnsureSucceeded("Storing the refresh token");
     }
 }

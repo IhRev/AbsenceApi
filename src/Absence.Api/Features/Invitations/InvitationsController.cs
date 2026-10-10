@@ -9,19 +9,17 @@ namespace Absence.Api.Features.Invitations;
 [Route("invitations")]
 public class InvitationsController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender = sender;
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<InvitationDTO>>> Get()
     {
-        var invitations = await _sender.Send(new GetUserInvitations.Query());
+        var invitations = await sender.Send(new GetUserInvitations.Query());
         return Ok(invitations);
     }
 
     [HttpPost]
     public async Task<ActionResult> SendInvitation([FromBody] InviteUserToOrganizationDTO invitation)
     {
-        var response = await _sender.Send(new InviteUser.Command(invitation));
+        var response = await sender.Send(new InviteUser.Command(invitation));
         return response.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
@@ -33,7 +31,7 @@ public class InvitationsController(ISender sender) : ControllerBase
     [HttpPost("{invitationId}")]
     public async Task<ActionResult> AcceptInvitation([FromRoute] int invitationId, [FromQuery] bool accepted)
     {
-        var response = await _sender.Send(new AcceptInvitation.Command(invitationId, accepted));
+        var response = await sender.Send(new AcceptInvitation.Command(invitationId, accepted));
         return response.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),

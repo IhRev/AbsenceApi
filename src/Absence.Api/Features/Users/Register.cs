@@ -26,8 +26,6 @@ public static class Register
 
     internal sealed class Handler(IUserService userRepository) : IRequestHandler<Command, OneOf<Success, Error<string>>>
     {
-        private readonly IUserService _userRepository = userRepository;
-
         public async Task<OneOf<Success, Error<string>>> Handle(Command request, CancellationToken cancellationToken)
         {
             var user = new UserEntity()
@@ -38,7 +36,7 @@ public static class Register
                 UserName = request.User.Credentials.Email,
             };
 
-            var result = await _userRepository.CreateAsync(user, request.User.Credentials.Password);
+            var result = await userRepository.CreateAsync(user, request.User.Credentials.Password);
             if (!result.Succeeded)
             {
                 return new Error<string>(result.ToString());

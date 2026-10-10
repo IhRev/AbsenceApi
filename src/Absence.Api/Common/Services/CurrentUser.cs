@@ -7,14 +7,12 @@ namespace Absence.Api.Common.Services;
 
 public class CurrentUser(IHttpContextAccessor httpContextAccessor) : IUser
 {
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-
     public string Id =>
-        _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ??
+        httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ??
         throw new MissingUserClaimException(ClaimTypes.NameIdentifier);
 
     public int ShortId =>
-        int.TryParse(_httpContextAccessor.HttpContext?.User?.FindFirstValue(CustomClaimTypes.ShortId), out var shortId)
+        int.TryParse(httpContextAccessor.HttpContext?.User?.FindFirstValue(CustomClaimTypes.ShortId), out var shortId)
             ? shortId
             : throw new MissingUserClaimException(CustomClaimTypes.ShortId);
 }

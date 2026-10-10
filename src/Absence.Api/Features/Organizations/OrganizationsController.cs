@@ -9,19 +9,17 @@ namespace Absence.Api.Features.Organizations;
 [Route("organizations")]
 public class OrganizationsController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender = sender;
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<OrganizationDTO>>> Get()
     {
-        var organizations = await _sender.Send(new GetUserOrganizations.Query());
+        var organizations = await sender.Send(new GetUserOrganizations.Query());
         return Ok(organizations);
     }
 
     [HttpGet("{organizationId}/members")]
     public async Task<ActionResult<IEnumerable<MemberDTO>>> Get([FromRoute] int organizationId)
     {
-        var result = await _sender.Send(new GetOrganizationMembers.Query(organizationId));
+        var result = await sender.Send(new GetOrganizationMembers.Query(organizationId));
         return result.Match<ActionResult>(
             success => Ok(success.Value),
             notFound => NotFound()
@@ -31,14 +29,14 @@ public class OrganizationsController(ISender sender) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<int>> Add([FromBody] CreateOrganizationDTO organization)
     {
-        var id = await _sender.Send(new AddOrganization.Command(organization));
+        var id = await sender.Send(new AddOrganization.Command(organization));
         return Ok(id);
     }
 
     [HttpDelete("{organizationId}")]
     public async Task<ActionResult> Delete([FromRoute] int organizationId, [FromBody] DeleteOrganizationRequest request)
     {
-        var result = await _sender.Send(new DeleteOrganization.Command(organizationId, request));
+        var result = await sender.Send(new DeleteOrganization.Command(organizationId, request));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
@@ -50,7 +48,7 @@ public class OrganizationsController(ISender sender) : ControllerBase
     [HttpPut("{organizationId}/members/{memberId}")]
     public async Task<ActionResult> ChangeAccess([FromRoute] int organizationId, [FromRoute] int memberId , [FromQuery] bool isAdmin)
     {
-        var result = await _sender.Send(new ChangeMemberAccess.Command(organizationId, memberId, isAdmin));
+        var result = await sender.Send(new ChangeMemberAccess.Command(organizationId, memberId, isAdmin));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
@@ -62,7 +60,7 @@ public class OrganizationsController(ISender sender) : ControllerBase
     [HttpDelete("{organizationId}/members/{memberId}")]
     public async Task<ActionResult> DeleteMember([FromRoute] int organizationId, [FromRoute] int memberId)
     {
-        var result = await _sender.Send(new global::Absence.Api.Features.Organizations.DeleteMember.Command(organizationId, memberId));
+        var result = await sender.Send(new global::Absence.Api.Features.Organizations.DeleteMember.Command(organizationId, memberId));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
@@ -74,7 +72,7 @@ public class OrganizationsController(ISender sender) : ControllerBase
     [HttpPut]
     public async Task<ActionResult> Edit([FromBody] EditOrganizationDTO editOrganizationDTO)
     {
-        var result = await _sender.Send(new EditOrganization.Command(editOrganizationDTO));
+        var result = await sender.Send(new EditOrganization.Command(editOrganizationDTO));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),

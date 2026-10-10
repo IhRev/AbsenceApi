@@ -9,12 +9,10 @@ namespace Absence.Api.Features.AbsenceTypes;
 [Route("organizations/{organizationId}/absences/types")]
 public class AbsenceTypesController(ISender sender) : ControllerBase
 {
-    private readonly ISender _sender = sender;
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AbsenceTypeDTO>>> Get([FromRoute] int organizationId)
     {
-        var result = await _sender.Send(new GetAbsenceTypes.Query(organizationId));
+        var result = await sender.Send(new GetAbsenceTypes.Query(organizationId));
         return result.Match<ActionResult>(
             success => Ok(success.Value),
             notFound => NotFound()
@@ -24,7 +22,7 @@ public class AbsenceTypesController(ISender sender) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<int>> Add([FromRoute] int organizationId, [FromBody] CreateAbsenceTypeRequest request)
     {
-        var result = await _sender.Send(new AddAbsenceType.Command(organizationId, request));
+        var result = await sender.Send(new AddAbsenceType.Command(organizationId, request));
         return result.Match<ActionResult>(
             success => Ok(success.Value),
             notFound => NotFound(),
@@ -36,7 +34,7 @@ public class AbsenceTypesController(ISender sender) : ControllerBase
     [HttpPut("{typeId}")]
     public async Task<ActionResult> Rename([FromRoute] int organizationId, [FromRoute] int typeId, [FromBody] RenameAbsenceTypeRequest request)
     {
-        var result = await _sender.Send(new RenameAbsenceType.Command(organizationId, typeId, request));
+        var result = await sender.Send(new RenameAbsenceType.Command(organizationId, typeId, request));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
@@ -48,7 +46,7 @@ public class AbsenceTypesController(ISender sender) : ControllerBase
     [HttpDelete("{typeId}")]
     public async Task<ActionResult> Delete([FromRoute] int organizationId, [FromRoute] int typeId)
     {
-        var result = await _sender.Send(new DeleteAbsenceType.Command(organizationId, typeId));
+        var result = await sender.Send(new DeleteAbsenceType.Command(organizationId, typeId));
         return result.Match<ActionResult>(
             success => Ok(),
             notFound => NotFound(),
