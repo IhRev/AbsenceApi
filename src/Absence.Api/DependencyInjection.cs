@@ -1,6 +1,5 @@
 ﻿using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Services;
-using Absence.Api.Services;
 using Absence.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;

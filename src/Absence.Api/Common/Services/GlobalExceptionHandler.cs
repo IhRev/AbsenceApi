@@ -1,9 +1,9 @@
-﻿using Absence.Api.Common.Exceptions;
+using Absence.Api.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace Absence.Api.Services;
+namespace Absence.Api.Common.Services;
 
 public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {

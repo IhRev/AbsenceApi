@@ -3,7 +3,7 @@ using Absence.Api.Common.Exceptions;
 using Absence.Api.Common.Interfaces;
 using System.Security.Claims;
 
-namespace Absence.Api.Services;
+namespace Absence.Api.Common.Services;
 
 public class CurrentUser(IHttpContextAccessor httpContextAccessor) : IUser
 {
