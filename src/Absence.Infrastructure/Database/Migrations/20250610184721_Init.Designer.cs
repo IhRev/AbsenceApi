@@ -25,7 +25,7 @@ namespace Absence.Infrastructure.Database.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.AbsenceEntity", b =>
+            modelBuilder.Entity("Absence.Domain.AbsenceEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -64,7 +64,7 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.ToTable("Absences");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.AbsenceEventEntity", b =>
+            modelBuilder.Entity("Absence.Domain.AbsenceEventEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -108,7 +108,7 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.ToTable("AbsenceEventEntity");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.AbsenceEventTypeEntity", b =>
+            modelBuilder.Entity("Absence.Domain.AbsenceEventTypeEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -125,7 +125,7 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.ToTable("AbsenceEventTypeEntity");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.AbsenceTypeEntity", b =>
+            modelBuilder.Entity("Absence.Domain.AbsenceTypeEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -143,7 +143,7 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.ToTable("AbsenceTypes");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.HolidayEntity", b =>
+            modelBuilder.Entity("Absence.Domain.HolidayEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -172,7 +172,7 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.ToTable("Holidays");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.OrganizationEntity", b =>
+            modelBuilder.Entity("Absence.Domain.OrganizationEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -195,7 +195,7 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.ToTable("Organizations");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.OrganizationUserEntity", b =>
+            modelBuilder.Entity("Absence.Domain.OrganizationUserEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -221,7 +221,7 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.ToTable("OrganizationUsers");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.OrganizationUserInvitationEntity", b =>
+            modelBuilder.Entity("Absence.Domain.OrganizationUserInvitationEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -244,7 +244,7 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.ToTable("OrganizationUserInvitations");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.UserEntity", b =>
+            modelBuilder.Entity("Absence.Domain.UserEntity", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -469,21 +469,21 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.AbsenceEntity", b =>
+            modelBuilder.Entity("Absence.Domain.AbsenceEntity", b =>
                 {
-                    b.HasOne("Absence.Infrastructure.Entities.AbsenceTypeEntity", "AbsenceType")
+                    b.HasOne("Absence.Domain.AbsenceTypeEntity", "AbsenceType")
                         .WithMany("Absences")
                         .HasForeignKey("AbsenceTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Absence.Infrastructure.Entities.OrganizationEntity", "Organization")
+                    b.HasOne("Absence.Domain.OrganizationEntity", "Organization")
                         .WithMany("Absences")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Absence.Infrastructure.Entities.UserEntity", "User")
+                    b.HasOne("Absence.Domain.UserEntity", "User")
                         .WithMany("Absences")
                         .HasForeignKey("UserId")
                         .HasPrincipalKey("ShortId")
@@ -497,21 +497,21 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.AbsenceEventEntity", b =>
+            modelBuilder.Entity("Absence.Domain.AbsenceEventEntity", b =>
                 {
-                    b.HasOne("Absence.Infrastructure.Entities.AbsenceEventTypeEntity", "AbsenceEventType")
+                    b.HasOne("Absence.Domain.AbsenceEventTypeEntity", "AbsenceEventType")
                         .WithMany("AbsenceEvents")
                         .HasForeignKey("AbsenceEventTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Absence.Infrastructure.Entities.OrganizationEntity", "Organization")
+                    b.HasOne("Absence.Domain.OrganizationEntity", "Organization")
                         .WithMany("AbsenceEvents")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Absence.Infrastructure.Entities.UserEntity", "User")
+                    b.HasOne("Absence.Domain.UserEntity", "User")
                         .WithMany("AbsenceEvents")
                         .HasForeignKey("UserId")
                         .HasPrincipalKey("ShortId")
@@ -525,9 +525,9 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.HolidayEntity", b =>
+            modelBuilder.Entity("Absence.Domain.HolidayEntity", b =>
                 {
-                    b.HasOne("Absence.Infrastructure.Entities.OrganizationEntity", "Organization")
+                    b.HasOne("Absence.Domain.OrganizationEntity", "Organization")
                         .WithMany("Holidays")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -536,9 +536,9 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.Navigation("Organization");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.OrganizationEntity", b =>
+            modelBuilder.Entity("Absence.Domain.OrganizationEntity", b =>
                 {
-                    b.HasOne("Absence.Infrastructure.Entities.UserEntity", "Owner")
+                    b.HasOne("Absence.Domain.UserEntity", "Owner")
                         .WithMany("Organizations")
                         .HasForeignKey("OwnerId")
                         .HasPrincipalKey("ShortId")
@@ -548,15 +548,15 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.OrganizationUserEntity", b =>
+            modelBuilder.Entity("Absence.Domain.OrganizationUserEntity", b =>
                 {
-                    b.HasOne("Absence.Infrastructure.Entities.OrganizationEntity", "Organization")
+                    b.HasOne("Absence.Domain.OrganizationEntity", "Organization")
                         .WithMany("OrganizationsUsers")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Absence.Infrastructure.Entities.UserEntity", "User")
+                    b.HasOne("Absence.Domain.UserEntity", "User")
                         .WithMany("OrganizationsUsers")
                         .HasForeignKey("UserId")
                         .HasPrincipalKey("ShortId")
@@ -568,15 +568,15 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.OrganizationUserInvitationEntity", b =>
+            modelBuilder.Entity("Absence.Domain.OrganizationUserInvitationEntity", b =>
                 {
-                    b.HasOne("Absence.Infrastructure.Entities.OrganizationEntity", "Organization")
+                    b.HasOne("Absence.Domain.OrganizationEntity", "Organization")
                         .WithMany("OrganizationUserInvitations")
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Absence.Infrastructure.Entities.UserEntity", "User")
+                    b.HasOne("Absence.Domain.UserEntity", "User")
                         .WithMany("OrganizationUserInvitations")
                         .HasForeignKey("UserId")
                         .HasPrincipalKey("ShortId")
@@ -599,7 +599,7 @@ namespace Absence.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Absence.Infrastructure.Entities.UserEntity", null)
+                    b.HasOne("Absence.Domain.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -608,7 +608,7 @@ namespace Absence.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Absence.Infrastructure.Entities.UserEntity", null)
+                    b.HasOne("Absence.Domain.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -623,7 +623,7 @@ namespace Absence.Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Absence.Infrastructure.Entities.UserEntity", null)
+                    b.HasOne("Absence.Domain.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -632,24 +632,24 @@ namespace Absence.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Absence.Infrastructure.Entities.UserEntity", null)
+                    b.HasOne("Absence.Domain.UserEntity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.AbsenceEventTypeEntity", b =>
+            modelBuilder.Entity("Absence.Domain.AbsenceEventTypeEntity", b =>
                 {
                     b.Navigation("AbsenceEvents");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.AbsenceTypeEntity", b =>
+            modelBuilder.Entity("Absence.Domain.AbsenceTypeEntity", b =>
                 {
                     b.Navigation("Absences");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.OrganizationEntity", b =>
+            modelBuilder.Entity("Absence.Domain.OrganizationEntity", b =>
                 {
                     b.Navigation("AbsenceEvents");
 
@@ -662,7 +662,7 @@ namespace Absence.Infrastructure.Database.Migrations
                     b.Navigation("OrganizationsUsers");
                 });
 
-            modelBuilder.Entity("Absence.Infrastructure.Entities.UserEntity", b =>
+            modelBuilder.Entity("Absence.Domain.UserEntity", b =>
                 {
                     b.Navigation("AbsenceEvents");
 

@@ -1,4 +1,4 @@
-using Absence.Infrastructure.Entities;
+using Absence.Domain;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using System.Text;

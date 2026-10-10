@@ -8,6 +8,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Absence.Api/Absence.Api.csproj", "src/Absence.Api/"]
+COPY ["src/Absence.Domain/Absence.Domain.csproj", "src/Absence.Domain/"]
 COPY ["src/Absence.Infrastructure/Absence.Infrastructure.csproj", "src/Absence.Infrastructure/"]
 RUN dotnet restore "./src/Absence.Api/Absence.Api.csproj"
 COPY . .

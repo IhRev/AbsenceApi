@@ -1,8 +1,7 @@
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
-using Absence.Infrastructure.Common;
+using Absence.Domain;
 using Absence.Infrastructure.Database.Contexts;
-using Absence.Infrastructure.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OneOf;

@@ -1,6 +1,4 @@
-using Absence.Infrastructure.Common;
-
-namespace Absence.Infrastructure.Entities;
+namespace Absence.Domain;
 
 public class AbsenceTypeEntity : IIdKeyed<int>
 {

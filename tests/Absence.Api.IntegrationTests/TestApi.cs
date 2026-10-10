@@ -2,7 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using Absence.Infrastructure.Database.Contexts;
-using Absence.Infrastructure.Entities;
+using Absence.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Absence.Api.IntegrationTests;

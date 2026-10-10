@@ -1,4 +1,4 @@
-using Absence.Infrastructure.Entities;
+using Absence.Domain;
 
 namespace Absence.Infrastructure.Identity;
 

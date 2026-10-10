@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Absence.Infrastructure.Entities;
+using Absence.Domain;
 using Absence.Infrastructure.Identity;
 using MediatR;
 using OneOf;

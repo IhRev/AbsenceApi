@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
 using Absence.Infrastructure.Database.Contexts;
-using Absence.Infrastructure.Entities;
+using Absence.Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using OneOf;

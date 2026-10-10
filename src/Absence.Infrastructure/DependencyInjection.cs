@@ -1,5 +1,5 @@
 using Absence.Infrastructure.Database.Contexts;
-using Absence.Infrastructure.Entities;
+using Absence.Domain;
 using Absence.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;

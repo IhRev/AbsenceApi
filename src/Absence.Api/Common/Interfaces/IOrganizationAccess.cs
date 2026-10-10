@@ -1,5 +1,5 @@
 using Absence.Api.Common.Results;
-using Absence.Infrastructure.Entities;
+using Absence.Domain;
 using OneOf;
 using OneOf.Types;
 

@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Absence.Domain\Absence.Domain.csproj" />
     <ProjectReference Include="..\Absence.Infrastructure\Absence.Infrastructure.csproj" />
   </ItemGroup>
 

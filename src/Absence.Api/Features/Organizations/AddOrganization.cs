@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Absence.Api.Common.Interfaces;
 using Absence.Infrastructure.Database.Contexts;
-using Absence.Infrastructure.Entities;
+using Absence.Domain;
 using MediatR;
 
 namespace Absence.Api.Features.Organizations;
