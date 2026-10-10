@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 
 namespace Absence.Api.IntegrationTests;
 
@@ -30,7 +31,7 @@ public class OrganizationAccessTests(AbsenceApiFactory factory)
         { "POST", "/holidays", """{"name":"Founders Day","date":"2030-01-01T00:00:00+00:00","organizationId":{org}}""" },
         { "GET", "/organizations/{org}/absences/events", null },
         { "POST", "/invitations", """{"userEmail":"nobody@test.local","organizationId":{org}}""" },
-        { "POST", "/organizations/{org}/absences?startDate={from}&endDate={to}", "[1]" },
+        { "GET", "/organizations/{org}/absences?startDate={from}&endDate={to}&userIds=1", null },
         { "PUT", "/organizations", """{"id":{org},"name":"Renamed"}""" },
         { "DELETE", "/organizations/{org}", """{"password":"Passw0rd!"}""" },
         { "PUT", "/organizations/{org}/members/{member}?isAdmin=true", null },
@@ -144,6 +145,25 @@ public class OrganizationAccessTests(AbsenceApiFactory factory)
         Assert.Equal(HttpStatusCode.Forbidden, delete.StatusCode);
     }
 
+    [Fact]
+    public async Task An_admin_reads_absences_for_the_users_they_name()
+    {
+        var owner = await factory.RegisterAsync("Olivia", "Owner");
+        var organizationId = await owner.CreateOrganizationAsync();
+        var member = await factory.AddMemberAsync(owner, organizationId);
+        var typeId = await factory.CreateAbsenceTypeAsync(organizationId, "Unpaid");
+        var start = new DateTimeOffset(2033, 5, 1, 0, 0, 0, TimeSpan.Zero);
+        var end = new DateTimeOffset(2033, 5, 4, 0, 0, 0, TimeSpan.Zero);
+        await owner.CreateAbsenceAsync(organizationId, typeId, start, end);
+
+        var query = $"/organizations/{organizationId}/absences?startDate={start.Encode()}&endDate={end.AddDays(1).Encode()}";
+        var ownerOnly = await owner.Client.GetFromJsonAsync<List<AbsencePayload>>($"{query}&userIds={owner.ShortId}");
+        var memberOnly = await owner.Client.GetFromJsonAsync<List<AbsencePayload>>($"{query}&userIds={member.ShortId}");
+
+        Assert.Equal([owner.ShortId], ownerOnly!.Select(_ => _.UserId));
+        Assert.Empty(memberOnly!);
+    }
+
     private static string Fill(string template, int organizationId, int memberShortId) =>
         template
             .Replace("{org}", organizationId.ToString())
@@ -153,4 +173,6 @@ public class OrganizationAccessTests(AbsenceApiFactory factory)
 
     private static string? FillJson(string? template, int organizationId, int memberShortId) =>
         template is null ? null : Fill(template, organizationId, memberShortId);
+
+    private sealed record AbsencePayload(int Id, int UserId);
 }

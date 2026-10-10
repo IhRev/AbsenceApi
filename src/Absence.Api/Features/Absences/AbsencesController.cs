@@ -12,23 +12,26 @@ public class AbsencesController(ISender sender) : ControllerBase
     private readonly ISender _sender = sender;
 
     [HttpGet("/organizations/{organizationId}/absences")]
-    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
+    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> Get(
+        [FromRoute] int organizationId,
+        [FromQuery] DateTimeOffset startDate,
+        [FromQuery] DateTimeOffset endDate,
+        [FromQuery] List<int>? userIds)
     {
+        if (userIds is { Count: > 0 })
+        {
+            var filtered = await _sender.Send(new GetUsersAbsences.Query(startDate, endDate, organizationId, userIds));
+            return filtered.Match<ActionResult>(
+                success => Ok(success.Value),
+                notFound => NotFound(),
+                accessDenied => Forbid()
+            );
+        }
+
         var response = await _sender.Send(new GetUserAbsences.Query(startDate, endDate, organizationId));
         return response.Match<ActionResult>(
             success => Ok(success.Value),
             notFound => NotFound()
-        );
-    }
-
-    [HttpPost("/organizations/{organizationId}/absences")]
-    public async Task<ActionResult<IEnumerable<AbsenceDTO>>> GetByUserIds([FromRoute] int organizationId, [FromBody] List<int> userIds, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
-    {
-        var response = await _sender.Send(new GetUsersAbsences.Query(startDate, endDate, organizationId, userIds));
-        return response.Match<ActionResult>(
-            success => Ok(success.Value),
-            notFound => NotFound(),
-            accessDenied => Forbid()
         );
     }
 
