@@ -52,7 +52,7 @@ public static class DependencyInjection
             });
 
         services
-            .AddDefaultIdentity<UserEntity>()
+            .AddIdentityCore<UserEntity>()
             .AddEntityFrameworkStores<AbsenceContext>()
             .AddDefaultTokenProviders();
 
@@ -62,6 +62,7 @@ public static class DependencyInjection
         services
             .Configure<IdentityOptions>(options =>
             {
+                options.Stores.MaxLengthForKeys = 128;
                 options.Password.RequireDigit = false;
                 options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = false;
