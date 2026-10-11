@@ -1,0 +1,47 @@
+using System.ComponentModel.DataAnnotations;
+using Absence.Api.Common.Interfaces;
+using Absence.Infrastructure.Database.Contexts;
+using Absence.Domain;
+using MediatR;
+
+namespace Absence.Api.Features.Organizations;
+
+public class CreateOrganizationDTO
+{
+    [Required(AllowEmptyStrings = false)]
+    public required string Name { get; set; }
+}
+
+public static class AddOrganization
+{
+    public sealed record Command(CreateOrganizationDTO Organization) : IRequest<int>;
+
+    internal sealed class Handler(
+        AbsenceContext db,
+        IUser user
+    ) : IRequestHandler<Command, int>
+    {
+        public async Task<int> Handle(Command request, CancellationToken cancellationToken)
+        {
+            var organization = new OrganizationEntity
+            {
+                Name = request.Organization.Name,
+                OwnerId = user.ShortId
+            };
+            organization.OrganizationsUsers.Add(new OrganizationUserEntity()
+            {
+                IsAdmin = true,
+                UserId = user.ShortId
+            });
+
+            // Every organization starts with a usable set of absence types; more can be added later.
+            organization.AbsenceTypes.Add(new AbsenceTypeEntity { Name = "Vacation" });
+            organization.AbsenceTypes.Add(new AbsenceTypeEntity { Name = "Sick leave" });
+
+            db.Organizations.Add(organization);
+            await db.SaveChangesAsync(cancellationToken);
+
+            return organization.Id;
+        }
+    }
+}

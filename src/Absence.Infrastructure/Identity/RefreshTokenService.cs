@@ -1,6 +1,4 @@
-﻿using Absence.Application.Common.Interfaces;
-using Absence.Application.Identity;
-using Absence.Domain.Entities;
+using Absence.Domain;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,12 +13,10 @@ internal class RefreshTokenService(
 {
     private const int REFRESH_TOKEN_SIZE = 64;
     private readonly JwtConfiguration _jwtConfiguration = jwtConfiguration.Value;
-    private readonly IRandomGenerator _randomGenerator = randomGenerator;
-    private readonly IUserService _userService = userService;
 
     public async Task<string> GenerateToken(UserEntity user, CancellationToken cancellationToken)
     {
-        var token = Convert.ToBase64String(_randomGenerator.GenerateBytes(REFRESH_TOKEN_SIZE));
+        var token = Convert.ToBase64String(randomGenerator.GenerateBytes(REFRESH_TOKEN_SIZE));
 
         await SaveToken(user, token, cancellationToken);
 
@@ -50,6 +46,8 @@ internal class RefreshTokenService(
     {
         user.RefreshToken = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
         user.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(_jwtConfiguration.RefreshTokenExpireTimeInDays);
-        await _userService.UpdateAsync(user);
+
+        // Issuing a token we failed to store would hand the caller a refresh token that can never work.
+        (await userService.UpdateAsync(user)).EnsureSucceeded("Storing the refresh token");
     }
 }

@@ -1,0 +1,56 @@
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Absence.Api.Features.Holidays;
+
+[Authorize]
+[ApiController]
+[Route("holidays")]
+public class HolidaysController(ISender sender) : ControllerBase
+{
+    [HttpGet("/organizations/{organizationId}/holidays")]
+    public async Task<ActionResult<IEnumerable<HolidayDTO>>> Get([FromRoute] int organizationId, [FromQuery] DateTimeOffset startDate, [FromQuery] DateTimeOffset endDate)
+    {
+        var response = await sender.Send(new GetHolidays.Query(organizationId, startDate, endDate));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            notFound => NotFound()
+        );
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<int>> Add([FromBody] CreateHolidayDTO holiday)
+    {
+        var response = await sender.Send(new AddHoliday.Command(holiday));
+        return response.Match<ActionResult>(
+            success => Ok(success.Value),
+            notFound => NotFound(),
+            badRequest => BadRequest(badRequest.Message),
+            accessDenied => Forbid()
+        );
+    }
+
+    [HttpPut]
+    public async Task<ActionResult> Edit([FromBody] EditHolidayDTO holiday)
+    {
+        var result = await sender.Send(new EditHoliday.Command(holiday));
+        return result.Match<ActionResult>(
+            success => Ok(),
+            notFound => NotFound(),
+            accessDenied => Forbid(),
+            badRequest => BadRequest(badRequest.Message)
+        );
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete([FromRoute] int id)
+    {
+        var result = await sender.Send(new DeleteHoliday.Command(id));
+        return result.Match<ActionResult>(
+            success => Ok(),
+            notFound => NotFound(),
+            accessDenied => Forbid()
+        );
+    }
+}

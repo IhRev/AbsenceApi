@@ -1,6 +1,5 @@
 using Absence.Api;
-using Absence.Application;
-using Absence.Infrastructure.Identity;
+using Absence.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseKestrel();
@@ -9,10 +8,12 @@ builder.Configuration.AddEnvironmentVariables();
 const string connectionStringName = "AbsenceDB";
 
 builder.Services
-    .AddApplication()
     .AddInfrastructure(builder.Configuration, connectionStringName)
     .AddApi(builder.Configuration);
 
 var app = builder.Build();
 app.AddMiddlewares();
 await app.RunAsync();
+
+// Top-level statements produce an internal Program; WebApplicationFactory<Program> needs it public.
+public partial class Program;

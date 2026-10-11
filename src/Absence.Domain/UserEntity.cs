@@ -1,0 +1,18 @@
+using Microsoft.AspNetCore.Identity;
+
+namespace Absence.Domain;
+
+public class UserEntity : IdentityUser, IIdKeyed<string>
+{
+    public int ShortId { get; set; }
+    public required string FirstName { get; set; }
+    public required string LastName { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTimeOffset? RefreshTokenExpiresAt { get; set; }
+    public ICollection<AbsenceEntity> Absences { get; set; } = [];
+    public ICollection<AbsenceEventEntity> AbsenceEvents { get; set; } = [];
+    public ICollection<OrganizationEntity> Organizations { get; set; } = [];
+    public ICollection<OrganizationUserEntity> OrganizationsUsers { get; set; } = [];
+    public ICollection<OrganizationUserInvitationEntity> InvitationsSent { get; set; } = [];
+    public ICollection<OrganizationUserInvitationEntity> InvitationsReceived { get; set; } = [];
+}

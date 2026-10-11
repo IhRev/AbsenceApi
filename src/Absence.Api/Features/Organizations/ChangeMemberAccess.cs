@@ -1,0 +1,61 @@
+using Absence.Api.Common.Interfaces;
+using Absence.Api.Common.Results;
+using Absence.Infrastructure.Database.Contexts;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using OneOf;
+using OneOf.Types;
+
+namespace Absence.Api.Features.Organizations;
+
+public static class ChangeMemberAccess
+{
+    public sealed record Command(int OrganizationId, int UserId, bool IsAdmin) : IRequest<OneOf<Success, NotFound, AccessDenied, BadRequest>>;
+
+    internal sealed class Handler(
+        IOrganizationAccess organizationAccess,
+        AbsenceContext db
+    ) : IRequestHandler<Command, OneOf<Success, NotFound, AccessDenied, BadRequest>>
+    {
+        public async Task<OneOf<Success, NotFound, AccessDenied, BadRequest>> Handle(Command request, CancellationToken cancellationToken)
+        {
+            var access = await organizationAccess.RequireAdminAsync(request.OrganizationId, cancellationToken);
+            if (!access.TryPickT0(out _, out var denied))
+            {
+                return denied.Match<OneOf<Success, NotFound, AccessDenied, BadRequest>>(
+                    notFound => notFound,
+                    accessDenied => accessDenied);
+            }
+
+            var organization = await db.Organizations.FirstOrDefaultAsync(
+                _ => _.Id == request.OrganizationId,
+                cancellationToken);
+            if (organization is null)
+            {
+                return new NotFound();
+            }
+
+            var organizationUser = await db.OrganizationUsers.FirstOrDefaultAsync(
+                _ => _.OrganizationId == request.OrganizationId && _.UserId == request.UserId,
+                cancellationToken);
+            if (organizationUser is null)
+            {
+                return new BadRequest($"User with id {request.UserId} doesn't belong to organization.");
+            }
+            if (organizationUser.UserId == organization.OwnerId)
+            {
+                return new BadRequest("Cannot change the organization owner's access.");
+            }
+
+            if (organizationUser.IsAdmin == request.IsAdmin)
+            {
+                return new BadRequest("Cannot change access to the same.");
+            }
+
+            organizationUser.IsAdmin = request.IsAdmin;
+            await db.SaveChangesAsync(cancellationToken);
+
+            return new Success();
+        }
+    }
+}
