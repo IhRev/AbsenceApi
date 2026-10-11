@@ -12,6 +12,7 @@ internal class AbsenceHolidayOverlapChecker(AbsenceContext db) : IAbsenceHoliday
         DateTimeOffset endDate,
         CancellationToken cancellationToken = default) =>
         db.Holidays.AnyAsync(
+            // Closed range, same as AbsenceHolidayOverlap.Contains. Inlined so EF can translate it.
             _ => _.OrganizationId == organizationId && _.Date >= startDate && _.Date <= endDate,
             cancellationToken);
 
@@ -20,6 +21,7 @@ internal class AbsenceHolidayOverlapChecker(AbsenceContext db) : IAbsenceHoliday
         DateTimeOffset date,
         CancellationToken cancellationToken = default) =>
         db.Absences.AnyAsync(
+            // Closed range, same as AbsenceHolidayOverlap.Contains. Inlined so EF can translate it.
             _ => _.OrganizationId == organizationId && _.StartDate <= date && _.EndDate >= date,
             cancellationToken);
 }
