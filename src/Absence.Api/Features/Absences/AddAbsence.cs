@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using Absence.Api.Common;
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
+using FluentValidation;
 using Absence.Domain;
 using Absence.Infrastructure.Database.Contexts;
 using MediatR;
@@ -31,6 +33,16 @@ public static class AddAbsence
         public CreateAbsenceDTO Absence { get; } = absence;
     }
 
+    internal sealed class CommandValidator : AbstractValidator<Command>
+    {
+        public CommandValidator()
+        {
+            RuleFor(command => command.Absence)
+                .Must(absence => AbsenceDateOrder.IsValid(absence.StartDate, absence.EndDate))
+                .WithMessage(AbsenceDateOrder.Message);
+        }
+    }
+
     internal sealed class Handler(
         AbsenceContext db,
         IAbsenceHolidayOverlapChecker overlapChecker,
@@ -52,11 +64,6 @@ public static class AddAbsence
             if (absenceType is null)
             {
                 return new BadRequest($"No absence type with id {request.Absence.Type} found.");
-            }
-
-            if (request.Absence.StartDate > request.Absence.EndDate)
-            {
-                return new BadRequest("Start date must be before end date.");
             }
 
             if (await overlapChecker.AbsenceOverlapsHolidayAsync(

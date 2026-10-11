@@ -1,6 +1,8 @@
-﻿using Absence.Api.Common.Interfaces;
+﻿using Absence.Api.Common.Behaviors;
+using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Services;
 using Absence.Infrastructure.Identity;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -20,7 +22,14 @@ public static class DependencyInjection
             .AddHttpContextAccessor();
 
         services
-            .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
+            .AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(assembly);
+                cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+                cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            });
+
+        services.AddValidatorsFromAssembly(assembly, includeInternalTypes: true);
 
         services
             .AddEndpointsApiExplorer();

@@ -1,3 +1,4 @@
+using Absence.Api.Common;
 using Absence.Api.Common.Interfaces;
 using Absence.Api.Common.Results;
 using Absence.Domain;
@@ -43,9 +44,9 @@ public static class RespondAbsenceEvent
             {
                 if (absenceEvent.AbsenceEventType is AbsenceEventType.CREATE or AbsenceEventType.UPDATE)
                 {
-                    if (absenceEvent.StartDate > absenceEvent.EndDate)
+                    if (!AbsenceDateOrder.IsValid(absenceEvent.StartDate, absenceEvent.EndDate))
                     {
-                        return new BadRequest("Start date must be before end date.");
+                        return new BadRequest(AbsenceDateOrder.Message);
                     }
 
                     if (await overlapChecker.AbsenceOverlapsHolidayAsync(
