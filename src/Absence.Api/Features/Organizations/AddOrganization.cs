@@ -14,10 +14,7 @@ public class CreateOrganizationDTO
 
 public static class AddOrganization
 {
-    public sealed class Command(CreateOrganizationDTO organization) : IRequest<int>
-    {
-        public CreateOrganizationDTO Organization { get; } = organization;
-    }
+    public sealed record Command(CreateOrganizationDTO Organization) : IRequest<int>;
 
     internal sealed class Handler(
         AbsenceContext db,

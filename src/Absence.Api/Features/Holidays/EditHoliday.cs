@@ -21,10 +21,7 @@ public class EditHolidayDTO
 
 public static class EditHoliday
 {
-    public sealed class Command(EditHolidayDTO holiday) : IRequest<OneOf<Success, NotFound, AccessDenied, BadRequest>>
-    {
-        public EditHolidayDTO Holiday { get; } = holiday;
-    }
+    public sealed record Command(EditHolidayDTO Holiday) : IRequest<OneOf<Success, NotFound, AccessDenied, BadRequest>>;
 
     internal sealed class Handler(
         AbsenceContext db,

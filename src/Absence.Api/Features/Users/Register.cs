@@ -19,10 +19,7 @@ public class RegisterDTO
 
 public static class Register
 {
-    public sealed class Command(RegisterDTO user) : IRequest<OneOf<Success, Error<string>>>
-    {
-        public RegisterDTO User { get; } = user;
-    }
+    public sealed record Command(RegisterDTO User) : IRequest<OneOf<Success, Error<string>>>;
 
     internal sealed class Handler(IUserService userRepository) : IRequestHandler<Command, OneOf<Success, Error<string>>>
     {

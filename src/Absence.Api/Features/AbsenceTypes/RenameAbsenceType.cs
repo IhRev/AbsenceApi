@@ -18,13 +18,7 @@ public class RenameAbsenceTypeRequest
 
 public static class RenameAbsenceType
 {
-    public sealed class Command(int organizationId, int typeId, RenameAbsenceTypeRequest request)
-        : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>
-    {
-        public int OrganizationId { get; } = organizationId;
-        public int TypeId { get; } = typeId;
-        public RenameAbsenceTypeRequest Request { get; } = request;
-    }
+    public sealed record Command(int OrganizationId, int TypeId, RenameAbsenceTypeRequest Request) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>;
 
     internal sealed class Handler(AbsenceContext db, IOrganizationAccess organizationAccess)
         : IRequestHandler<Command, OneOf<Success, NotFound, BadRequest, AccessDenied>>

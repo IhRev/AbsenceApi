@@ -11,10 +11,7 @@ namespace Absence.Api.Features.Absences;
 
 public static class DeleteAbsence
 {
-    public sealed class Command(int id) : IRequest<OneOf<Persisted, Queued, NotFound, AccessDenied>>
-    {
-        public int Id { get; } = id;
-    }
+    public sealed record Command(int Id) : IRequest<OneOf<Persisted, Queued, NotFound, AccessDenied>>;
 
     internal sealed class Handler(
         AbsenceContext db,

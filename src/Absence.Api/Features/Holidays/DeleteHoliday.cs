@@ -10,10 +10,7 @@ namespace Absence.Api.Features.Holidays;
 
 public static class DeleteHoliday
 {
-    public sealed class Command(int id) : IRequest<OneOf<Success, NotFound, AccessDenied>>
-    {
-        public int Id { get; } = id;
-    }
+    public sealed record Command(int Id) : IRequest<OneOf<Success, NotFound, AccessDenied>>;
 
     internal sealed class Handler(
         AbsenceContext db,

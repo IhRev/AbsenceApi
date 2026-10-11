@@ -19,10 +19,7 @@ public class EditOrganizationDTO
 
 public static class EditOrganization
 {
-    public sealed class Command(EditOrganizationDTO organization) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>
-    {
-        public EditOrganizationDTO Organization { get; } = organization;
-    }
+    public sealed record Command(EditOrganizationDTO Organization) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>;
 
     internal sealed class Handler(
         AbsenceContext db,

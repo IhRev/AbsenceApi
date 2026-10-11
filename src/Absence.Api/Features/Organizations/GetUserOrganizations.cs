@@ -7,7 +7,7 @@ namespace Absence.Api.Features.Organizations;
 
 public static class GetUserOrganizations
 {
-    public sealed class Query : IRequest<IEnumerable<OrganizationDTO>>;
+    public sealed record Query : IRequest<IEnumerable<OrganizationDTO>>;
 
     internal sealed class Handler(
         AbsenceContext db,

@@ -15,10 +15,7 @@ public class AbsenceTypeDTO
 
 public static class GetAbsenceTypes
 {
-    public sealed class Query(int organizationId) : IRequest<OneOf<Success<IEnumerable<AbsenceTypeDTO>>, NotFound>>
-    {
-        public int OrganizationId { get; } = organizationId;
-    }
+    public sealed record Query(int OrganizationId) : IRequest<OneOf<Success<IEnumerable<AbsenceTypeDTO>>, NotFound>>;
 
     internal sealed class Handler(AbsenceContext db, IOrganizationAccess organizationAccess)
         : IRequestHandler<Query, OneOf<Success<IEnumerable<AbsenceTypeDTO>>, NotFound>>

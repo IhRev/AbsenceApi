@@ -28,10 +28,7 @@ public class CreateAbsenceDTO
 
 public static class AddAbsence
 {
-    public sealed class Command(CreateAbsenceDTO absence) : IRequest<OneOf<Persisted, Queued, NotFound, BadRequest>>
-    {
-        public CreateAbsenceDTO Absence { get; } = absence;
-    }
+    public sealed record Command(CreateAbsenceDTO Absence) : IRequest<OneOf<Persisted, Queued, NotFound, BadRequest>>;
 
     internal sealed class CommandValidator : AbstractValidator<Command>
     {

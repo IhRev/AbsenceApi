@@ -19,12 +19,7 @@ public class CreateAbsenceTypeRequest
 
 public static class AddAbsenceType
 {
-    public sealed class Command(int organizationId, CreateAbsenceTypeRequest request)
-        : IRequest<OneOf<Success<int>, NotFound, BadRequest, AccessDenied>>
-    {
-        public int OrganizationId { get; } = organizationId;
-        public CreateAbsenceTypeRequest Request { get; } = request;
-    }
+    public sealed record Command(int OrganizationId, CreateAbsenceTypeRequest Request) : IRequest<OneOf<Success<int>, NotFound, BadRequest, AccessDenied>>;
 
     internal sealed class Handler(AbsenceContext db, IOrganizationAccess organizationAccess)
         : IRequestHandler<Command, OneOf<Success<int>, NotFound, BadRequest, AccessDenied>>

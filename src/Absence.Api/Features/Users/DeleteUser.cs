@@ -18,10 +18,7 @@ public class DeleteUserRequest
 
 public static class DeleteUser
 {
-    public sealed class Command(DeleteUserRequest request) : IRequest<OneOf<Success, BadRequest, Unauthorized>>
-    {
-        public DeleteUserRequest Request { get; } = request;
-    }
+    public sealed record Command(DeleteUserRequest Request) : IRequest<OneOf<Success, BadRequest, Unauthorized>>;
 
     internal sealed class Handler(
         IUserService userService,

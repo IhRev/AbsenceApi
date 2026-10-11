@@ -22,10 +22,7 @@ public class CreateHolidayDTO
 
 public static class AddHoliday
 {
-    public sealed class Command(CreateHolidayDTO holiday) : IRequest<OneOf<Success<int>, NotFound, BadRequest, AccessDenied>>
-    {
-        public CreateHolidayDTO Holiday { get; } = holiday;
-    }
+    public sealed record Command(CreateHolidayDTO Holiday) : IRequest<OneOf<Success<int>, NotFound, BadRequest, AccessDenied>>;
 
     internal sealed class Handler(
         AbsenceContext db,

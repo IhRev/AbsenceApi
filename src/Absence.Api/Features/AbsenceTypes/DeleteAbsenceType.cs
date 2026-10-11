@@ -10,11 +10,7 @@ namespace Absence.Api.Features.AbsenceTypes;
 
 public static class DeleteAbsenceType
 {
-    public sealed class Command(int organizationId, int typeId) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>
-    {
-        public int OrganizationId { get; } = organizationId;
-        public int TypeId { get; } = typeId;
-    }
+    public sealed record Command(int OrganizationId, int TypeId) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>;
 
     internal sealed class Handler(AbsenceContext db, IOrganizationAccess organizationAccess)
         : IRequestHandler<Command, OneOf<Success, NotFound, BadRequest, AccessDenied>>

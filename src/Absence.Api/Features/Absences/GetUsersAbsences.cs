@@ -10,14 +10,7 @@ namespace Absence.Api.Features.Absences;
 
 public static class GetUsersAbsences
 {
-    public sealed class Query(DateTimeOffset startDate, DateTimeOffset endDate, int organizationId, List<int> userIds)
-        : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound, AccessDenied>>
-    {
-        public DateTimeOffset StartDate { get; } = startDate;
-        public DateTimeOffset EndDate { get; } = endDate;
-        public int OrganizationId { get; } = organizationId;
-        public List<int> UserIds { get; } = userIds;
-    }
+    public sealed record Query(DateTimeOffset StartDate, DateTimeOffset EndDate, int OrganizationId, List<int> UserIds) : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound, AccessDenied>>;
 
     internal sealed class Handler(
         AbsenceContext db,

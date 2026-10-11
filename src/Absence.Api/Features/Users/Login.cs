@@ -17,10 +17,7 @@ public class UserCredentials
 
 public static class Login
 {
-    public sealed class Command(UserCredentials credentials) : IRequest<OneOf<AuthTokens, BadRequest>>
-    {
-        public UserCredentials Credentials { get; } = credentials;
-    }
+    public sealed record Command(UserCredentials Credentials) : IRequest<OneOf<AuthTokens, BadRequest>>;
 
     internal sealed class Handler(
         IUserService userService,

@@ -10,11 +10,7 @@ namespace Absence.Api.Features.Organizations;
 
 public static class DeleteMember
 {
-    public sealed class Command(int organizationId, int memberId) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>
-    {
-        public int OrganizationId { get; } = organizationId;
-        public int MemberId { get; } = memberId;
-    }
+    public sealed record Command(int OrganizationId, int MemberId) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>;
 
     internal sealed class Handler(
         IOrganizationAccess organizationAccess,

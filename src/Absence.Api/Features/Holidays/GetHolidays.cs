@@ -9,13 +9,7 @@ namespace Absence.Api.Features.Holidays;
 
 public static class GetHolidays
 {
-    public sealed class Query(int organizationId, DateTimeOffset startDate, DateTimeOffset endDate)
-        : IRequest<OneOf<Success<IEnumerable<HolidayDTO>>, NotFound>>
-    {
-        public int OrganizationId { get; } = organizationId;
-        public DateTimeOffset StartDate { get; } = startDate;
-        public DateTimeOffset EndDate { get; } = endDate;
-    }
+    public sealed record Query(int OrganizationId, DateTimeOffset StartDate, DateTimeOffset EndDate) : IRequest<OneOf<Success<IEnumerable<HolidayDTO>>, NotFound>>;
 
     internal sealed class Handler(
         AbsenceContext db,

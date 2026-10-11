@@ -9,7 +9,7 @@ namespace Absence.Api.Features.Users;
 
 public static class GetUserDetails
 {
-    public sealed class Query : IRequest<OneOf<Success<UserDetails>, Unauthorized>>;
+    public sealed record Query : IRequest<OneOf<Success<UserDetails>, Unauthorized>>;
 
     internal sealed class Handler(IUser currentUser, IUserService userService)
         : IRequestHandler<Query, OneOf<Success<UserDetails>, Unauthorized>>

@@ -17,10 +17,7 @@ public class RefreshTokenRequest
 
 public static class RefreshToken
 {
-    public sealed class Command(RefreshTokenRequest refreshTokenRequest) : IRequest<OneOf<AuthTokens, BadRequest>>
-    {
-        public RefreshTokenRequest RefreshTokenRequest { get; } = refreshTokenRequest;
-    }
+    public sealed record Command(RefreshTokenRequest RefreshTokenRequest) : IRequest<OneOf<AuthTokens, BadRequest>>;
 
     internal sealed class Handler(
         IUserService userService,

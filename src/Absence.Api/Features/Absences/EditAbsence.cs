@@ -28,10 +28,7 @@ public class EditAbsenceDTO
 
 public static class EditAbsence
 {
-    public sealed class Command(EditAbsenceDTO absence) : IRequest<OneOf<Persisted, Queued, NotFound, BadRequest, AccessDenied>>
-    {
-        public EditAbsenceDTO Absence { get; } = absence;
-    }
+    public sealed record Command(EditAbsenceDTO Absence) : IRequest<OneOf<Persisted, Queued, NotFound, BadRequest, AccessDenied>>;
 
     internal sealed class CommandValidator : AbstractValidator<Command>
     {

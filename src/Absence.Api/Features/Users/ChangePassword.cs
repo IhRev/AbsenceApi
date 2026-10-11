@@ -18,10 +18,7 @@ public class ChangePasswordRequest
 
 public static class ChangePassword
 {
-    public sealed class Command(ChangePasswordRequest request) : IRequest<OneOf<Success, BadRequest, Unauthorized>>
-    {
-        public ChangePasswordRequest Request { get; } = request;
-    }
+    public sealed record Command(ChangePasswordRequest Request) : IRequest<OneOf<Success, BadRequest, Unauthorized>>;
 
     internal sealed class Handler(IUserService userService, IUser currentUser) : IRequestHandler<Command, OneOf<Success, BadRequest, Unauthorized>>
     {

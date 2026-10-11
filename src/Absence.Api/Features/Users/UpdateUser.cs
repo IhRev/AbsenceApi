@@ -18,10 +18,7 @@ public class UpdateUserRequest
 
 public static class UpdateUser
 {
-    public sealed class Command(UpdateUserRequest userDetails) : IRequest<OneOf<Success, Unauthorized>>
-    {
-        public UpdateUserRequest UserDetails { get; } = userDetails;
-    }
+    public sealed record Command(UpdateUserRequest UserDetails) : IRequest<OneOf<Success, Unauthorized>>;
 
     internal sealed class Handler(IUserService userService, IUser currentUser) : IRequestHandler<Command, OneOf<Success, Unauthorized>>
     {

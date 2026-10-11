@@ -7,7 +7,7 @@ namespace Absence.Api.Features.Invitations;
 
 public static class GetUserInvitations
 {
-    public sealed class Query : IRequest<IEnumerable<InvitationDTO>>;
+    public sealed record Query : IRequest<IEnumerable<InvitationDTO>>;
 
     internal sealed class Handler(
         IUser user,

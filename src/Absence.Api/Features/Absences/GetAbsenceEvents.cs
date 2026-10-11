@@ -10,10 +10,7 @@ namespace Absence.Api.Features.Absences;
 
 public static class GetAbsenceEvents
 {
-    public sealed class Query(int organizationId) : IRequest<OneOf<Success<IEnumerable<AbsenceEventDTO>>, NotFound, AccessDenied>>
-    {
-        public int OrganizationId { get; } = organizationId;
-    }
+    public sealed record Query(int OrganizationId) : IRequest<OneOf<Success<IEnumerable<AbsenceEventDTO>>, NotFound, AccessDenied>>;
 
     internal sealed class Handler(
         AbsenceContext db,

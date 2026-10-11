@@ -22,10 +22,7 @@ public class InviteUserToOrganizationDTO
 
 public static class InviteUser
 {
-    public sealed class Command(InviteUserToOrganizationDTO invite) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>
-    {
-        public InviteUserToOrganizationDTO Invite { get; } = invite;
-    }
+    public sealed record Command(InviteUserToOrganizationDTO Invite) : IRequest<OneOf<Success, NotFound, BadRequest, AccessDenied>>;
 
     internal sealed class Handler(
         AbsenceContext db,

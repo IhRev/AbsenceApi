@@ -11,11 +11,7 @@ namespace Absence.Api.Features.Invitations;
 
 public static class AcceptInvitation
 {
-    public sealed class Command(int id, bool accepted) : IRequest<OneOf<Success, NotFound, AccessDenied>>
-    {
-        public int Id { get; } = id;
-        public bool Accepted { get; } = accepted;
-    }
+    public sealed record Command(int Id, bool Accepted) : IRequest<OneOf<Success, NotFound, AccessDenied>>;
 
     internal sealed class Handler(
         AbsenceContext db,

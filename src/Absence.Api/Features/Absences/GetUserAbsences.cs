@@ -9,13 +9,7 @@ namespace Absence.Api.Features.Absences;
 
 public static class GetUserAbsences
 {
-    public sealed class Query(DateTimeOffset startDate, DateTimeOffset endDate, int organizationId)
-        : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound>>
-    {
-        public DateTimeOffset StartDate { get; } = startDate;
-        public DateTimeOffset EndDate { get; } = endDate;
-        public int OrganizationId { get; } = organizationId;
-    }
+    public sealed record Query(DateTimeOffset StartDate, DateTimeOffset EndDate, int OrganizationId) : IRequest<OneOf<Success<IEnumerable<AbsenceDTO>>, NotFound>>;
 
     internal sealed class Handler(
         AbsenceContext db,

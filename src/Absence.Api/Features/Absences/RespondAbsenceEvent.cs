@@ -12,11 +12,7 @@ namespace Absence.Api.Features.Absences;
 
 public static class RespondAbsenceEvent
 {
-    public sealed class Command(int id, bool accepted) : IRequest<OneOf<Success, NotFound, AccessDenied, BadRequest>>
-    {
-        public int Id { get; } = id;
-        public bool Accepted { get; } = accepted;
-    }
+    public sealed record Command(int Id, bool Accepted) : IRequest<OneOf<Success, NotFound, AccessDenied, BadRequest>>;
 
     internal sealed class Handler(
         AbsenceContext db,

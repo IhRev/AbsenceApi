@@ -18,11 +18,7 @@ public class DeleteOrganizationRequest
 
 public static class DeleteOrganization
 {
-    public sealed class Command(int id, DeleteOrganizationRequest request) : IRequest<OneOf<Success, NotFound, AccessDenied, Unauthorized>>
-    {
-        public int Id { get; } = id;
-        public DeleteOrganizationRequest Request { get; } = request;
-    }
+    public sealed record Command(int Id, DeleteOrganizationRequest Request) : IRequest<OneOf<Success, NotFound, AccessDenied, Unauthorized>>;
 
     internal sealed class Handler(
         IUser user,

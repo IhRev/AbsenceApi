@@ -9,7 +9,7 @@ namespace Absence.Api.Features.Users;
 
 public static class Logout
 {
-    public sealed class Command : IRequest<OneOf<Success, Unauthorized>>;
+    public sealed record Command : IRequest<OneOf<Success, Unauthorized>>;
 
     internal sealed class Handler(IUserService userService, IUser currentUser) : IRequestHandler<Command, OneOf<Success, Unauthorized>>
     {
